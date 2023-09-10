@@ -62,14 +62,29 @@ df['date_time'] = pd.to_datetime(df['Timestamp'])
 sydney_tz = pytz.timezone('Australia/Sydney')
 df['date_time_sydney'] = df['date_time'].dt.tz_convert(sydney_tz)
 df['sydney_date'] = df['date_time_sydney'].dt.date
-df['50-day SMA'] = df['Close'].rolling(window=50).mean()
+df['100-day SMA'] = df['Close'].rolling(window=100).mean()
 df['200-day SMA'] = df['Close'].rolling(window=200).mean()
 
-df['cross']=np.where(df['50-day SMA'].isnull() | df['200-day SMA'].isnull(), "Null",
-                    np.where((df['50-day SMA']>df['200-day SMA']), '50-day>200-day','50-day<=200-day'))
+df['cross']=np.where(df['100-day SMA'].isnull() | df['200-day SMA'].isnull(), "Null",
+                    np.where((df['100-day SMA']>df['200-day SMA']), '100-day>200-day','100-day<=200-day'))
 df['cross(pre)']=df['cross'].shift(1)
 
 df['key_point']=np.where(df['cross']==df['cross(pre)'], "Null","Yes")
+
+df['triger_cross']=np.where(df['100-day SMA'].isnull() | df['200-day SMA'].isnull(), "Null",
+                            np.where(df['Close'].astype(float)>df['100-day SMA'], 'Close>100-day','Close<=100-day'))
+df['triger_cross(pre)']=df['triger_cross'].shift(1)
+
+df['trigger_point']=np.where(df['triger_cross']==df['triger_cross(pre)'], "Null",
+                            np.where(df['triger_cross']=='Close>100-day',"buy_trigger","sell_trigger"))
+
+df['confirm_cross']=np.where(df['100-day SMA'].isnull() | df['200-day SMA'].isnull(), "Null",
+                            np.where(df['Close'].astype(float)>df['200-day SMA'], 'Close>200-day','Close<=200-day'))
+df['confirm_cross(pre)']=df['confirm_cross'].shift(1)
+
+df['confirm_point']=np.where(df['confirm_cross']==df['confirm_cross(pre)'], "Null",
+                            np.where(df['confirm_cross']=='Close>200-day',"buy_confirm","sell_confirm"))
+
 
 print(df)
 
