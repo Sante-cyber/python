@@ -5,6 +5,7 @@ from datetime import datetime
 from python.common import login,password,server
 
 
+mt.initialize()
 mt.login(login,password,server)
 
 symbol='AUDUSD'

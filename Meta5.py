@@ -23,6 +23,12 @@ num_symbols
 
 symbols=mt.symbols_get()
 symbols
+df=pd.DataFrame(symbols)
+a=df.iloc[:,[93,95]]
+a.reset_index(inplace=True)
+b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors')) | (a.iloc[:,2].str.contains('Exotics'))]
+c=b[~a.iloc[:,1].str.contains('.a')]
+
 
 symbols_info=mt.symbol_info("AUDUSD")._asdict()
 symbols_info

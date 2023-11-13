@@ -2,14 +2,24 @@ import MetaTrader5 as mt
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
-from python.common import login,password,server
+from common import login,password,server
+import time
+import os
+import sys
 
+# os.environ['PYSPARK_PYTHON'] = sys.executable
+# os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
+# login=51339268
+# password='UZcMdrwV'
+# server='ICMarkets-Demo'
+
+mt.initialize()
 
 mt.login(login,password,server)
 
 symbol='AUDUSD'
 timeframe=mt.TIMEFRAME_M10
-volume=0.1
+volume=0.01
 strategy_name='ma_trendfollowing'
 
 def get_sma(symbol,timeframe,period):
@@ -52,7 +62,6 @@ def close_positions(order_type):
     }
     if mt.positions_total()>0:
         positions=mt.positions_get()
-
         positions_df=pd.DataFrame(positions,columns=positions[0]._asdict().keys())
 
         if order_type!='all':
@@ -105,33 +114,35 @@ if __name__=='__main__':
 
     while True:
         account_info=mt.account_info()
+        print(datetime.now(),
+              '| Login:',account_info.login,
+              '| Balance: ',account_info.balance,
+              '| Equity: ', account_info.equity)
+        
+        num_positions=mt.positions_total()
+
+        if not check_allowed_trading_hours():
+            close_positions('all')
+        
+        fast_sma=get_sma(symbol,timeframe,10)
+        slow_sma=get_sma(symbol,timeframe,100)
+
+        if fast_sma>slow_sma:
+            close_positions('sell')
+
+            if num_positions==0 and check_allowed_trading_hours():
+                order_result=market_order(symbol,volume,'buy')
+                print(order_result)
+        
+        elif fast_sma<slow_sma:
+            close_positions('buy')
+
+            if num_positions==0 and check_allowed_trading_hours():
+                order_result=market_order(symbol,volume,'sell')
+                print(order_result)
+        
+
+        time.sleep(1)
 
 
 
-
-
-
-def get_signal(x):
-    if 9<=x['hour']<=18:
-        if x['sma_10']>x['sma_100']:
-            return 1
-        elif x['sma_10']<x['sma_100']:
-            return -1
-    return 0
-
-bars2['signal']=bars2.apply(get_signal,axis=1)
-bars2['prev_price']=bars2['close'].shift(1)
-bars2['price_change']=bars2['close']-bars2['prev_price']
-
-bars2['signal_change']=(bars2['signal']-bars2['signal'].shift(1)).abs()
-bars2['commission']=bars2.apply(lambda x:commission*x['signal_change']*x['trade_volume'],axis=1)*100000
-bars2
-
-bars3=bars2.dropna().copy()
-bars3['profit']=bars3['signal']*bars3['price_change']*bars3['trade_volume']*100000
-bars3['grossip_profit']=bars3['profit'].cumsum()
-bars3['net_profit']=bars3['grossip_profit']-bars3['commission'].cumsum()
-print(bars3)
-
-fig=px.line(bars3,'time', ['grossip_profit','net_profit'],title='AUDUSD Backtest MA Trendfollowing')
-fig.show()
