@@ -6,9 +6,9 @@ from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
 
-# login=51339268
-# password='UZcMdrwV'
-# server='ICMarkets-Demo'
+login=51339268
+password='UZcMdrwV'
+server='ICMarkets-Demo'
 
 mt.initialize()
 mt.login(login,password,server)
@@ -39,6 +39,12 @@ class position:
         self.close_price=close_price
         self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
         self.status='closed'
+
+    def monitor_equity(self,close_date_time,close_price):
+        self.close_datetime=close_date_time
+        self.close_price=close_price
+        self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
+        self.status='open'
     
     def _asdict(self):
         return {
@@ -57,7 +63,7 @@ class position:
 
 class Strategy:
 
-    def __init__(self,df,starting_balance,volume):
+    def __init__(self,df,starting_balance,volume,df1):
         self.starting_balance=starting_balance
         self.volume=volume
         self.positions=[]
@@ -65,7 +71,12 @@ class Strategy:
     
     def get_positions_df(self):
         df=pd.DataFrame([position._asdict() for position in self.positions])
-        df['pnl']=df['profit'].cumsum()+self.starting_balance
+        df['pnl_close']=df['profit'].cumsum()+self.starting_balance
+        return df
+    
+    def get_equity_df(self):
+        df=pd.DataFrame([position._asdict() for position in self.positions])
+        df['pnl_equity']=df['profit'].cumsum()+self.starting_balance
         return df
     
     def add_position(self,position):
@@ -79,17 +90,32 @@ class Strategy:
     
     def run(self):
         for i, data in self.data.iterrows():
-            if data.signal=='buy' and self.trading_allowed():
-                sl=data.close-3*data.sd
-                tp=data.close+2*data.sd
+            if data.signal=='buy' and data.hour>=9 and data.hour<=18 and self.trading_allowed():
+                sl=data.close-1*data.sd
+                tp=data.close+1.5*data.sd
                 self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
             elif data.signal=='sell' and self.trading_allowed():
-                sl=data.close+3*data.sd
-                tp=data.close-2*data.sd
+                sl=data.close+1*data.sd
+                tp=data.close-1.5*data.sd
                 self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
 
             for pos in self.positions:
                 if pos.status=='open':
+                    profit=(data.close_price-pos.open_price)*pos.volume if pos.order_type=='buy' else (pos.open_price-data.close_price)*pos.volume
+                    equity={
+                            'open_datetime':pos.open_datetime,
+                            'open_price':pos.open_price,
+                            'order_type':pos.order_type,
+                            'volume': pos.volume,
+                            'sl':pos.sl,
+                            'tp':pos.tp,
+                            'close_datetime':data.close_datetime,
+                            'close_price':data.close_price,
+                            'profit':profit,
+                            'status':pos.status,
+                            'symbol':pos.symbol
+                        }
+                    df1=df1.append(equity, ignore_index=True)
                     if (pos.sl>=data.close and pos.order_type=='buy'):
                         pos.close_position(data.time,pos.sl)
                     elif (pos.sl<=data.close and pos.order_type=='sell'):
@@ -105,7 +131,7 @@ symbols=mt.symbols_get()
 df=pd.DataFrame(symbols)
 a=df.iloc[:,[93,95]]
 a.reset_index(inplace=True)
-a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
+# a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
 b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
 c=b[(~a.iloc[:,1].str.contains('.a'))]
 # c=b[(~a.iloc[:,1].str.contains('.a')) & (~a.iloc[:,1].str.contains('EURZAR')) & (~a.iloc[:,1].str.contains('EURTRY')) 
@@ -120,10 +146,11 @@ aa=a.iloc[40:]
 
 for currency in c.iloc[:,1]:
     print(f'{currency}--start')
-    bars=mt.copy_rates_range(currency,mt.TIMEFRAME_D1,datetime(2020,1,1),datetime.now())
+    bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(2023,1,1),datetime.now())
     bars
     df=pd.DataFrame(bars)
     df['time']=pd.to_datetime(df['time'],unit='s')
+    df['hour']=df['time'].dt.hour
 
     # fig=px.line(df,x='time',y='close')
     # fig.show()
@@ -140,7 +167,8 @@ for currency in c.iloc[:,1]:
        
     df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'])
     print(f'{currency} have been got and start run the strategy')
-    bollinger_strategy=Strategy(df,200,1000)
+    df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
+    bollinger_strategy=Strategy(df,200,1000,df1)
     result=bollinger_strategy.run()
     result.dropna(inplace=True)
     last=result[-1:]

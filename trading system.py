@@ -1,21 +1,24 @@
 import MetaTrader5 as mt
 
-class trade_set:
-#------------------initially class attribute value------------------#
-    def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol):
-        self.order_type=order_type
+class trade_system:
+
+
+
+
+#------------------initially class trade system value------------------#
+    def __init__(self,symbol,timeframe,volume,deviation,magic,sl,tp):
+        self.symbol=symbol
+        self.timeframe=timeframe
+        self.deviation=deviation
+        self.magic=magic
         self.volume=volume
         self.sl=sl
         self.tp=tp
-        self.close_datetime=None
-        self.close_price=None
-        self.profit=None
-        self.status='open'
-        self.symbol=symbol
+      
 
 #-------------make order-------------------------------------#
 
-    def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
+    def market_order(self,order_type):
 
         order_type_dict={
                 'buy':mt.ORDER_TYPE_BUY,
@@ -23,21 +26,21 @@ class trade_set:
             }
         
         price_dict={
-            'buy':mt.symbol_info_tick(symbol).ask,
-            'sell':mt.symbol_info_tick(symbol).bid
+            'buy':mt.symbol_info_tick(self.symbol).ask,
+            'sell':mt.symbol_info_tick(self.symbol).bid
         }
 
         request={
             "action":mt.TRADE_ACTION_DEAL,
-            "symbol":symbol,
-            "volume":volume,
+            "symbol":self.symbol,
+            "volume":self.volume,
             "type":order_type_dict[order_type],
             "price":price_dict[order_type],
-            "deviation":deviation,
-            "magic":magic,
-            'sl':stoploss,
-            'tp':takeprofit,
-            "deviation":deviation,
+            "deviation":self.deviation,
+            "magic":self.magic,
+            'sl':self.sl,
+            'tp':self.tp,
+            "deviation":self.deviation,
             "comment":"python market order",
             "type_time":mt.ORDER_TIME_GTC,
             "type_filling":mt.ORDER_FILLING_IOC,
