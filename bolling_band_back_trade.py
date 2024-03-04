@@ -74,8 +74,12 @@ if mt.initialize():
     b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
     symbols=b[(~a.iloc[:,1].str.contains('.a'))]
     positions=mt.positions_get()
-    positions_df=pd.DataFrame(positions,columns=positions[0]._asdict().keys())
-    total_volume=positions_df['volume'].sum()
+    if  len(positions) !=0:
+       positions_df=pd.DataFrame(positions,columns=positions[0]._asdict().keys())
+       total_volume=positions_df['volume'].sum()
+    else:
+       total_volume=0
+       
 while total_volume<=3:
 
     for symbol in symbols.iloc[:,1]:
@@ -92,7 +96,6 @@ while total_volume<=3:
                 signal,standard_deviation=get_signal(symbol) 
                 if signal is not None:
                     print(f"It's good chance to {signal} to this symbol--{symbol}")
-        
         
         if signal=='buy':
             tick=mt.symbol_info_tick(symbol) 
