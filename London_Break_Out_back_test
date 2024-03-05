@@ -5,9 +5,6 @@ import plotly.graph_objects as go
 from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
-import calendar
-
-
 
 mt.initialize()
 mt.login(login,password,server)
@@ -139,8 +136,8 @@ class Strategy:
                         elif (pos.tp>=data.close and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.tp)
             return self.get_positions_df()
-
-
+        
+        
 symbols=mt.symbols_get()
 df=pd.DataFrame(symbols)
 a=df.iloc[:,[93,95]]
@@ -148,73 +145,18 @@ a.reset_index(inplace=True)
 # a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
 b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
 c=b[(~a.iloc[:,1].str.contains('.a'))]
-# c=b[(~a.iloc[:,1].str.contains('.a')) & (~a.iloc[:,1].str.contains('EURZAR')) & (~a.iloc[:,1].str.contains('EURTRY')) 
-#     & (~a.iloc[:,1].str.contains('NOK')) & (~a.iloc[:,1].str.contains('SEKJPY')) & (~a.iloc[:,1].str.contains('SGDJPY'))]
-
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 # volume = list(range(1000, 10000 + 1000, 1000))
-years=list(range(2020, 2023 + 1, 1))
-months=list(range(1, 12 + 1, 1))
-a=c.iloc[:,1]
-
-# aa=a.iloc[40:]
+# years=list(range(2020, 2023 + 1, 1))
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
-for year in years:
-  for month in months:
-    end_date = calendar.monthrange(year, month)[1]
-    for currency in c.iloc[:,1]:
-        print(year)
-        print(month)
-        print(end_date)
-        # currency='NZDUSD'
-        # year=2020
-        print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M30,datetime(year,month,1),datetime(year,month,end_date))
-        # datetime.now()
-        df=pd.DataFrame(bars)
-        print(df)
-        df['time']=pd.to_datetime(df['time'],unit='s')
-        df['hour']=df['time'].dt.hour
 
-        # fig=px.line(df,x='time',y='close')
-        # fig.show()
-
-        df['sma']=df['close'].rolling(20).mean()
-        df['sd']=df['close'].rolling(20).std()
-        df['lb']=df['sma']-2*df['sd']
-        df['ub']=df['sma']+2*df['sd']
-        df.dropna(inplace=True)
-
-        # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
-        # fig.show()
-    
-        
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'])
-        print(f'{currency} have been got and start run the strategy')
-    # for i in volume:
-        bollinger_strategy=Strategy(df,200,1000)
-        trade=True
-        result=bollinger_strategy.run(trade)
-        result.dropna(inplace=True)
-        last=result[-1:]
-        df1=pd.concat([df1,result])
-        df2=pd.concat([df2,last])
-        j=j+1
-        print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/M30_month/result_detail_0.01.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/M30_month/final_result_detail_0.01.csv')
-print('finish')
-    # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
-    # for i,position in result.iterrows():
-    #     if position.status=='closed':
-    #         fig.add_shape(type='line',x0=position.open_datetime,y0=position.open_price,x1=position.close_datetime,y1=position.close_price)
-    #         line=dict(
-    #             color='green' if position.profit>=0 else "dark",
-    #             width=3
-    #         )
-    # fig.show()
-
-
-
+year=2023
+currency='GBPJPY'
+bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M15,datetime(year,1,1),datetime(year,12,31))
+# datetime.now()
+df=pd.DataFrame(bars)
+print(df)
+df['time']=pd.to_datetime(df['time'],unit='s')
+df['hour']=df['time'].dt.hour
