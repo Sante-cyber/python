@@ -153,7 +153,7 @@ c=b[(~a.iloc[:,1].str.contains('.a'))]
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volume = list(range(1000, 10000 + 1000, 1000))
+# volume = list(range(1000, 10000 + 1000, 1000))
 years=list(range(2020, 2023 + 1, 1))
 
 a=c.iloc[:,1]
@@ -164,7 +164,7 @@ for year in years:
     for currency in c.iloc[:,1]:
         # currency='EURUSD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1),datetime(year,12,31))
+        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1),datetime(year,12,31))
         # datetime.now()
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
@@ -195,8 +195,8 @@ for year in years:
         df2=pd.concat([df2,last])
         j=j+1
         print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/result_detail_0.01.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/final_result_detail_0.01.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/result_detail_0.01_H1.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/final_result_detail_0.01_H1.csv')
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
     # for i,position in result.iterrows():
