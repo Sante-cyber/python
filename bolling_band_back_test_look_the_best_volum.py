@@ -6,7 +6,9 @@ from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
 
-
+login=51658107
+password='VxBvOa*4'
+server='ICMarkets-Demo'
 
 mt.initialize()
 mt.login(login,password,server)
@@ -143,9 +145,12 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 10000 + 1000, 1000))
-years=list(range(2020, 2023 + 1, 1))
-symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
+# volumes = list(range(1000, 10000 + 1000, 1000))
+# years=list(range(2020, 2023 + 1, 1))
+# symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
+symbol=['NZDCAD']
+years=[2024]
+volumes=[10000]
 
 # aa=a.iloc[40:]
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])

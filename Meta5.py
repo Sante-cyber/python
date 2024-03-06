@@ -71,12 +71,13 @@ num_order_history=mt.history_orders_total(datetime(2023,1,1),datetime(2023,8,19)
 num_order_history
 print(num_order_history)
 
+a=mt.history_orders_get(datetime(2023,1,1),datetime(2024,3,7))
 #list history orders
 order_history=mt.history_orders_get(datetime(2023,1,1),datetime(2023,8,25))
 order_history
 
 #number of history deals
-num_deal_history=mt.history_deals_total(datetime(2023,1,1),datetime(2023,8,25))
+num_deal_history=mt.history_deals_total(datetime(2023,1,1),datetime(2024,3,7))
 num_deal_history
 
 #list of history deals

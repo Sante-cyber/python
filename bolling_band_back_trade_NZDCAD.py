@@ -7,6 +7,7 @@ from common import login,password,server
 import numpy as np
 import time
 import schedule
+import datetime
 
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
 
@@ -47,7 +48,7 @@ def get_signal(symbol):
     sma=df['close'].mean()
     sd=df['close'].std()
     lower_band=sma-STANDARD_DEVIATIONS*sd
-    upper_band=sma-STANDARD_DEVIATIONS*sd
+    upper_band=sma+STANDARD_DEVIATIONS*sd
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
     if last_close_price<lower_band and hour>=9 and hour<=18:
@@ -65,7 +66,7 @@ if mt.initialize():
     print('connect to MetaTrader5')
     mt.login(login,password,server)
 
-    TIMEFRAME=mt.TIMEFRAME_D1
+    TIMEFRAME=mt.TIMEFRAME_H1
     VOLUME=0.1
     DEVIATION=20
     MAGIC=10
@@ -73,7 +74,7 @@ if mt.initialize():
     STANDARD_DEVIATIONS=2
     TP_SD=1.5
     SL_SD=1
-    symbol='NZDCAD'
+    symbol='NZDCAD.a'
 
     # symbols=mt.symbols_get()
     # df=pd.DataFrame(symbols)
@@ -87,9 +88,11 @@ if mt.initialize():
     #    total_volume=positions_df['volume'].sum()
     # else:
     #    total_volume=0
-   
+
+now = datetime.datetime.now()
 
 while True:
+  
     signal=None
     print(f'Stragety symbol:{symbol}')
 
@@ -110,7 +113,7 @@ while True:
         print(result)
     else: print(f'there is no trade chance for this symbol--{symbol}')
 
-    time.sleep(3600)
+    time.sleep(1800)
 
 
 
