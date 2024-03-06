@@ -64,7 +64,7 @@ if mt.initialize():
     MAGIC=10
     SMA_PERIOD=20
     STANDARD_DEVIATIONS=2
-    TP_SD=2
+    TP_SD=1.5
     SL_SD=1
 
     symbols=mt.symbols_get()

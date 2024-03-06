@@ -145,7 +145,7 @@ df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 10000 + 1000, 1000))
 years=list(range(2020, 2023 + 1, 1))
-symbol=['GBPCAD','EURAUD','GBPNZD','EURNZD','GBPAUD']
+symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
 # aa=a.iloc[40:]
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
@@ -153,10 +153,12 @@ df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume
 for year in years:
     print(year)
     for currency in symbol:
-        # currency='EURUSD'
+        # currency='NZDCAD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1),datetime(year,12,31))
-        # datetime.now()
+        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
+        # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
+      
+#  datetime.now()
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
         df['hour']=df['time'].dt.hour
@@ -188,8 +190,8 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/result_detail.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/final_result_detail.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
     # for i,position in result.iterrows():
