@@ -40,6 +40,7 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
     order_result=mt.order_send(request)
     return(order_result)
 
+
 def get_signal(symbol):
     bars=mt.copy_rates_from_pos(symbol,TIMEFRAME,1,SMA_PERIOD)
     df=pd.DataFrame(bars)
@@ -52,11 +53,11 @@ def get_signal(symbol):
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
     if last_close_price<lower_band and hour>=9 and hour<=18:
-        return 'buy', sd
+        return 'buy', sd, last_close_price,upper_band,lower_band,hour
     elif last_close_price>upper_band and hour>=9 and hour<=18:
-        return 'sell',sd
+        return 'sell',sd,last_close_price,upper_band,lower_band,hour
     else:
-        return [None,None]
+        return [None,sd,last_close_price,upper_band,lower_band,hour]
 
 
 
@@ -68,7 +69,7 @@ if mt.initialize():
 
     TIMEFRAME=mt.TIMEFRAME_H1
     VOLUME=0.1
-    DEVIATION=20
+    DEVIATION=5
     MAGIC=10
     SMA_PERIOD=20
     STANDARD_DEVIATIONS=2
@@ -95,25 +96,28 @@ while True:
   
     signal=None
     print(f'Stragety symbol:{symbol}')
-
+    
     if mt.positions_total()==0:
-        signal,standard_deviation=get_signal(symbol)
+        signal,standard_deviation,last_close_price,upper_band,lower_band,hour=get_signal(symbol)
         if signal is not None:
             print(f"It's good chance to {signal} to this symbol--{symbol}")
 
     if signal=='buy':
         tick=mt.symbol_info_tick(symbol) 
-        print(tick)
-        result=market_order(symbol,VOLUME,signal,20,10,tick.bid-SL_SD*standard_deviation,tick.bid+TP_SD*standard_deviation)
-        print(result)
+        print(f'cuurently_bid_price_tick--{tick.ask}--less than {last_close_price+DEVIATION/10000} make order')
+        if tick.ask<=(last_close_price+DEVIATION/10000):
+            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.ask-SL_SD*standard_deviation,tick.ask+TP_SD*standard_deviation)
+            print(result)
+            print(f'currently bid')
     elif signal=='sell':
         tick=mt.symbol_info_tick(symbol) 
-        print(tick)
-        result=market_order(symbol,VOLUME,signal,20,10,tick.bid+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
+        print(f'cuurently_bid_price_tick--{tick.bid}--bigger than {last_close_price-DEVIATION/10000} can make order')
+        if tick.bid>=(last_close_price-DEVIATION/10000):
+            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.bid+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
         print(result)
-    else: print(f'there is no trade chance for this symbol--{symbol}')
+    else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{last_close_price}--upper_band--{upper_band}--lower_band--{lower_band}--hour--{hour}')
 
-    time.sleep(1800)
+    time.sleep(60)
 
 
 

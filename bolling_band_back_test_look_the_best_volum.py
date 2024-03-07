@@ -6,9 +6,9 @@ from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
 
-login=51658107
-password='VxBvOa*4'
-server='ICMarkets-Demo'
+# login=51658107
+# password='VxBvOa*4'
+# server='ICMarkets-Demo'
 
 mt.initialize()
 mt.login(login,password,server)
@@ -145,12 +145,12 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-# volumes = list(range(1000, 10000 + 1000, 1000))
-# years=list(range(2020, 2023 + 1, 1))
+volumes = list(range(1000, 10000 + 1000, 1000))
+years=list(range(2020, 2023 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 symbol=['NZDCAD']
-years=[2024]
-volumes=[10000]
+# years=[2024]
+# volumes=[10000]
 
 # aa=a.iloc[40:]
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
@@ -161,7 +161,7 @@ for year in years:
         # currency='NZDCAD'
         print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
-        # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
+        bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
 #  datetime.now()
         df=pd.DataFrame(bars)
@@ -176,6 +176,7 @@ for year in years:
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
+        df.to_csv('C:/Ally/a.csv')
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
