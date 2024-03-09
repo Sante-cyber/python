@@ -3,11 +3,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-from common import login,password,server
+from common import login_real,password_real,server_real
 import numpy as np
 import time
 import schedule
-import datetime
+# import datetime
+import pytz
 
 # login=51658107
 # password='VxBvOa*4'
@@ -73,7 +74,7 @@ if mt.initialize():
     # login=51658107
     # password='VxBvOa*4'
     # server='ICMarkets-Demo'
-    mt.login(login,password,server)
+    mt.login(login_real,password_real,server_real)
 
     TIMEFRAME=mt.TIMEFRAME_H1
     VOLUME=0.1
@@ -98,7 +99,23 @@ if mt.initialize():
     # else:
     #    total_volume=0
 
-now = datetime.datetime.now()
+# Define Sydney time zone
+sydney_tz = pytz.timezone('Australia/Sydney')
+
+# Define GMT+3 time zone
+gmt_tz = pytz.timezone('Etc/GMT-2')
+
+# Get current time in Sydney
+sydney_time = datetime.now(sydney_tz)
+
+# Convert Sydney time to GMT+3
+gmt_time = sydney_time.astimezone(gmt_tz)
+
+print("Sydney Time:", sydney_time.strftime('%Y-%m-%d %H:%M:%S %Z%z'))
+print("GMT Time:", gmt_time.strftime('%Y-%m-%d %H:%M:%S %Z%z'))
+
+gmt_hour=gmt_time.hour
+
 
 while True:
   
