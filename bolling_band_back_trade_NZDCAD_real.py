@@ -58,9 +58,9 @@ def get_signal(symbol):
     upper_band=sma+STANDARD_DEVIATIONS*sd
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
-    if last_close_price<lower_band and hour>=9 and hour<=18:
+    if last_close_price<lower_band and hour>=9 and hour<=21:
         return 'buy', sd, last_close_price,upper_band,lower_band,hour
-    elif last_close_price>upper_band and hour>=9 and hour<=18:
+    elif last_close_price>upper_band and hour>=9 and hour<=21:
         return 'sell',sd,last_close_price,upper_band,lower_band,hour
     else:
         return [None,sd,last_close_price,upper_band,lower_band,hour]
