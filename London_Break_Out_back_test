@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
+import pytz
 
 login=51658107
 password='VxBvOa*4'
@@ -166,3 +167,23 @@ print(df)
 df['time']=pd.to_datetime(df['time'],unit='s')
 df['time_gmt'] = df['time'] - pd.Timedelta(hours=3)
 df['gmt_hour']=df['time_gmt'].dt.hour
+
+
+def last_sunday_in_march(year):
+    # Start with the last day of March
+    last_day_of_march = datetime(year, 3, 31)
+
+    # Find the day of the week for the last day of March (0 = Monday, 6 = Sunday)
+    day_of_week = last_day_of_march.weekday()
+
+    # Calculate the number of days to subtract to get to the last Sunday
+    days_to_subtract = day_of_week + 1  # Add 1 to get to Sunday
+
+    # Subtract the number of days to get to the last Sunday
+    last_sunday = last_day_of_march - timedelta(days=days_to_subtract)
+
+    return last_sunday
+
+# Example usage:
+year = 2023
+print("Last Sunday in March", year, ":", last_sunday_in_march(year))

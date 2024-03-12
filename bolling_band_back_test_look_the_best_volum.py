@@ -93,9 +93,9 @@ class Strategy:
             for i, data in self.data.iterrows():  
               if trade==True:
                   
-                if data.signal=='buy' and data.hour>=9 and data.hour<=18 and self.trading_allowed():
+                if data.signal=='buy' and data.hour>=9 and data.hour<=21 and self.trading_allowed():
                     sl=data.close-1*data.sd
-                    tp=data.close+1.5*data.sd
+                    tp=data.close+1.8*data.sd
                     self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
                 elif data.signal=='sell' and self.trading_allowed():
                     sl=data.close+1*data.sd
@@ -161,7 +161,7 @@ for year in years:
         # currency='NZDCAD'
         print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
-        bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
+        # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
 #  datetime.now()
         df=pd.DataFrame(bars)
