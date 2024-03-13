@@ -6,6 +6,7 @@ from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
 import pytz
+import datetime as dt
 
 login=51658107
 password='VxBvOa*4'
@@ -158,32 +159,72 @@ j=0
 # years=list(range(2020, 2023 + 1, 1))
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
 
-year=2023
+def last_sunday_of_month(year, month):
+    # Get the last day of the given month
+    last_day_of_month = dt.date(year, month, 1) + dt.timedelta(days=32)
+    last_day_of_month = last_day_of_month.replace(day=1) - dt.timedelta(days=1)
+    
+    # Find the last Sunday
+    while last_day_of_month.weekday() != 6:  # 6 represents Sunday
+        last_day_of_month -= dt.timedelta(days=1)
+    
+    # Combine date with a specific time (midnight)
+    last_sunday_datetime = dt.datetime.combine(last_day_of_month, dt.time.min)
+    
+    return last_sunday_datetime
+
+def get_session(hour):
+    if 0<=hour<8:
+        return 'asian session'
+    else: None
+
+
+year = 2023
+month=3
+last_day_march=last_sunday_of_month(year, month)
+month=10
+last_day_oct=last_sunday_of_month(year, month)
+
 currency='GBPJPY'
 bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M15,datetime(year,1,1),datetime(year,12,31))
 # datetime.now()
 df=pd.DataFrame(bars)
 print(df)
 df['time']=pd.to_datetime(df['time'],unit='s')
-df['time_gmt'] = df['time'] - pd.Timedelta(hours=3)
+
+df['time_gmt'] = np.where( (df['time']>=last_day_march) & (df['time'] <= last_day_oct), 
+                           df['time'] - pd.Timedelta(hours=3),
+                           df['time'] - pd.Timedelta(hours=2))
 df['gmt_hour']=df['time_gmt'].dt.hour
+df['gmt_date']=df['time_gmt'].dt.date
 
+df['session']=df['gmt_hour'].apply(get_session)
 
-def last_sunday_in_march(year):
-    # Start with the last day of March
-    last_day_of_march = datetime(year, 3, 31)
+df_by_date=df.groupby(['gmt_date','session'],as_index=False).agg(
+    session_high=('high','max'),
+    session_low=('low','min')
+)
 
-    # Find the day of the week for the last day of March (0 = Monday, 6 = Sunday)
-    day_of_week = last_day_of_march.weekday()
+df=df.merge(df_by_date,on=['gmt_date'],how='left')
+df['stoploss']=df['session_high']
 
-    # Calculate the number of days to subtract to get to the last Sunday
-    days_to_subtract = day_of_week + 1  # Add 1 to get to Sunday
+fig=go.Figure(
+    data=[go.Candlestick(
+        name='GBPJPY OHLC',
+        x=df['time_gmt'],
+        open=df['open'],
+        high=df['high'],
+        low=df['low'],
+        close=df['close'],
+    )]
+)
+fig.update_layout(xaxis_rangeslider_visible=False,height=600)
+fig.add_trace(go.Scatter(name='asia_high',x=df['time_gmt'],y=df['session_high']))
+fig.add_trace(go.Scatter(name='asia_low',x=df['time_gmt'],y=df['session_low']))
+fig.show()
 
-    # Subtract the number of days to get to the last Sunday
-    last_sunday = last_day_of_march - timedelta(days=days_to_subtract)
+df.to_csv('E:/EA/a.csv')
 
-    return last_sunday
 
 # Example usage:
-year = 2023
-print("Last Sunday in March", year, ":", last_sunday_in_march(year))
+

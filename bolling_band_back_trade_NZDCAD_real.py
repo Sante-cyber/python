@@ -58,9 +58,9 @@ def get_signal(symbol):
     upper_band=sma+STANDARD_DEVIATIONS*sd
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
-    if last_close_price<lower_band and hour>=9 and hour<=21:
+    if last_close_price<lower_band and hour>=7:
         return 'buy', sd, last_close_price,upper_band,lower_band,hour
-    elif last_close_price>upper_band and hour>=9 and hour<=21:
+    elif last_close_price>upper_band and hour>=7:
         return 'sell',sd,last_close_price,upper_band,lower_band,hour
     else:
         return [None,sd,last_close_price,upper_band,lower_band,hour]
@@ -77,12 +77,12 @@ if mt.initialize():
     mt.login(login_real,password_real,server_real)
 
     TIMEFRAME=mt.TIMEFRAME_H1
-    VOLUME=0.04
+    VOLUME=0.03
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=20
     STANDARD_DEVIATIONS=2
-    TP_SD=1.5
+    TP_SD=2
     SL_SD=1
     symbol='NZDCAD.a'
 
@@ -135,14 +135,15 @@ while True:
         print(f'cuurently_bid_price_tick--{tick.ask}--less than {last_close_price} make order')
         if tick.ask<=last_close_price:
             result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.bid-SL_SD*standard_deviation,tick.ask+TP_SD*standard_deviation)
+            print(signal,tick.bid,tick.ask,standard_deviation)
             print(result)
-            print(f'currently bid')
     elif signal=='sell':
         tick=mt.symbol_info_tick(symbol) 
         print(f'cuurently_bid_price_tick--{tick.bid}--bigger than {last_close_price} can make order')
         if tick.bid>=last_close_price:
             result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.ask+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
-        print(result)
+            print(signal,tick.bid,tick.ask,standard_deviation)
+            print(result)
     else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{last_close_price}--upper_band--{upper_band}--lower_band--{lower_band}--hour--{hour}')
 
     time.sleep(60)

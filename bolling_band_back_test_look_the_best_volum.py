@@ -93,9 +93,9 @@ class Strategy:
             for i, data in self.data.iterrows():  
               if trade==True:
                   
-                if data.signal=='buy' and data.hour>=9 and data.hour<=21 and self.trading_allowed():
+                if data.signal=='buy'  and self.trading_allowed():
                     sl=data.close-1*data.sd
-                    tp=data.close+1.8*data.sd
+                    tp=data.close+1.5*data.sd
                     self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
                 elif data.signal=='sell' and self.trading_allowed():
                     sl=data.close+1*data.sd
@@ -176,7 +176,7 @@ for year in years:
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
-        df.to_csv('C:/Ally/a.csv')
+        # df.to_csv('C:/Ally/a.csv')
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
@@ -196,8 +196,9 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
     # for i,position in result.iterrows():
