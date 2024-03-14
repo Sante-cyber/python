@@ -196,8 +196,8 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
 
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])

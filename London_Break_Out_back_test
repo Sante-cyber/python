@@ -15,13 +15,36 @@ server='ICMarkets-Demo'
 mt.initialize()
 mt.login(login,password,server)
 
+for i,x in df.iterrows():
+    #open trade logic
+    open_cond1=12>x['gmt_hour']>=8
+    num_open_trades=trades[trades['state']=='open'].shape[0]
+    open_cond2=num_open_trades==0
+    # print(trades)
+    if open_cond1 and open_cond2 and x['open']>x['session_high']:
+        trades.loc[len(trades),trades.columns]=['open','buy',x['time_gmt'],x['open'],None,None,None]
+    elif open_cond1 and open_cond2 and x['open']<x['session_low']:
+        trades.loc[len(trades),trades.columns]=['open','sell',x['time_gmt'],x['open'],None,None,None]
+    # print(x,open_cond1,open_cond2,trades,num_open_trades)
+    if num_open_trades==0:
+        continue
+        
+    #close trade logic
+    close_cond1=x['gmt_hour']>=17
+    open_trade_order_type=trades[trades['state']=='open'].iloc[0]['order_type']
+    close_cond2=x['low']<=x['stoploss'] if open_trade_order_type=='buy'\
+                                        else x['high']>=x['stoploss']
+    # print(close_cond1,close_cond2)
+    if close_cond1:
+        trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['open'],'time up']
+    if close_cond2:
+        trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['stoploss'],'touch stop loss']
 
-
-def find_signal(close,lower_band,upper_band):
-        if close<lower_band:
-            return 'buy'
-        elif close>upper_band:
+def find_signal(open,lower_band,upper_band):
+        if open<lower_band:
             return 'sell'
+        elif open>upper_band:
+            return 'buy'
 
 class position:
     def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol):
@@ -42,13 +65,7 @@ class position:
         self.close_price=close_price
         self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
         self.status='closed'
-
-    def monitor_equity(self,close_date_time,close_price):
-        self.close_datetime=close_date_time
-        self.close_price=close_price
-        self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
-        self.status='open'
-    
+   
     def _asdict(self):
         return {
             'open_datetime':self.open_datetime,
@@ -76,12 +93,7 @@ class Strategy:
         df=pd.DataFrame([position._asdict() for position in self.positions])
         df['pnl_close']=df['profit'].cumsum()+self.starting_balance
         return df
-    
-    def get_equity_df(self):
-        df=pd.DataFrame([position._asdict() for position in self.positions])
-        df['pnl_equity']=df['profit'].cumsum()+self.starting_balance
-        return df
-    
+        
     def add_position(self,position):
         self.positions.append(position)
 
@@ -96,14 +108,10 @@ class Strategy:
             for i, data in self.data.iterrows():  
               if trade==True:
                   
-                if data.signal=='buy' and data.hour>=9 and data.hour<=18 and self.trading_allowed():
-                    sl=data.close-1*data.sd
-                    tp=data.close+1.5*data.sd
-                    self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
-                elif data.signal=='sell' and self.trading_allowed():
-                    sl=data.close+1*data.sd
-                    tp=data.close-1.5*data.sd
-                    self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
+                if data.signal=='buy' and data.gmt_hour>=8 and data.gmt_hour<12 and self.trading_allowed():
+                    self.add_position(position(data.time_gmt,data.close,data.signal,self.volume,data.stoploss,None,currency))
+                elif data.signal=='sell' and data.gmt_hour>=8 and data.gmt_hour<12 and self.trading_allowed():
+                    self.add_position(position(data.time_gmt,data.close,data.signal,self.volume,data.stoploss,None,currency))
 
                 for pos in self.positions:
                     if pos.status=='open':
@@ -143,21 +151,6 @@ class Strategy:
                         elif (pos.tp>=data.close and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.tp)
             return self.get_positions_df()
-        
-        
-symbols=mt.symbols_get()
-df=pd.DataFrame(symbols)
-a=df.iloc[:,[93,95]]
-a.reset_index(inplace=True)
-# a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
-b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
-c=b[(~a.iloc[:,1].str.contains('.a'))]
-df1=pd.DataFrame()
-df2=pd.DataFrame()
-j=0
-# volume = list(range(1000, 10000 + 1000, 1000))
-# years=list(range(2020, 2023 + 1, 1))
-df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
 
 def last_sunday_of_month(year, month):
     # Get the last day of the given month
@@ -206,7 +199,36 @@ df_by_date=df.groupby(['gmt_date','session'],as_index=False).agg(
 )
 
 df=df.merge(df_by_date,on=['gmt_date'],how='left')
-df['stoploss']=df['session_high']
+df['stoploss']=df['session_high']-(df['session_high']-df['session_low'])/2
+
+trades=pd.DataFrame(columns=['state','order_type','open_time','open_price','close_time','close_price','close_reason'])
+
+for i,x in df.iterrows():
+    #open trade logic
+    open_cond1=12>x['gmt_hour']>=8
+    num_open_trades=trades[trades['state']=='open'].shape[0]
+    open_cond2=num_open_trades==0
+    # print(trades)
+    if open_cond1 and open_cond2 and x['open']>x['session_high']:
+        trades.loc[len(trades),trades.columns]=['open','buy',x['time_gmt'],x['open'],None,None,None]
+    elif open_cond1 and open_cond2 and x['open']<x['session_low']:
+        trades.loc[len(trades),trades.columns]=['open','sell',x['time_gmt'],x['open'],None,None,None]
+    # print(x,open_cond1,open_cond2,trades,num_open_trades)
+    if num_open_trades==0:
+        continue
+        
+    #close trade logic
+    close_cond1=x['gmt_hour']>=17
+    open_trade_order_type=trades[trades['state']=='open'].iloc[0]['order_type']
+    close_cond2=x['low']<=x['stoploss'] if open_trade_order_type=='buy'\
+                                        else x['high']>=x['stoploss']
+    # print(close_cond1,close_cond2)
+    if close_cond1:
+        trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['open'],'time up']
+    if close_cond2:
+        trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['stoploss'],'touch stop loss']
+    
+trades
 
 fig=go.Figure(
     data=[go.Candlestick(
@@ -221,6 +243,7 @@ fig=go.Figure(
 fig.update_layout(xaxis_rangeslider_visible=False,height=600)
 fig.add_trace(go.Scatter(name='asia_high',x=df['time_gmt'],y=df['session_high']))
 fig.add_trace(go.Scatter(name='asia_low',x=df['time_gmt'],y=df['session_low']))
+fig.add_trace(go.Scatter(name='stoploss',x=df['time_gmt'],y=df['stoploss']))
 fig.show()
 
 df.to_csv('E:/EA/a.csv')
