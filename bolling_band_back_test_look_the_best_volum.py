@@ -124,20 +124,23 @@ class Strategy:
                         if not df123.empty:
                            profit= df123['pnl_close'].iloc[-1]
                         #    print(profit)
-                        total_profit=(data.close-pos.open_price)*pos.volume+profit
+                        if pos.order_type=='buy':
+                            total_profit=(data.low-pos.open_price)*pos.volume+profit
+                        else:
+                            total_profit=(pos.open_price-data.high)*pos.volume+profit
                         if total_profit<profit/2 and  pos.order_type=='buy':
                             pos.close_position(data.time,data.close)
                             trade=False
                         elif total_profit<profit/2 and  pos.order_type=='sell':
                             pos.close_position(data.time,data.close)
                             trade=False
-                        elif (pos.sl>=data.close and pos.order_type=='buy'):
+                        elif (pos.sl>=data.low and pos.order_type=='buy'):
                             pos.close_position(data.time,pos.sl)
-                        elif (pos.sl<=data.close and pos.order_type=='sell'):
+                        elif (pos.sl<=data.high and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.sl)
-                        elif (pos.tp<=data.close and pos.order_type=='buy'):
+                        elif (pos.tp<=data.high and pos.order_type=='buy'):
                             pos.close_position(data.time,pos.tp)
-                        elif (pos.tp>=data.close and pos.order_type=='sell'):
+                        elif (pos.tp>=data.low and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.tp)
             return self.get_positions_df()
 
@@ -196,9 +199,9 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
-
+df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+# 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
     # for i,position in result.iterrows():
