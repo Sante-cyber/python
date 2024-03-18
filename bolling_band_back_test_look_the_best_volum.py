@@ -89,59 +89,68 @@ class Strategy:
         return True
     
     def run(self,trade):
-        
-            for i, data in self.data.iterrows():  
-              if trade==True:
+        # self.data.
+            for i, data in df.iterrows():
+                
+              if i<len(df)-1:
+                next_row=df.iloc[i + 1]
                   
-                if data.signal=='buy'  and self.trading_allowed():
-                    sl=data.close-1*data.sd
-                    tp=data.close+1.5*data.sd
-                    self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
-                elif data.signal=='sell' and self.trading_allowed():
-                    sl=data.close+1*data.sd
-                    tp=data.close-1.5*data.sd
-                    self.add_position(position(data.time,data.close,data.signal,self.volume,sl,tp,currency))
-
-                for pos in self.positions:
-                    if pos.status=='open':
-                        # profit=(data.close-pos.open)*pos.volume if pos.order_type=='buy' else (pos.open_price-data.close)*pos.volume
-                        # equity={
-                        #         'open_datetime':pos.open_datetime,
-                        #         'open_price':pos.open_price,
-                        #         'order_type':pos.order_type,
-                        #         'volume': pos.volume,
-                        #         'sl':pos.sl,
-                        #         'tp':pos.tp,
-                        #         'close_datetime':data.time,
-                        #         'close_price':data.close,
-                        #         'profit':profit,
-                        #         'status':pos.status,
-                        #         'symbol':pos.symbol
-                        #     }
-                        # df1=df1.append(equity, ignore_index=True)
-                        df123=self.get_positions_df()
-                        # print(df123)
-                        if not df123.empty:
-                           profit= df123['pnl_close'].iloc[-1]
-                        #    print(profit)
-                        if pos.order_type=='buy':
-                            total_profit=(data.low-pos.open_price)*pos.volume+profit
-                        else:
-                            total_profit=(pos.open_price-data.high)*pos.volume+profit
-                        if total_profit<profit/2 and  pos.order_type=='buy':
-                            pos.close_position(data.time,data.low)
-                            trade=False
-                        elif total_profit<profit/2 and  pos.order_type=='sell':
-                            pos.close_position(data.time,data.high)
-                            trade=False
-                        elif (pos.sl>=data.low and pos.order_type=='buy'):
-                            pos.close_position(data.time,pos.sl)
-                        elif (pos.sl<=data.high and pos.order_type=='sell'):
-                            pos.close_position(data.time,pos.sl)
-                        elif (pos.tp<=data.high and pos.order_type=='buy'):
-                            pos.close_position(data.time,pos.tp)
-                        elif (pos.tp>=data.low and pos.order_type=='sell'):
-                            pos.close_position(data.time,pos.tp)
+                if trade==True:
+                    
+                    if data.signal=='buy'  and self.trading_allowed():
+                        if next_row.low<=data.close:
+                            # print(f'{data}--{next_row}')
+                            sl=data.close-1*data.sd
+                            tp=data.close+2*data.sd
+                            self.add_position(position(next_row.time,data.close,data.signal,self.volume,sl,tp,currency))
+                    elif data.signal=='sell' and self.trading_allowed():
+                        if next_row.high>=data.close:
+                            # print(f'{data}--{next_row}')
+                            sl=data.close+1*data.sd
+                            tp=data.close-2*data.sd
+                            self.add_position(position(next_row.time,data.close,data.signal,self.volume,sl,tp,currency))
+            
+                    for pos in self.positions:
+                        # print(pos.status)
+                        if pos.status=='open':
+                            # profit=(data.close-pos.open)*pos.volume if pos.order_type=='buy' else (pos.open_price-data.close)*pos.volume
+                            # equity={
+                            #         'open_datetime':pos.open_datetime,
+                            #         'open_price':pos.open_price,
+                            #         'order_type':pos.order_type,
+                            #         'volume': pos.volume,
+                            #         'sl':pos.sl,
+                            #         'tp':pos.tp,
+                            #         'close_datetime':data.time,
+                            #         'close_price':data.close,
+                            #         'profit':profit,
+                            #         'status':pos.status,
+                            #         'symbol':pos.symbol
+                            #     }
+                            # df1=df1.append(equity, ignore_index=True)
+                            df123=self.get_positions_df()
+                            # print(df123)
+                            if not df123.empty:
+                                profit= df123['pnl_close'].iloc[-1]
+                            #    print(profit)
+                            if pos.order_type=='buy':
+                                total_profit=(next_row.low-pos.open_price)*pos.volume+profit
+                            else:
+                                total_profit=(pos.open_price-next_row.high)*pos.volume+profit
+                            if total_profit<profit/2 and  pos.order_type=='buy':
+                                pos.close_position(next_row.time,next_row.low)
+                                trade=False
+                            elif total_profit<profit/2 and  pos.order_type=='sell':
+                                pos.close_position(next_row.time,next_row.high)
+                                trade=False
+                            elif (pos.sl>=next_row.low and pos.order_type=='buy'):
+                                pos.close_position(next_row.time,pos.sl)
+                            elif (pos.sl<=next_row.high and pos.order_type=='sell'):
+                                pos.close_position(next_row.time,pos.sl)
+                            elif (pos.tp<=next_row.high and pos.order_type=='buy'):
+                                pos.close_position(next_row.time,pos.tp)
+                            elif (pos.tp>=next_row.low and pos.order_type=='sell'):
+                                pos.close_position(next_row.time,pos.tp)
             return self.get_positions_df()
 
 
@@ -149,9 +158,9 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 10000 + 1000, 1000))
-years=list(range(2020, 2023 + 1, 1))
+years=list(range(2020, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
-symbol=['NZDCAD']
+symbol=['GBPAUD']
 # years=[2024]
 # volumes=[10000]
 
@@ -163,7 +172,7 @@ for year in years:
     for currency in symbol:
         # currency='NZDCAD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
+        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(year,12,31))
         # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
 #  datetime.now()
@@ -179,13 +188,15 @@ for year in years:
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
-        # df.to_csv('C:/Ally/a.csv')
+    
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
         
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'])
+        df.reset_index(inplace=True)
+        # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
@@ -199,8 +210,11 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+            
+df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
