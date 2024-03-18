@@ -211,10 +211,10 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
             
-df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])

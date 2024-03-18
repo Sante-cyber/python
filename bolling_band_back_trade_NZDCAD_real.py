@@ -76,8 +76,8 @@ if mt.initialize():
     # server='ICMarkets-Demo'
     mt.login(login_real,password_real,server_real)
 
-    TIMEFRAME=mt.TIMEFRAME_H1
-    VOLUME=0.03
+    TIMEFRAME=mt.TIMEFRAME_H4
+    VOLUME=0.02
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=20
