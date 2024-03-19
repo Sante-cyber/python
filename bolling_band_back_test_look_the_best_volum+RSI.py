@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
 import numpy as np
+import pandas_ta as ta
 from common import login,password,server
 
 login=51658107
@@ -15,14 +16,7 @@ mt.login(login,password,server)
 
 
 def rsi(data,window):
-    delta=data['close'].diff()
-    gain=delta.where(delta>0,0)
-    loss=delta.where(delta<0,0)
-    avg_gain=gain.rolling(window).mean()
-    avg_loss=loss.rolling(window).mean()
-    rs=avg_gain/avg_loss
-    rsi=100-(100/(1+rs))
-    data['rsi']=rsi
+    data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=70
     data['oversold']=30
     return data
@@ -171,7 +165,7 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2020, 2024 + 1, 1))
+years=list(range(2024, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 symbol=['GBPAUD']
 # years=[2024]
@@ -206,10 +200,11 @@ for year in years:
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
-        df=rsi(df,13)
+        df=rsi(df,14)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
-        df.to_csv('E:/EA/bollinger-bands/H1_year/a.csv')
+        # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
+        df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
@@ -225,10 +220,10 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
             
-# df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-# df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
-df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
