@@ -52,24 +52,27 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
 def get_signal(symbol):
     bars=mt.copy_rates_from_pos(symbol,TIMEFRAME,1,SMA_PERIOD)
     df=pd.DataFrame(bars)
-    df['rsi']=ta.rsi(df.close, length=14)
-    df['overbought']=68
-    df['oversold']=28
+    overbought=68
+    oversold=28
     df['time']=pd.to_datetime(df['time'],unit='s')
     df['hour']=df['time'].dt.hour
-    sma=df['close'].mean()
-    sd=df['close'].std()
-    lower_band=sma-STANDARD_DEVIATIONS*sd
-    upper_band=sma+STANDARD_DEVIATIONS*sd
+    df['rsi']=ta.rsi(df.close, length=14)
+    df['sma']=df['close'].rolling(20).mean()
+    df['sd']=df['close'].rolling(20).std()
+    df['lower_band']=df['sma']-STANDARD_DEVIATIONS*df['sd']
+    df['upper_band']=df['sma']+STANDARD_DEVIATIONS*df['sd']
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
-    rsi=df.iloc[-1]['rsi']
-    if last_close_price<lower_band:
-        return 'buy', sd, last_close_price,upper_band,lower_band,hour
-    elif last_close_price>upper_band:
-        return 'sell',sd,last_close_price,upper_band,lower_band,hour
+    last_rsi=df.iloc[-1]['rsi']
+    last_lower_band=df.iloc[-1]['lower_band']
+    last_upper_band=df.iloc[-1]['upper_band']
+    last_sd=df.iloc[-1]['sd']
+    if last_close_price<last_lower_band and last_rsi<oversold:
+        return 'buy', last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
+    elif last_close_price>last_upper_band and last_rsi>overbought:
+        return 'sell',last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
     else:
-        return [None,sd,last_close_price,upper_band,lower_band,hour]
+        return None,last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
 
 
 
@@ -86,7 +89,7 @@ if mt.initialize():
     VOLUME=0.02
     DEVIATION=5
     MAGIC=10
-    SMA_PERIOD=20
+    SMA_PERIOD=100
     STANDARD_DEVIATIONS=2
     TP_SD=2
     SL_SD=1
@@ -129,28 +132,28 @@ while True:
     print(f'Stragety symbol:{symbol}')
     
     if mt.positions_total()==0:
-        signal,standard_deviation,last_close_price,upper_band,lower_band,hour=get_signal(symbol)
+        signal,standard_deviation,last_close_price,upper_band,lower_band,hour,rsi=get_signal(symbol)
         if signal is not None:
             print(f"It's good chance to {signal} to this symbol--{symbol}")
     else:
-       signal,standard_deviation,last_close_price,upper_band,lower_band,hour=get_signal(symbol)
+       signal,standard_deviation,last_close_price,upper_band,lower_band,hour,rsi=get_signal(symbol)
        signal=None
 
     if signal=='buy':
         tick=mt.symbol_info_tick(symbol) 
-        print(f'cuurently_bid_price_tick--{tick.ask}--less than {last_close_price} make order')
+        print(f'cuurently_bid_price_tick--{tick.ask}--less than {last_close_price}  and rsi--{rsi} less than 28 make order')
         if tick.ask<=last_close_price:
-            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.bid-SL_SD*standard_deviation,tick.ask+TP_SD*standard_deviation)
-            print(signal,tick.bid,tick.ask,standard_deviation)
+            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.ask-SL_SD*standard_deviation,tick.ask+TP_SD*standard_deviation)
+            print(f'signal-{signal},standard_deviation--{standard_deviation}')
             print(result)
     elif signal=='sell':
         tick=mt.symbol_info_tick(symbol) 
-        print(f'cuurently_bid_price_tick--{tick.bid}--bigger than {last_close_price} can make order')
+        print(f'cuurently_bid_price_tick--{tick.bid}--bigger than {last_close_price} can make order and rsi--{rsi} bigger than 68')
         if tick.bid>=last_close_price:
-            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.ask+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
-            print(signal,tick.bid,tick.ask,standard_deviation)
+            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.bid+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
+            print(f'signal-{signal},standard_deviation--{standard_deviation}')
             print(result)
-    else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{last_close_price}--upper_band--{upper_band}--lower_band--{lower_band}--hour--{hour}')
+    else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{last_close_price}--upper_band--{upper_band}--lower_band--{lower_band}--hour--{hour}--rsi--{rsi}')
 
     time.sleep(60)
 
