@@ -164,6 +164,8 @@ symbol=['GBPAUD']
 # years=[2024]
 # volumes=[10000]
 
+
+
 # aa=a.iloc[40:]
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
 

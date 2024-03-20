@@ -17,8 +17,8 @@ mt.login(login,password,server)
 
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
-    data['overbought']=70
-    data['oversold']=30
+    data['overbought']=68
+    data['oversold']=28
     return data
 
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
@@ -164,14 +164,29 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2024, 2024 + 1, 1))
+volumes = list(range(1000, 10000 + 1000, 1000))
+years=list(range(2020, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
+
 symbol=['GBPAUD']
 # years=[2024]
 # volumes=[10000]
 
 # aa=a.iloc[40:]
+
+
+
+# symbols=mt.symbols_get()
+# df3=pd.DataFrame(symbols)
+# a=df3.iloc[:,[93,95]]
+# a.reset_index(inplace=True)
+# # a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
+# b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
+# c=b[(~a.iloc[:,1].str.contains('.a'))]
+
+# symbol=c.iloc[:,1]
+
+
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
 
 for year in years:
@@ -219,7 +234,20 @@ for year in years:
             df2=pd.concat([df2,last])
             j=j+1
             print(f'{currency} have finished-{j}')
-            
+
+df1['win_rate']=np.where(df1['profit']<0,0,1)
+win_result=df1.groupby('win_rate').agg({'open_datetime':"count"}).reset_index()
+col_sums = win_result['open_datetime'].sum()
+win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
+
+df2['year']=df2['close_datetime'].dt.year
+revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
+revenue_result = revenue_result.unstack()
+
+print(win_result)
+
+print(revenue_result)
+    
 df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
 df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')

@@ -7,12 +7,14 @@ from common import login_real,password_real,server_real
 import numpy as np
 import time
 import schedule
+import pandas_ta as ta
 # import datetime
 import pytz
 
 # login=51658107
 # password='VxBvOa*4'
 # server='ICMarkets-Demo'
+
 
 
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
@@ -50,6 +52,9 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
 def get_signal(symbol):
     bars=mt.copy_rates_from_pos(symbol,TIMEFRAME,1,SMA_PERIOD)
     df=pd.DataFrame(bars)
+    df['rsi']=ta.rsi(df.close, length=14)
+    df['overbought']=68
+    df['oversold']=28
     df['time']=pd.to_datetime(df['time'],unit='s')
     df['hour']=df['time'].dt.hour
     sma=df['close'].mean()
@@ -58,6 +63,7 @@ def get_signal(symbol):
     upper_band=sma+STANDARD_DEVIATIONS*sd
     last_close_price=df.iloc[-1]['close']
     hour=df.iloc[-1]['hour']
+    rsi=df.iloc[-1]['rsi']
     if last_close_price<lower_band:
         return 'buy', sd, last_close_price,upper_band,lower_band,hour
     elif last_close_price>upper_band:
