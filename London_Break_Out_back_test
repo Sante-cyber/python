@@ -40,10 +40,10 @@ for i,x in df.iterrows():
     if close_cond2:
         trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['stoploss'],'touch stop loss']
 
-def find_signal(open,lower_band,upper_band):
-        if open<lower_band:
+def find_signal(open,session_high,session_low,gmt_hour):
+        if open<session_low and gmt_hour>=8 and gmt_hour<12:
             return 'sell'
-        elif open>upper_band:
+        elif open>session_high and gmt_hour>=8 and gmt_hour<12:
             return 'buy'
 
 class position:
@@ -108,10 +108,10 @@ class Strategy:
             for i, data in self.data.iterrows():  
               if trade==True:
                   
-                if data.signal=='buy' and data.gmt_hour>=8 and data.gmt_hour<12 and self.trading_allowed():
-                    self.add_position(position(data.time_gmt,data.close,data.signal,self.volume,data.stoploss,None,currency))
-                elif data.signal=='sell' and data.gmt_hour>=8 and data.gmt_hour<12 and self.trading_allowed():
-                    self.add_position(position(data.time_gmt,data.close,data.signal,self.volume,data.stoploss,None,currency))
+                if data.signal=='buy' and self.trading_allowed():
+                    self.add_position(position(data.time_gmt,data.open,data.signal,self.volume,data.stoploss,None,currency))
+                elif data.signal=='sell' and self.trading_allowed():
+                    self.add_position(position(data.time_gmt,data.open,data.signal,self.volume,data.stoploss,None,currency))
 
                 for pos in self.positions:
                     if pos.status=='open':
@@ -133,22 +133,27 @@ class Strategy:
                         df123=self.get_positions_df()
                         # print(df123)
                         if not df123.empty:
-                           profit= df123['pnl_close'].iloc[-1]
+                            profit= df123['pnl_close'].iloc[-1]
                         #    print(profit)
-                        total_profit=(data.close-pos.open_price)*pos.volume+profit
+                        if pos.order_type=='buy':
+                            total_profit=(data.low-pos.open_price)*pos.volume+profit
+                        else:
+                            total_profit=(pos.open_price-data.high)*pos.volume+profit
                         if total_profit<profit/2 and  pos.order_type=='buy':
-                            pos.close_position(data.time,data.close)
+                            pos.close_position(data.time,data.low)
                             trade=False
                         elif total_profit<profit/2 and  pos.order_type=='sell':
-                            pos.close_position(data.time,data.close)
+                            pos.close_position(data.time,data.high)
                             trade=False
-                        elif (pos.sl>=data.close and pos.order_type=='buy'):
+                        elif data.gmt_hour>=17:
+                            pos.close_position(data.time,data.open)
+                        elif (pos.sl>=data.low and pos.order_type=='buy') :
                             pos.close_position(data.time,pos.sl)
-                        elif (pos.sl<=data.close and pos.order_type=='sell'):
+                        elif (pos.sl<=data.high and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.sl)
-                        elif (pos.tp<=data.close and pos.order_type=='buy'):
+                        elif (pos.tp<=data.high and pos.order_type=='buy'):
                             pos.close_position(data.time,pos.tp)
-                        elif (pos.tp>=data.close and pos.order_type=='sell'):
+                        elif (pos.tp>=data.low and pos.order_type=='sell'):
                             pos.close_position(data.time,pos.tp)
             return self.get_positions_df()
 
@@ -182,7 +187,6 @@ currency='GBPJPY'
 bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M15,datetime(year,1,1),datetime(year,12,31))
 # datetime.now()
 df=pd.DataFrame(bars)
-print(df)
 df['time']=pd.to_datetime(df['time'],unit='s')
 
 df['time_gmt'] = np.where( (df['time']>=last_day_march) & (df['time'] <= last_day_oct), 
