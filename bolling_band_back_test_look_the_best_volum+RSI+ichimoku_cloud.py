@@ -15,16 +15,23 @@ mt.initialize()
 mt.login(login,password,server)
 
 
+def calculate_ichimoku_cloud(data, conversion_window, base_window, span_window):
+    data['Conversion_Line'] = (data['high'].rolling(window=conversion_window).max() + data['low'].rolling(window=conversion_window).min()) / 2
+    data['Base_Line'] = (data['high'].rolling(window=base_window).max() + data['low'].rolling(window=base_window).min()) / 2
+    data['Leading_Span_A'] = ((data['Conversion_Line'] + data['Base_Line']) / 2).shift(base_window)
+    data['Leading_Span_B'] = ((data['high'].rolling(window=span_window).max() + data['low'].rolling(window=span_window).min()) / 2).shift(base_window)
+    return data
+
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=68
-    data['oversold']=30
+    data['oversold']=28
     return data
 
-def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
-        if close<lower_band and rsi<oversold:
+def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,Leading_Span_A,Leading_Span_B):
+        if close<lower_band and rsi<oversold and Leading_Span_A > Leading_Span_B:
             return 'buy'
-        elif close>upper_band and rsi>overbought:
+        elif close>upper_band and rsi>overbought and Leading_Span_A <Leading_Span_B:
             return 'sell'
 
 class position:
@@ -164,8 +171,8 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2024, 2024 + 1, 1))
+volumes = list(range(1000, 10000 + 1000, 1000))
+years=list(range(2020, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
 symbol=['GBPAUD']
@@ -216,15 +223,16 @@ for year in years:
         # fig.show()
     
         df=rsi(df,14)
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
+        df=calculate_ichimoku_cloud(df,9,26,52)
+        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['Leading_Span_A'], df['Leading_Span_B'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
+        df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
-            bollinger_strategy=Strategy(df,200,volume)
+            bollinger_strategy=Strategy(df,300,volume)
             trade=True
             result=bollinger_strategy.run(trade)
             # print(result)
@@ -236,7 +244,8 @@ for year in years:
             print(f'{currency} have finished-{j}')
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
-win_result=df1.groupby('win_rate').agg({'open_datetime':"count"}).reset_index()
+df1['year']=df1['close_datetime'].dt.year
+win_result=df1.groupby(['year','win_rate']).agg({'open_datetime':"count"}).reset_index()
 col_sums = win_result['open_datetime'].sum()
 win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
 
