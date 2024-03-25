@@ -261,12 +261,13 @@ df2['year']=df2['close_datetime'].dt.year
 revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
 revenue_result = revenue_result.unstack()
 
+print(fibonacci_support_level,fibonacci_resistance_level)
 print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_fibonacci.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_fibonacci.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
