@@ -15,10 +15,16 @@ mt.initialize()
 mt.login(login,password,server)
 
 
+def calculate_atr(data, window):
+    tr = np.maximum(data['high'] - data['low'], abs(data['high'] - data['close'].shift(1)), abs(data['low'] - data['close'].shift(1)))
+    atr = tr.rolling(window=window).mean()
+    return atr
+
+
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=68
-    data['oversold']=29
+    data['oversold']=30
     return data
 
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
@@ -204,9 +210,8 @@ for year in years:
 
         # fig=px.line(df,x='time',y='close')
         # fig.show()
-
         df['sma']=df['close'].rolling(20).mean()
-        df['sd']=df['close'].rolling(20).std()
+        df['sd']=calculate_atr(df,5)
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)

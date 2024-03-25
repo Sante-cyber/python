@@ -15,24 +15,24 @@ mt.initialize()
 mt.login(login,password,server)
 
 
-def calculate_macd(data, short_window, long_window, signal_window):
-    data['ShortEMA'] = data['close'].ewm(span=short_window, min_periods=1, adjust=False).mean()
-    data['LongEMA'] = data['close'].ewm(span=long_window, min_periods=1, adjust=False).mean()
-    data['MACD'] = data['ShortEMA'] - data['LongEMA']
-    data['Sig'] = data['MACD'].ewm(span=signal_window, min_periods=1, adjust=False).mean()
-    return data
-
+def fibonacci_retracement(high, low):
+    retracement_levels = [0, 0.236, 0.382, 0.5, 0.618, 1]  # Fibonacci levels
+    fibonacci_prices = []
+    for level in retracement_levels:
+        fibonacci_price = high - (high - low) * level
+        fibonacci_prices.append(fibonacci_price)
+    return fibonacci_prices
 
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=68
-    data['oversold']=28
+    data['oversold']=29
     return data
 
-def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,macd,sig):
-        if close<lower_band and rsi<oversold and macd > Leading_Span_B:
+def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,fibonacci_support_level,fibonacci_resistance_level):
+        if close<lower_band and rsi<oversold and close < fibonacci_support_level:
             return 'buy'
-        elif close>upper_band and rsi>overbought and Leading_Span_A <Leading_Span_B:
+        elif close>upper_band and rsi>overbought and close >fibonacci_resistance_level:
             return 'sell'
 
 class position:
@@ -218,14 +218,20 @@ for year in years:
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
+        
+        high_price = df['close'].max()
+        low_price = df['close'].min()
     
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
         df=rsi(df,14)
-        df=calculate_ichimoku_cloud(df,9,26,52)
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['Leading_Span_A'], df['Leading_Span_B'])
+        fibonacci_prices =fibonacci_retracement(high_price,low_price)
+        fibonacci_support_level = fibonacci_prices[1] 
+        fibonacci_resistance_level = fibonacci_prices[4]
+        
+        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],fibonacci_support_level,fibonacci_resistance_level)
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
         df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
@@ -233,7 +239,7 @@ for year in years:
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
-            bollinger_strategy=Strategy(df,300,volume)
+            bollinger_strategy=Strategy(df,200,volume)
             trade=True
             result=bollinger_strategy.run(trade)
             # print(result)
@@ -246,15 +252,16 @@ for year in years:
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
-win_result=df1.groupby(['year','win_rate']).agg({'open_datetime':"count"}).reset_index()
-col_sums = win_result['open_datetime'].sum()
-win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
+win_result=df1.groupby(['year','win_rate','volume']).agg({'open_datetime':"count"}).reset_index()
+pivot_table = win_result.pivot_table(index=['year','win_rate'], columns='volume', values='open_datetime')
+# col_sums = win_result['open_datetime'].sum()
+# win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
 
 df2['year']=df2['close_datetime'].dt.year
 revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
 revenue_result = revenue_result.unstack()
 
-print(win_result)
+print(pivot_table)
 
 print(revenue_result)
     

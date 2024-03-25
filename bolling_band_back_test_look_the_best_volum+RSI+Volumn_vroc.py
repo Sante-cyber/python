@@ -18,13 +18,13 @@ mt.login(login,password,server)
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=68
-    data['oversold']=29
+    data['oversold']=28
     return data
 
-def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
-        if close<lower_band and rsi<oversold:
+def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,trend):
+        if close<lower_band and rsi<oversold and trend>0:
             return 'buy'
-        elif close>upper_band and rsi>overbought:
+        elif close>upper_band and rsi>overbought and trend>0:
             return 'sell'
 
 class position:
@@ -193,7 +193,7 @@ for year in years:
     print(year)
     for currency in symbol:
         # currency='NZDCAD'
-        print(f'{currency}--start')
+        # print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(year,12,31))
         # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
@@ -207,23 +207,30 @@ for year in years:
 
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
+        # df['volume_trend'] = df['tick_volume'].diff().rolling(window=20).mean()
+        # df['obv'] = (df['close'].diff() > 0).astype(int)
+        # df['obv'] = df['obv'].replace(0, -1)
+        # df['obv'] = df['obv'] * df['tick_volume']
+        # df['obv'] = df['obv'].cumsum()
+        # df['trend'] = df['obv'].diff().rolling(window=1).mean()
+        df['vroc'] = ((df['tick_volume'] - df['tick_volume'].shift(20)) / df['tick_volume'].shift(20)) * 100
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
-    
+
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
         df=rsi(df,14)
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
+        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['vroc'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
+        df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
-            print(volume)
+            # print(volume)
             bollinger_strategy=Strategy(df,200,volume)
             trade=True
             result=bollinger_strategy.run(trade)
@@ -233,7 +240,7 @@ for year in years:
             df1=pd.concat([df1,result])
             df2=pd.concat([df2,last])
             j=j+1
-            print(f'{currency} have finished-{j}')
+            # print(f'{currency} have finished-{j}')
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
@@ -250,8 +257,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_vol.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_vol.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'

@@ -15,10 +15,29 @@ mt.initialize()
 mt.login(login,password,server)
 
 
+def calculate_macd(data, short_window, long_window, signal_window):
+    data['ShortEMA'] = data['close'].ewm(span=short_window, min_periods=1, adjust=False).mean()
+    data['LongEMA'] = data['close'].ewm(span=long_window, min_periods=1, adjust=False).mean()
+    data['MACD'] = data['ShortEMA'] - data['LongEMA']
+    data['Sig'] = data['MACD'].ewm(span=signal_window, min_periods=1, adjust=False).mean()
+    data.reset_index(inplace=True)
+    signals = []
+    for i in range(1, len(data)):
+        if data['MACD'][i] > data['Sig'][i] and data['MACD'][i - 1] <= data['Sig'][i - 1]:
+            signals.append('Buy')
+        elif data['MACD'][i] < data['Sig'][i] and data['MACD'][i - 1] >= data['Sig'][i - 1]:
+            signals.append('Sell')
+        else:
+            signals.append('')
+    signals.insert(0, '')
+    data['msignal']=signals
+    return data
+
+
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
     data['overbought']=68
-    data['oversold']=29
+    data['oversold']=28
     return data
 
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
@@ -164,8 +183,8 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 10000 + 1000, 1000))
-years=list(range(2020, 2024 + 1, 1))
+volumes = list(range(1000, 1000 + 1000, 1000))
+years=list(range(2023, 2023 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
 symbol=['GBPAUD']
@@ -216,15 +235,16 @@ for year in years:
         # fig.show()
     
         df=rsi(df,14)
+        df=calculate_macd(df,12,26,9)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
+        df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
-            bollinger_strategy=Strategy(df,200,volume)
+            bollinger_strategy=Strategy(df,300,volume)
             trade=True
             result=bollinger_strategy.run(trade)
             # print(result)
@@ -237,16 +257,15 @@ for year in years:
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
-win_result=df1.groupby(['year','win_rate','volume']).agg({'open_datetime':"count"}).reset_index()
-pivot_table = win_result.pivot_table(index=['year','win_rate'], columns='volume', values='open_datetime')
-# col_sums = win_result['open_datetime'].sum()
-# win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
+win_result=df1.groupby(['year','win_rate']).agg({'open_datetime':"count"}).reset_index()
+col_sums = win_result['open_datetime'].sum()
+win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
 
 df2['year']=df2['close_datetime'].dt.year
 revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
 revenue_result = revenue_result.unstack()
 
-print(pivot_table)
+print(win_result)
 
 print(revenue_result)
     
