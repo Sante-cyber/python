@@ -15,13 +15,15 @@ mt.initialize()
 mt.login(login,password,server)
 
 
-def fibonacci_retracement(high, low):
+def fibonacci_retracement(df):
     retracement_levels = [0, 0.236, 0.382, 0.5, 0.618, 1]  # Fibonacci levels
-    fibonacci_prices = []
     for level in retracement_levels:
-        fibonacci_price = high - (high - low) * level
-        fibonacci_prices.append(fibonacci_price)
-    return fibonacci_prices
+        col=f'fibonacci_prices_{level}'
+        print(col)
+        df[col] = df['high_price'] - (df['high_price'] - df['low_price']) * level
+    df['fibonacci_support_level']=df['fibonacci_prices_0.236']
+    df['fibonacci_resistance_level']=df['fibonacci_prices_0.618']
+    return df
 
 def rsi(data,window):
     data['rsi']=ta.rsi(df.close, length=window)
@@ -203,8 +205,12 @@ for year in years:
         # currency='NZDCAD'
         print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(year,12,31))
+        if year>2020:
+            bars1=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year-1,4,1), datetime(year-1,12,31))
         # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
-      
+            df5=pd.DataFrame(bars1)
+            high_price = df5['close'].max()
+            low_price = df5['close'].min()
 #  datetime.now()
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
@@ -219,19 +225,22 @@ for year in years:
         df['ub']=df['sma']+2*df['sd']
         df.dropna(inplace=True)
         
-        high_price = df['close'].max()
-        low_price = df['close'].min()
-    
+        # high_price = df['close'].max()
+        # low_price = df['close'].min()
+        df['high_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].max(), axis=1)
+        df['low_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].min(), axis=1)
+        df['high_price'] = df.apply(lambda row: max(row['high_price1'], high_price), axis=1)
+        df['low_price'] = df.apply(lambda row: min(row['low_price1'], low_price), axis=1)
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
         df=rsi(df,14)
-        fibonacci_prices =fibonacci_retracement(high_price,low_price)
-        fibonacci_support_level = fibonacci_prices[1] 
-        fibonacci_resistance_level = fibonacci_prices[4]
+        df =fibonacci_retracement(df)
+        # fibonacci_support_level = fibonacci_prices[1] 
+        # fibonacci_resistance_level = fibonacci_prices[4]
         
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],fibonacci_support_level,fibonacci_resistance_level)
+        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['fibonacci_support_level'],df['fibonacci_resistance_level'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
         df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
@@ -261,7 +270,7 @@ df2['year']=df2['close_datetime'].dt.year
 revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
 revenue_result = revenue_result.unstack()
 
-print(fibonacci_support_level,fibonacci_resistance_level)
+
 print(pivot_table)
 
 print(revenue_result)
