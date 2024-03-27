@@ -22,7 +22,7 @@ def fibonacci_retracement(df):
         print(col)
         df[col] = df['high_price'] - (df['high_price'] - df['low_price']) * level
     df['fibonacci_support_level']=df['fibonacci_prices_0.236']
-    df['fibonacci_resistance_level']=df['fibonacci_prices_0.618']
+    df['fibonacci_resistance_level']=df['fibonacci_prices_0.236']
     return df
 
 def rsi(data,window):
@@ -31,11 +31,67 @@ def rsi(data,window):
     data['oversold']=29
     return data
 
+def ema(data,window,backcandles):
+    data['ema']=ta.ema(data.close,length=window)
+    emasignal=[0]*len(data)
+    for row in range(backcandles,len(data)):
+        upt=1
+        dnt=1
+        for i in range(row-backcandles,row+1):
+            if max(data.open[i],data.close[i])>=data.ema[i]:
+                dnt=0
+            if min(data.open[i],data.close[i])<=data.ema[i]:
+                upt=0
+            if upt==1 and dnt==1:
+                emasignal[row]=3
+            elif upt==1:
+                emasignal[row]=2
+            elif dnt==1:
+                emasignal[row]=1
+    data['emasignal']=emasignal
+    return data
+        
+
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,fibonacci_support_level,fibonacci_resistance_level):
         if close<lower_band and rsi<oversold and close < fibonacci_support_level:
             return 'buy'
         elif close>upper_band and rsi>overbought and close >fibonacci_resistance_level:
             return 'sell'
+
+
+def generate_signal(df,l,backcandles,gap,zone_threshold,price_diff_threshold):
+    print(l,backcandles,gap,zone_threshold,price_diff_threshold)
+    max_price=df.high[l-backcandles:l-gap].max()
+    min_price=df.low[l-backcandles:l-gap].min()
+    index_max=df.high[l-backcandles:l-gap].idxmax()
+    index_min=df.high[l-backcandles:l-gap].idxmin()
+    price_diff=max_price-min_price
+    print(price_diff)
+    if(df.emasignal[l]==2
+       and index_min<index_max
+       and price_diff>price_diff_threshold):
+        l1=max_price-0.62*price_diff
+        l2=max_price-0.78*price_diff
+        l3=max_price-0.*price_diff
+        if abs(df.close[l]-l1)<zone_threshold and df.high[l-gap:l].min()>l1:
+            return('buy',l2,l3,index_min,index_max)
+        else:
+            return(None,0,0,0,0)
+    elif (df.emasignal[l]==1
+        and index_min>index_max
+        and price_diff>price_diff_threshold):
+        l1=min_price+0.62*price_diff
+        l2=min_price+0.78*price_diff
+        l3=min_price+0.*price_diff
+        if abs(df.close[l]-l1) < zone_threshold and df.low[l-gap:l].max()<l1:
+            return('sell',l2,l3,index_min,index_max)
+        else:
+            return(None,0,0,0,0)
+    else:
+        return(None,0,0,0,0)
+
+  
+           
 
 class position:
     def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol):
@@ -170,22 +226,16 @@ class Strategy:
                                 pos.close_position(next_row.time,pos.tp)
             return self.get_positions_df()
 
-
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
 years=list(range(2023, 2023 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
-
 symbol=['GBPAUD']
 # years=[2024]
 # volumes=[10000]
-
 # aa=a.iloc[40:]
-
-
-
 # symbols=mt.symbols_get()
 # df3=pd.DataFrame(symbols)
 # a=df3.iloc[:,[93,95]]
@@ -193,10 +243,7 @@ symbol=['GBPAUD']
 # # a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
 # b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
 # c=b[(~a.iloc[:,1].str.contains('.a'))]
-
 # symbol=c.iloc[:,1]
-
-
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
 
 for year in years:
@@ -215,32 +262,59 @@ for year in years:
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
         df['hour']=df['time'].dt.hour
-
+        df=ema(df,40,5)
+        gap_candles=5
+        backcandles=10
+        signal=[None for i in range(len(df))]    
+        tp=[0 for i in range(len(df))]
+        sl=[0 for i in range(len(df))]
+        minswing=[0 for i in range(len(df))]
+        maxswing=[0 for i in range(len(df))]
+        for row in range(backcandles, len(df)):
+            gen_sig = generate_signal(df, row, backcandles=backcandles, gap=gap_candles, zone_threshold=0.001, price_diff_threshold=0.001)
+            signal[row] = gen_sig[0]
+            sl[row] = gen_sig[1]
+            tp[row] = gen_sig[2]
+            minswing[row] = gen_sig[3]
+            maxswing[row] = gen_sig[4]
+    
+        df['signal'] = signal
+        # df['sl'] = sl
+        # df['tp'] = tp
+        # df['minswing'] = minswing
+        # df['maxswing'] = maxswing
+        
+        
+        
+        
+        # df.to_csv('C:/Ally/a.csv')
         # fig=px.line(df,x='time',y='close')
         # fig.show()
+
+
 
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
-        df.dropna(inplace=True)
+        df.dropna(subset=['sd'], inplace=True)
         
         # high_price = df['close'].max()
         # low_price = df['close'].min()
-        df['high_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].max(), axis=1)
-        df['low_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].min(), axis=1)
-        df['high_price'] = df.apply(lambda row: max(row['high_price1'], high_price), axis=1)
-        df['low_price'] = df.apply(lambda row: min(row['low_price1'], low_price), axis=1)
+        # df['high_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].max(), axis=1)
+        # df['low_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].min(), axis=1)
+        # df['high_price'] = df.apply(lambda row: max(row['high_price1'], high_price), axis=1)
+        # df['low_price'] = df.apply(lambda row: min(row['low_price1'], low_price), axis=1)
 
-        # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
-        # fig.show()
+        # # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
+        # # fig.show()
     
-        df=rsi(df,14)
-        df =fibonacci_retracement(df)
-        # fibonacci_support_level = fibonacci_prices[1] 
-        # fibonacci_resistance_level = fibonacci_prices[4]
+        # df=rsi(df,14)
+        # df =fibonacci_retracement(df)
+        # # fibonacci_support_level = fibonacci_prices[1] 
+        # # fibonacci_resistance_level = fibonacci_prices[4]
         
-        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['fibonacci_support_level'],df['fibonacci_resistance_level'])
+        # df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['fibonacci_support_level'],df['fibonacci_resistance_level'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
         df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
