@@ -83,18 +83,19 @@ def find_high_low_points(df, window_size):
             elif df['close_price'].iloc[i] == min_price and min_price < low_price:
                 low_price = min_price
                 low_points.append((df.index[i], low_price))
-                
-    return high_points, low_points
+    
+    # Create a DataFrame with high points marked as 1 in the 'high_point' column
+    high_point_df = df.copy()
+    high_point_df['high_point'] = 0
+    for index, _ in high_points:
+        high_point_df.loc[index, 'high_point'] = 1
+    
+    return high_point_df
 
-# Specify the window size for finding high and low points
+# Specify the window size for finding high points
 window_size = 5  # Adjust as needed
 
-high_points, low_points = find_high_low_points(df, window_size)
+# Find high points and mark them in the DataFrame
+df_with_high_points = find_high_low_points(df, window_size)
 
-print("High Points:")
-for point in high_points:
-    print("Date:", point[0], "| High Price:", point[1])
-
-print("\nLow Points:")
-for point in low_points:
-    print("Date:", point[0], "| Low Price:", point[1])
+print(df_with_high_points)
