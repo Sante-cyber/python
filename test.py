@@ -55,3 +55,46 @@ low_points = identify_swings(df['close'])
 trendline_low = calculate_lower_trendline(df['close'], low_points)
 
 print(trendline_low)
+
+
+import pandas as pd
+
+# Sample DataFrame with 'date' and 'close_price' columns
+# Replace this with your actual DataFrame
+data = {'date': pd.date_range(start='2023-01-01', end='2023-12-31', freq='D'),
+        'close_price': [100, 105, 110, 108, 112, 115, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 160, 156, 152, 148, 144, 140, 136, 132, 128, 124, 120, 116, 112, 108, 104, 100]}
+df = pd.DataFrame(data)
+
+def find_high_low_points(df, window_size):
+    high_points = []
+    low_points = []
+    high_price = -float('inf')  # Initialize to negative infinity
+    low_price = float('inf')    # Initialize to positive infinity
+    
+    for i in range(len(df)):
+        if i >= window_size:  # Start checking from the window_size index
+            window_prices = df['close_price'].iloc[i-window_size:i]  # Get prices within the window
+            max_price = window_prices.max()
+            min_price = window_prices.min()
+            
+            if df['close_price'].iloc[i] == max_price and max_price > high_price:
+                high_price = max_price
+                high_points.append((df.index[i], high_price))
+            elif df['close_price'].iloc[i] == min_price and min_price < low_price:
+                low_price = min_price
+                low_points.append((df.index[i], low_price))
+                
+    return high_points, low_points
+
+# Specify the window size for finding high and low points
+window_size = 5  # Adjust as needed
+
+high_points, low_points = find_high_low_points(df, window_size)
+
+print("High Points:")
+for point in high_points:
+    print("Date:", point[0], "| High Price:", point[1])
+
+print("\nLow Points:")
+for point in low_points:
+    print("Date:", point[0], "| Low Price:", point[1])
