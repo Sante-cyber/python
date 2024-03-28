@@ -50,14 +50,32 @@ def ema(data,window,backcandles):
                 emasignal[row]=1
     data['emasignal']=emasignal
     return data
-        
 
-def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,fibonacci_support_level,fibonacci_resistance_level):
-        if close<lower_band and rsi<oversold and close < fibonacci_support_level:
-            return 'buy'
-        elif close>upper_band and rsi>overbought and close >fibonacci_resistance_level:
-            return 'sell'
+def find_lower_high_point(df):
+    for i in range(1, len(df) - 1):
+        if df['close'][i] > df['close'][i - 1] and df['close'][i] > df['close'][i + 1]:
+            df.at[i, 'high_point'] = 1
+        elif df['close'][i] < df['close'][i - 1] and df['close'][i] < df['close'][i + 1]:
+            df.at[i, 'low_point'] = 1
+    
+    return(df)
 
+def find_closest_high_point_price(price,index):
+    closest_high_point = df[(df['high_point'] == 1) & (df.index < index)]
+    if not closest_high_point.empty:
+        closest_high_point = closest_high_point.iloc[-1]['close']
+        return closest_high_point
+    else:
+        return None
+
+# Function to find the closest low point price before the given price
+def find_closest_low_point_price(price,index):
+    closest_low_point = df[(df['low_point'] == 1) & (df.index < index)]
+    if not closest_low_point.empty:
+        closest_low_point = closest_low_point.iloc[-1]['close']
+        return closest_low_point
+    else:
+        return None
 
 def generate_signal(df,l,backcandles,gap,zone_threshold,price_diff_threshold):
     print(l,backcandles,gap,zone_threshold,price_diff_threshold)
@@ -89,10 +107,14 @@ def generate_signal(df,l,backcandles,gap,zone_threshold,price_diff_threshold):
             return(None,0,0,0,0)
     else:
         return(None,0,0,0,0)
+        
+def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,fibonacci_support_level,fibonacci_resistance_level):
+        if close<lower_band and rsi<oversold and close < fibonacci_support_level:
+            return 'buy'
+        elif close>upper_band and rsi>overbought and close >fibonacci_resistance_level:
+            return 'sell'
 
-  
-           
-
+      
 class position:
     def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol):
         self.open_datetime=open_datetime
@@ -262,52 +284,18 @@ for year in years:
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
         df['hour']=df['time'].dt.hour
-        df=ema(df,40,5)
-        gap_candles=5
-        backcandles=10
-        signal=[None for i in range(len(df))]    
-        tp=[0 for i in range(len(df))]
-        sl=[0 for i in range(len(df))]
-        minswing=[0 for i in range(len(df))]
-        maxswing=[0 for i in range(len(df))]
-        for row in range(backcandles, len(df)):
-            gen_sig = generate_signal(df, row, backcandles=backcandles, gap=gap_candles, zone_threshold=0.001, price_diff_threshold=0.001)
-            signal[row] = gen_sig[0]
-            sl[row] = gen_sig[1]
-            tp[row] = gen_sig[2]
-            minswing[row] = gen_sig[3]
-            maxswing[row] = gen_sig[4]
-    
-        df['signal'] = signal
-        # df['sl'] = sl
-        # df['tp'] = tp
-        # df['minswing'] = minswing
-        # df['maxswing'] = maxswing
         
+        df=find_lower_high_point(df)
+        df['previous_high_point'], df['previous_high_point_index'] = zip(*df.apply(lambda row: find_closest_high_point_price(row['close'], row.name), axis=1))
+        df['previous_low_point'], df['previous_low_point_index'] = zip(*df.apply(lambda row: find_closest_low_point_price(row['close'], row.name), axis=1))
         
-        
-        
-        # df.to_csv('C:/Ally/a.csv')
-        # fig=px.line(df,x='time',y='close')
-        # fig.show()
-
-
-
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
         df.dropna(subset=['sd'], inplace=True)
         
-        # high_price = df['close'].max()
-        # low_price = df['close'].min()
-        # df['high_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].max(), axis=1)
-        # df['low_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].min(), axis=1)
-        # df['high_price'] = df.apply(lambda row: max(row['high_price1'], high_price), axis=1)
-        # df['low_price'] = df.apply(lambda row: min(row['low_price1'], low_price), axis=1)
 
-        # # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
-        # # fig.show()
     
         # df=rsi(df,14)
         # df =fibonacci_retracement(df)
@@ -355,15 +343,49 @@ df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_fibo
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
-    # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
-    # for i,position in result.iterrows():
-    #     if position.status=='closed':
-    #         fig.add_shape(type='line',x0=position.open_datetime,y0=position.open_price,x1=position.close_datetime,y1=position.close_price)
-    #         line=dict(
-    #             color='green' if position.profit>=0 else "dark",
-    #             width=3
-    #         )
-    # fig.show()
 
+# fig=px.line(df,x='time',y=['close','sma','lb','ub'])
+# for i,position in result.iterrows():
+#     if position.status=='closed':
+#         fig.add_shape(type='line',x0=position.open_datetime,y0=position.open_price,x1=position.close_datetime,y1=position.close_price)
+#         line=dict(
+#             color='green' if position.profit>=0 else "dark",
+#             width=3
+#         )
+# fig.show()
 
+# df=ema(df,40,5)
+# gap_candles=5
+# backcandles=10
+# signal=[None for i in range(len(df))]    
+# tp=[0 for i in range(len(df))]
+# sl=[0 for i in range(len(df))]
+# minswing=[0 for i in range(len(df))]
+# maxswing=[0 for i in range(len(df))]
+# for row in range(backcandles, len(df)):
+#     gen_sig = generate_signal(df, row, backcandles=backcandles, gap=gap_candles, zone_threshold=0.001, price_diff_threshold=0.001)
+#     signal[row] = gen_sig[0]
+#     sl[row] = gen_sig[1]
+#     tp[row] = gen_sig[2]
+#     minswing[row] = gen_sig[3]
+#     maxswing[row] = gen_sig[4]
 
+# df['signal'] = signal
+# df['sl'] = sl
+# df['tp'] = tp
+# df['minswing'] = minswing
+# df['maxswing'] = maxswing               
+        
+# df.to_csv('C:/Ally/a.csv')
+# fig=px.line(df,x='time',y='close')
+# fig.show()
+
+# high_price = df['close'].max()
+# low_price = df['close'].min()
+# df['high_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].max(), axis=1)
+# df['low_price1'] = df.apply(lambda row: df.loc[:row.name, 'close'].min(), axis=1)
+# df['high_price'] = df.apply(lambda row: max(row['high_price1'], high_price), axis=1)
+# df['low_price'] = df.apply(lambda row: min(row['low_price1'], low_price), axis=1)
+
+# # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
+# # fig.show()

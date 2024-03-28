@@ -19,7 +19,7 @@ bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(y
 
 df = pd.DataFrame(bars)
 df['time']=pd.to_datetime(df['time'],unit='s')
-df.set_index('time', inplace=True)
+# df.set_index('time', inplace=True)
 
 def identify_swings(prices, window=5):
     low_points = []
@@ -56,46 +56,37 @@ trendline_low = calculate_lower_trendline(df['close'], low_points)
 
 print(trendline_low)
 
-
-import pandas as pd
-
-# Sample DataFrame with 'date' and 'close_price' columns
-# Replace this with your actual DataFrame
-data = {'date': pd.date_range(start='2023-01-01', end='2023-12-31', freq='D'),
-        'close_price': [100, 105, 110, 108, 112, 115, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 160, 156, 152, 148, 144, 140, 136, 132, 128, 124, 120, 116, 112, 108, 104, 100]}
-df = pd.DataFrame(data)
-
-def find_high_low_points(df, window_size):
-    high_points = []
-    low_points = []
-    high_price = -float('inf')  # Initialize to negative infinity
-    low_price = float('inf')    # Initialize to positive infinity
+def find_lower_high_point(df):
+    for i in range(1, len(df) - 1):
+        if df['close'][i] > df['close'][i - 1] and df['close'][i] > df['close'][i + 1]:
+            df.at[i, 'high_point'] = 1
+        elif df['close'][i] < df['close'][i - 1] and df['close'][i] < df['close'][i + 1]:
+            df.at[i, 'low_point'] = 1
     
-    for i in range(len(df)):
-        if i >= window_size:  # Start checking from the window_size index
-            window_prices = df['close_price'].iloc[i-window_size:i]  # Get prices within the window
-            max_price = window_prices.max()
-            min_price = window_prices.min()
-            
-            if df['close_price'].iloc[i] == max_price and max_price > high_price:
-                high_price = max_price
-                high_points.append((df.index[i], high_price))
-            elif df['close_price'].iloc[i] == min_price and min_price < low_price:
-                low_price = min_price
-                low_points.append((df.index[i], low_price))
-    
-    # Create a DataFrame with high points marked as 1 in the 'high_point' column
-    high_point_df = df.copy()
-    high_point_df['high_point'] = 0
-    for index, _ in high_points:
-        high_point_df.loc[index, 'high_point'] = 1
-    
-    return high_point_df
+    return(df)
 
-# Specify the window size for finding high points
-window_size = 5  # Adjust as needed
 
-# Find high points and mark them in the DataFrame
-df_with_high_points = find_high_low_points(df, window_size)
 
-print(df_with_high_points)
+# Function to find the closest high point price and index before the given price
+def find_closest_high_point(price, index):
+    closest_high_point = df[(df['high_point'] == 1) & (df.index < index)]
+    if not closest_high_point.empty:
+        closest_high_point = closest_high_point.iloc[-1]
+        return closest_high_point['close'], closest_high_point.name
+    else:
+        return None, None
+
+# Function to find the closest low point price and index before the given price
+def find_closest_low_point(price, index):
+    closest_low_point = df[(df['low_point'] == 1) & (df.index < index)]
+    if not closest_low_point.empty:
+        closest_low_point = closest_low_point.iloc[-1]
+        return closest_low_point['close'], closest_low_point.name
+    else:
+        return None, None
+
+# Add new columns for previous high point price, index, previous low point price, and index
+df['previous_high_point'], df['previous_high_point_index'] = zip(*df.apply(lambda row: find_closest_high_point(row['close'], row.name), axis=1))
+df['previous_low_point'], df['previous_low_point_index'] = zip(*df.apply(lambda row: find_closest_low_point(row['close'], row.name), axis=1))
+
+df.to_csv('C:/Ally/a.csv')
