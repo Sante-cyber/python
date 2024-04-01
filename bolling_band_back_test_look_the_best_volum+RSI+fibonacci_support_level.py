@@ -53,9 +53,9 @@ def ema(data,window,backcandles):
 
 def find_lower_high_point(df):
     for i in range(1, len(df) - 1):
-        if df['close'][i] > df['close'][i - 1] and df['close'][i] > df['close'][i + 1]:
+        if df['high'][i] > df['high'][i - 1] and df['high'][i] > df['high'][i + 1]:
             df.at[i, 'high_point'] = 1
-        elif df['close'][i] < df['close'][i - 1] and df['close'][i] < df['close'][i + 1]:
+        elif df['low'][i] < df['low'][i - 1] and df['low'][i] < df['low'][i + 1]:
             df.at[i, 'low_point'] = 1
     
     return(df)
@@ -109,6 +109,7 @@ def generate_signal(df,l,backcandles,gap,zone_threshold,price_diff_threshold):
         return(None,0,0,0,0)
         
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold,fibonacci_support_level,fibonacci_resistance_level):
+        print(fibonacci_support_level,fibonacci_resistance_level)
         if close<lower_band and rsi<oversold and close < fibonacci_support_level:
             return 'buy'
         elif close>upper_band and rsi>overbought and close >fibonacci_resistance_level:
@@ -197,12 +198,16 @@ class Strategy:
                             # print(f'{data}--{next_row}')
                             sl=data.close-1*data.sd
                             tp=data.close+2*data.sd
+                            # sl=0.995*data.close
+                            # tp=1.015*data.close
                             self.add_position(position(next_row.time,data.close,data.signal,self.volume,sl,tp,currency))
                     elif data.signal=='sell' and self.trading_allowed():
                         if next_row.high>=data.close:
                             # print(f'{data}--{next_row}')
                             sl=data.close+1*data.sd
                             tp=data.close-2*data.sd
+                            # sl=1.005*data.close
+                            # tp=0.985*data.close
                             self.add_position(position(next_row.time,data.close,data.signal,self.volume,sl,tp,currency))
             
                     for pos in self.positions:
@@ -274,38 +279,41 @@ for year in years:
         # currency='NZDCAD'
         print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(year,12,31))
-        if year>2020:
-            bars1=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year-1,4,1), datetime(year-1,12,31))
+        # if year>2020:
+        #     bars1=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year-1,4,1), datetime(year-1,12,31))
         # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
-            df5=pd.DataFrame(bars1)
-            high_price = df5['close'].max()
-            low_price = df5['close'].min()
+            # df5=pd.DataFrame(bars1)
+            # high_price = df5['close'].max()
+            # low_price = df5['close'].min()
 #  datetime.now()
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
         df['hour']=df['time'].dt.hour
         
         df=find_lower_high_point(df)
-        df['previous_high_point'], df['previous_high_point_index'] = zip(*df.apply(lambda row: find_closest_high_point_price(row['close'], row.name), axis=1))
-        df['previous_low_point'], df['previous_low_point_index'] = zip(*df.apply(lambda row: find_closest_low_point_price(row['close'], row.name), axis=1))
-        
+        df['previous_high_point_price'] = df.apply(lambda row: find_closest_high_point_price(row['close'], row.name), axis=1)
+        df['previous_low_point_price'] = df.apply(lambda row: find_closest_low_point_price(row['close'], row.name), axis=1)
+
+        df['buy_l1']=df['previous_high_point_price']-0.618*(df['previous_high_point_price']-df['previous_low_point_price'])
+        df['sell_l1']=df['previous_high_point_price']-0.232*(df['previous_high_point_price']-df['previous_low_point_price'])
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
+
         df.dropna(subset=['sd'], inplace=True)
         
 
     
-        # df=rsi(df,14)
+        df=rsi(df,14)
         # df =fibonacci_retracement(df)
         # # fibonacci_support_level = fibonacci_prices[1] 
         # # fibonacci_resistance_level = fibonacci_prices[4]
         
-        # df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['fibonacci_support_level'],df['fibonacci_resistance_level'])
+        df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'],df['buy_l1'],df['sell_l1'])
         df.reset_index(inplace=True)
-        # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
+        df.to_csv('E:/EA/bollinger-bands/H4_year/a_rsi_f.csv')
+        # df.to_csv('C:/c/EA/bollinger-bands/H4_year/a.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
@@ -337,10 +345,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_fibonacci.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_fibonacci.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_fibonacci.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_fibonacci.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_fibonacci.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_fibonacci.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
 
