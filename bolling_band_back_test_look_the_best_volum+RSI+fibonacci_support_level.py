@@ -294,8 +294,8 @@ for year in years:
         df['previous_high_point_price'] = df.apply(lambda row: find_closest_high_point_price(row['close'], row.name), axis=1)
         df['previous_low_point_price'] = df.apply(lambda row: find_closest_low_point_price(row['close'], row.name), axis=1)
 
-        df['buy_l1']=df['previous_high_point_price']-0.618*(df['previous_high_point_price']-df['previous_low_point_price'])
-        df['sell_l1']=df['previous_high_point_price']-0.232*(df['previous_high_point_price']-df['previous_low_point_price'])
+        df['buy_l1']=df['previous_high_point_price']-1.618*(df['previous_high_point_price']-df['previous_low_point_price'])
+        df['sell_l1']=df['previous_high_point_price']+1.618*(df['previous_high_point_price']-df['previous_low_point_price'])
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
         df['lb']=df['sma']-2*df['sd']
