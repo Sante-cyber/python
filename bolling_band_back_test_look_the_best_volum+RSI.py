@@ -218,8 +218,8 @@ for year in years:
         df=rsi(df,14)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
-        df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        # df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
+        # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
+        df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
@@ -250,10 +250,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
-df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
