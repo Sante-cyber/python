@@ -219,7 +219,7 @@ for year in years:
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
         # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv('C:/c/EA/bollinger-bands/H4_year/b.csv')
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
