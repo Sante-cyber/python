@@ -38,7 +38,7 @@ def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
             return 'sell'
 
 class position:
-    def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol):
+    def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol,is_trade):
         self.open_datetime=open_datetime
         self.open_price=open_price
         self.order_type=order_type
@@ -50,6 +50,7 @@ class position:
         self.profit=0
         self.status='open'
         self.symbol=symbol
+        self.is_trade=is_trade
 
     def close_position(self,close_date_time,close_price):
         self.close_datetime=close_date_time
@@ -75,7 +76,8 @@ class position:
             'close_price':self.close_price,
             'profit':self.profit,
             'status':self.status,
-            'symbol':self.symbol
+            'symbol':self.symbol,
+            'is_trade':self.is_trade
         }
 
 class Strategy:
@@ -119,6 +121,7 @@ class Strategy:
                 next_row=df.iloc[i + 1]
                 next_2_row=df.iloc[i + 2]
                 next_3_row=df.iloc[i + 3]
+                next_4_row=df.iloc[i + 4]
               
                 if not pre_row.empty :
                     if is_trade==0 and pre_row.signal is None and data.signal=='buy' and next_row.signal is None:
@@ -140,28 +143,38 @@ class Strategy:
                             # print(f'{data}--{next_row}')
                             sl=next_row.close-1*next_row.sd
                             tp=next_row.close+2*next_row.sd
-                            self.add_position(position(next_2_row.time,next_row.close,trade_signal,self.volume,sl,tp,currency))
+                            self.add_position(position(next_2_row.time,next_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                        else: is_trade=0
                     elif is_trade==2 and  self.trading_allowed():
                         if next_row.low_point==1 and next_2_row.high_point!=1:
                           if next_3_row.low<=next_2_row.close:
                             sl=next_2_row.close-1*next_2_row.sd
                             tp=next_2_row.close+2*next_2_row.sd
-                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency))
+                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                          else: is_trade=0
+                        elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.low_point!=1:
+                            
                     elif is_trade==3 and self.trading_allowed():
                         if next_2_row.high>=next_row.close:
                             # print(f'{data}--{next_row}')
                             sl=next_row.close+1*next_row.sd
                             tp=next_row.close-2*next_row.sd
-                            self.add_position(position(next_2_row.time,next_row.close,trade_signal,self.volume,sl,tp,currency))
+                            self.add_position(position(next_2_row.time,next_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                        else: is_trade=0
                     elif is_trade==4 and self.trading_allowed():
                         if next_row.high_point==1 and next_2_row.low_point!=1:
                           if next_3_row.high>=next_2_row.close:
                             sl=next_2_row.close+1*next_2_row.sd
                             tp=next_2_row.close-2*next_2_row.sd
-                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency))
+                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                          else: is_trade=0
                     for pos in self.positions:
                         # print(pos.status)
-                        if pos.status=='open':
+                        if pos.status=='open' and data.time>=pos.open_datetime:
                             # profit=(data.close-pos.open)*pos.volume if pos.order_type=='buy' else (pos.open_price-data.close)*pos.volume
                             # equity={
                             #         'open_datetime':pos.open_datetime,
@@ -183,23 +196,23 @@ class Strategy:
                                 profit= df123['pnl_close'].iloc[-1]
                             #    print(profit)
                             if pos.order_type=='buy' :
-                                total_profit=(next_row.low-pos.open_price)*pos.volume+profit
+                                total_profit=(data.low-pos.open_price)*pos.volume+profit
                             else:
-                                total_profit=(pos.open_price-next_row.high)*pos.volume+profit
+                                total_profit=(pos.open_price-data.high)*pos.volume+profit
                             if total_profit<profit/2 and  pos.order_type=='buy':
-                                pos.close_position(next_row.time,next_row.low)
+                                pos.close_position(data.time,data.low)
                                 trade=False
                             elif total_profit<profit/2 and  pos.order_type=='sell':
-                                pos.close_position(next_row.time,next_row.high)
+                                pos.close_position(data.time,data.high)
                                 trade=False
-                            elif (pos.sl>=next_row.low and pos.order_type=='buy'):
-                                pos.close_position(next_row.time,pos.sl)
-                            elif (pos.sl<=next_row.high and pos.order_type=='sell'):
-                                pos.close_position(next_row.time,pos.sl)
-                            elif (pos.tp<=next_row.high and pos.order_type=='buy'):
-                                pos.close_position(next_row.time,pos.tp)
-                            elif (pos.tp>=next_row.low and pos.order_type=='sell'):
-                                pos.close_position(next_row.time,pos.tp)
+                            elif (pos.sl>=data.low and pos.order_type=='buy'):
+                                pos.close_position(data.time,pos.sl)
+                            elif (pos.sl<=data.high and pos.order_type=='sell'):
+                                pos.close_position(data.time,pos.sl)
+                            elif (pos.tp<=data.high and pos.order_type=='buy'):
+                                pos.close_position(data.time,pos.tp)
+                            elif (pos.tp>=data.low and pos.order_type=='sell'):
+                                pos.close_position(data.time,pos.tp)
             return self.get_positions_df()
 
 
