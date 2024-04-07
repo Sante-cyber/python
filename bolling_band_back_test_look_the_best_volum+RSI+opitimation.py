@@ -117,11 +117,12 @@ class Strategy:
               if i>0:
                 pre_row=df.iloc[i-1]
                 
-              if i<len(df)-3:
+              if i<len(df)-5:
                 next_row=df.iloc[i + 1]
                 next_2_row=df.iloc[i + 2]
                 next_3_row=df.iloc[i + 3]
                 next_4_row=df.iloc[i + 4]
+                next_5_row=df.iloc[i + 5]
               
                 if not pre_row.empty :
                     if is_trade==0 and pre_row.signal is None and data.signal=='buy' and next_row.signal is None:
@@ -148,14 +149,20 @@ class Strategy:
                         else: is_trade=0
                     elif is_trade==2 and  self.trading_allowed():
                         if next_row.low_point==1 and next_2_row.high_point!=1:
-                          if next_3_row.low<=next_2_row.close:
-                            sl=next_2_row.close-1*next_2_row.sd
-                            tp=next_2_row.close+2*next_2_row.sd
-                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                          if next_4_row.low<=next_3_row.close:
+                            sl=next_3_row.close-1*next_3_row.sd
+                            tp=next_3_row.close+2*next_3_row.sd
+                            self.add_position(position(next_4_row.time,next_3_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
                             is_trade=0
                           else: is_trade=0
-                        elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.low_point!=1:
-                            
+                        elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.high_point!=1:
+                          if next_5_row.low<=next_4_row.close:
+                            sl=next_4_row.close-1*next_4_row.sd
+                            tp=next_4_row.close+2*next_4_row.sd
+                            self.add_position(position(next_5_row.time,next_4_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                          else: is_trade=0                      
+                        # elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.low_point!=1:                        
                     elif is_trade==3 and self.trading_allowed():
                         if next_2_row.high>=next_row.close:
                             # print(f'{data}--{next_row}')
@@ -166,10 +173,17 @@ class Strategy:
                         else: is_trade=0
                     elif is_trade==4 and self.trading_allowed():
                         if next_row.high_point==1 and next_2_row.low_point!=1:
-                          if next_3_row.high>=next_2_row.close:
-                            sl=next_2_row.close+1*next_2_row.sd
-                            tp=next_2_row.close-2*next_2_row.sd
-                            self.add_position(position(next_3_row.time,next_2_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                          if next_4_row.high>=next_3_row.close:
+                            sl=next_3_row.close+1*next_3_row.sd
+                            tp=next_3_row.close-2*next_3_row.sd
+                            self.add_position(position(next_4_row.time,next_3_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            is_trade=0
+                          else: is_trade=0
+                        elif next_row.high_point==1 and next_2_row.low_point==1 and next_3_row.high_point!=1:
+                          if next_5_row.high>=next_4_row.close:
+                            sl=next_4_row.close+1*next_4_row.sd
+                            tp=next_4_row.close-2*next_4_row.sd
+                            self.add_position(position(next_5_row.time,next_4_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
                             is_trade=0
                           else: is_trade=0
                     for pos in self.positions:
@@ -242,7 +256,7 @@ symbol=['GBPAUD']
 # symbol=c.iloc[:,1]
 
 
-df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
+df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol','is_trade'])
 
 for year in years:
     print(year)
@@ -279,8 +293,8 @@ for year in years:
         # df=rsi(df,14)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
-        # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
+        df.to_csv(f'E:/EA/bollinger-bands/H4_year/a_{year}_opi.csv')
+        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
         # df_h1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_h1_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
@@ -312,10 +326,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])

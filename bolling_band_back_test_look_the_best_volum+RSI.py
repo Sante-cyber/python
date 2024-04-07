@@ -164,7 +164,7 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 10000 + 1000, 1000))
+volumes = list(range(2000, 10000 + 1000, 1000))
 years=list(range(2020, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
@@ -218,13 +218,13 @@ for year in years:
         df=rsi(df,14)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
-        # df.to_csv('E:/EA/bollinger-bands/H4_year/a.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
+        df.to_csv(f'E:/EA/bollinger-bands/H4_year/a_{year}.csv')
+        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
-            bollinger_strategy=Strategy(df,200,volume)
+            bollinger_strategy=Strategy(df,500,volume)
             trade=True
             result=bollinger_strategy.run(trade)
             # print(result)
@@ -250,10 +250,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
