@@ -30,12 +30,57 @@ def find_lower_high_point(df,type):
     
     return(df)
 
+def count_consecutive_above(df, column_name,number):
+    consecutive_counts = []  # List to store counts for each row
+    count = 0  # Initialize count of consecutive rows
+    for value in df[column_name]:  # Iterate over values in the specific column
+        if value >= number:  # If the value is greater than 70
+            count += 1  # Increment the count of consecutive rows
+        else:
+            count = 0  # Reset the count if the value is not greater than 70
+        consecutive_counts.append(count)  # Append the count for the current row
+    return consecutive_counts
+
+def count_consecutive_lower(df, column_name,number):
+    consecutive_counts = []  # List to store counts for each row
+    count = 0  # Initialize count of consecutive rows
+    for value in df[column_name]:  # Iterate over values in the specific column
+        if value <= number:  # If the value is lower than 30
+            count += 1  # Increment the count of consecutive rows
+        else:
+            count = 0  # Reset the count if the value is not greater than 30
+        consecutive_counts.append(count)  # Append the count for the current row
+    return consecutive_counts
+
 
 def find_signal(close,lower_band,upper_band,rsi,overbought,oversold):
         if close<lower_band and rsi<oversold:
             return 'buy'
         elif close>upper_band and rsi>overbought:
             return 'sell'
+
+def count_signal_buy(df, column_name):
+    buy_counts = []  # List to store counts for each row
+    count = 0  # Initialize count of consecutive rows
+    for value in df[column_name]:  # Iterate over values in the specific column
+        if value =='buy':  # If the value is lower than 30
+            count += 1  # Increment the count of consecutive rows
+        else:
+            count = 0  # Reset the count if the value is not greater than 30
+        buy_counts.append(count)  # Append the count for the current row
+    return buy_counts
+
+
+def count_signal_sell(df, column_name):
+    buy_counts = []  # List to store counts for each row
+    count = 0  # Initialize count of consecutive rows
+    for value in df[column_name]:  # Iterate over values in the specific column
+        if value =='sell':  # If the value is lower than 30
+            count += 1  # Increment the count of consecutive rows
+        else:
+            count = 0  # Reset the count if the value is not greater than 30
+        buy_counts.append(count)  # Append the count for the current row
+    return buy_counts
 
 class position:
     def __init__(self,open_datetime,open_price,order_type,volume,sl,tp,symbol,is_trade):
@@ -114,33 +159,22 @@ class Strategy:
             pre_row=pd.DataFrame()
             for i, data in df.iterrows():
                 
-              if i>0:
+              if i>1:
                 pre_row=df.iloc[i-1]
+                pre_2_row=df.iloc[i-2]
                 
-              if i<len(df)-5:
+              if i<len(df)-1:
                 next_row=df.iloc[i + 1]
-                next_2_row=df.iloc[i + 2]
-                next_3_row=df.iloc[i + 3]
-                next_4_row=df.iloc[i + 4]
-                next_5_row=df.iloc[i + 5]
-              
                 if not pre_row.empty :
-                    if is_trade==0 and pre_row.signal is None and data.signal=='buy' and next_row.signal is None:
+                    if is_trade==0 and data.signal=='buy' and data.buy_cnt==1:
                         is_trade=1
                         trade_signal='buy'
-                    elif is_trade==0 and pre_row.signal is None and data.signal=='buy' and next_row.signal is not None:
+                    elif is_trade==0 and data.signal=='sell' and data.buy_cnt==1:
                         is_trade=2
-                        trade_signal='buy'
-                    elif is_trade==0 and pre_row.signal is None and data.signal=='sell' and next_row.signal is None:
-                        is_trade=3
-                        trade_signal='sell'
-                    elif is_trade==0 and pre_row.signal is None and data.signal=='sell' and next_row.signal is not None:
-                        is_trade=4
                         trade_signal='sell'
                 if trade==True:
-                    
                     if is_trade==1  and self.trading_allowed():
-                        if next_2_row.low<=next_row.close:
+                        if data.buy_cnt==0 and pre_row.buy_cnt==1:
                             # print(f'{data}--{next_row}')
                             sl=next_row.close-1*next_row.sd
                             tp=next_row.close+1.8*next_row.sd
@@ -168,6 +202,7 @@ class Strategy:
                             self.add_position(position(next_2_row.time,next_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
                         else: is_trade=0
                     elif is_trade==4 and self.trading_allowed():
+                        # if data.over_70==5:
                         if next_row.high_point==1 and next_2_row.low_point!=1:
                           if next_4_row.high>=next_3_row.close:
                             sl=next_3_row.close+0.6*next_3_row.sd
@@ -175,10 +210,11 @@ class Strategy:
                             self.add_position(position(next_4_row.time,next_3_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
                           else: is_trade=0
                         elif next_row.high_point==1 and next_2_row.low_point==1 and next_3_row.high_point!=1:
-                          if next_5_row.high>=next_4_row.close:
-                            sl=next_4_row.close+0.6*next_4_row.sd
-                            tp=next_4_row.close-0.9*next_4_row.sd
-                            self.add_position(position(next_5_row.time,next_4_row.close,trade_signal,self.volume,sl,tp,currency,is_trade))
+                          order_price=(next_4_row.high+next_4_row.close)/2
+                          if next_5_row.high>=order_price:
+                            sl=order_price+0.6*next_4_row.sd
+                            tp=order_price-0.9*next_4_row.sd
+                            self.add_position(position(next_5_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                           else: is_trade=0
                     for pos in self.positions:
                         # print(pos.status)
@@ -233,7 +269,7 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 10000 + 1000, 1000))
+volumes = list(range(1000, 1000 + 1000, 1000))
 years=list(range(2020, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
@@ -286,12 +322,15 @@ for year in years:
         df=find_lower_high_point(df,'tick_volume')
         df.dropna(subset=['sd'], inplace=True)
         df=rsi(df,14)
-
+        df['over_70'] = count_consecutive_above(df, 'rsi',70)
+        df['lower_30'] = count_consecutive_lower(df, 'rsi',30)
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
     
         # df=rsi(df,14)
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
+        df['buy_cnt']=count_signal_buy(df,'signal')
+        df['sell_cnt']=count_signal_sell(df, 'signal')
         df.reset_index(inplace=True)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/a_{year}_opi.csv')
         df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi.csv')
@@ -311,7 +350,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result.csv')
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
