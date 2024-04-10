@@ -52,7 +52,7 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
 def get_signal(symbol):
     bars=mt.copy_rates_from_pos(symbol,TIMEFRAME,1,SMA_PERIOD)
     df=pd.DataFrame(bars)
-    overbought=70
+    overbought=74
     oversold=28
     df['time']=pd.to_datetime(df['time'],unit='s')
     df['hour']=df['time'].dt.hour
@@ -86,7 +86,7 @@ if mt.initialize():
     mt.login(login_real,password_real,server_real)
 
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.02
+    VOLUME=0.03
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=100
