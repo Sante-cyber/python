@@ -309,8 +309,7 @@ class Strategy:
                                     trade_type=1
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,trade_type))
                                 else: is_trade=0
-                            elif data.buy_cnt==0 and pre_row.buy_cnt>1 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0:
-                                
+                            # elif data.buy_cnt==0 and pre_row.buy_cnt>1 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
                         elif is_trade==2 and  self.trading_allowed():
                             if data.sell_cnt==0 and pre_row.sell_cnt==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and data.over_70==0:
                                 order_price=data.close
