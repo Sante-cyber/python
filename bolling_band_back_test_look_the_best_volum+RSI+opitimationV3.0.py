@@ -293,13 +293,33 @@ class Strategy:
                     next_row=df.iloc[i + 1]
                     if not pre_row.empty :
                         if is_trade==0 \
-                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30  \
-                                and data.buy_cnt==0 and data.lower_30==0 :
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 and pre_row.high_rsi>30 \
+                                and data.buy_cnt==0 and data.lower_30==0 and  data.high_rsi<30 and data.high_rsi<data.low_rsi:
                             is_trade=1
                             trade_signal='buy'
                         elif is_trade==0 \
-                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 \
-                                and data.sell_cnt==0  and data.over_70==0 :
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 and pre_row.high_rsi>30 \
+                                and data.buy_cnt==0 and data.lower_30==0 and  data.high_rsi>30:
+                            is_trade=1
+                            trade_signal='buy'
+                        elif is_trade==0 \
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 and pre_row.high_rsi<30 \
+                                and data.buy_cnt==0 and data.lower_30==0 and data.high_rsi>data.low_rsi:
+                            is_trade=1
+                            trade_signal='buy'
+                        elif is_trade==0 \
+                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>70\
+                                and data.sell_cnt==0  and data.over_70==0 and data.high_rsi>data.low_rsi:
+                            is_trade=2
+                            trade_signal='sell'
+                        # elif is_trade==0 \
+                        #         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>30 \
+                        #         and data.buy_cnt==0 and data.lower_30==0 and  data.high_rsi>30:
+                        #     is_trade=1
+                        #     trade_signal='buy'
+                        elif is_trade==0 \
+                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi<70\
+                                and data.sell_cnt==0  and data.over_70==0 and data.high_rsi<data.low_rsi:
                             is_trade=2
                             trade_signal='sell'
                     if trade==True:
