@@ -308,6 +308,11 @@ class Strategy:
                             is_trade=1.3
                             trade_signal='buy'
                         elif is_trade==0 \
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 \
+                                and data.buy_cnt==0 and data.lower_30==2:
+                            is_trade=1.4
+                            trade_signal='buy'
+                        elif is_trade==0 \
                                 and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>70\
                                 and data.sell_cnt==0  and data.over_70==0 and data.low_rsi>69 and data.high_rsi>70 and data.sd<0.02:
                             is_trade=2.1
@@ -324,7 +329,7 @@ class Strategy:
                             trade_signal='sell'
                     if trade==True:
                         # print(is_trade)
-                        if is_trade>=1 and is_trade<2 and self.trading_allowed():
+                        if is_trade>=1 and is_trade<=1.3 and self.trading_allowed():
                             order_price=data.close
                             if next_row.low<=order_price:
                                 sl=order_price-2*data.sd
@@ -334,7 +339,18 @@ class Strategy:
                                 self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 is_trade=0
                             else: is_trade=0
+                        elif is_trade==1.4 and self.trading_allowed():
                             # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
+                            if data.lower_30==0 and pre_row.lower_30!=0:
+                                order_price=data.close
+                                if next_row.low<=order_price:
+                                    sl=order_price-1*data.sd
+                                    tp=order_price+2*data.sd
+                                    if (tp-order_price)/order_price>0.0058:
+                                        tp=order_price+0.0058*order_price  
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
                         elif is_trade>=2 and is_trade<3 and  self.trading_allowed():
                             order_price=data.close
                             if next_row.high>=order_price:
@@ -404,7 +420,7 @@ volumes = list(range(1000, 1000 + 1000, 1000))
 years=list(range(2018, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
-# symbol=['GBPAUD']
+symbol=['GBPAUD']
 # years=[2024]
 # volumes=[10000]
 
@@ -412,15 +428,15 @@ years=list(range(2018, 2024 + 1, 1))
 
 
 
-symbols=mt.symbols_get()
-df3=pd.DataFrame(symbols)
-a=df3.iloc[:,[93,95]]
-a.reset_index(inplace=True)
-# a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
-b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
-c=b[(~a.iloc[:,1].str.contains('.a'))]
+# symbols=mt.symbols_get()
+# df3=pd.DataFrame(symbols)
+# a=df3.iloc[:,[93,95]]
+# a.reset_index(inplace=True)
+# # a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
+# b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
+# c=b[(~a.iloc[:,1].str.contains('.a'))]
 
-symbol=c.iloc[:,1]
+# symbol=c.iloc[:,1]
 
 
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol','is_trade'])
