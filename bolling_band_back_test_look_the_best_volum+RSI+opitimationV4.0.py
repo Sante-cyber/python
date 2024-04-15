@@ -481,8 +481,8 @@ for year in years:
         df['buy_cnt']=count_signal_buy(df,'signal')
         df['sell_cnt']=count_signal_sell(df, 'signal')
         df.reset_index(inplace=True)
-        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/a_{year}_opi.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_test.csv')
+        df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi.csv')
+        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_test.csv')
         # df_h1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_h1_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
@@ -499,7 +499,8 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_test.csv',index=False)
+        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_test.csv',index=False)
+        df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
@@ -516,10 +517,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_test.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_test.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_test.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_test.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_4.0.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_4.0.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
