@@ -335,22 +335,36 @@ class Strategy:
                                 sl=order_price-2*data.sd
                                 tp=order_price+2*data.sd
                                 if (tp-order_price)/order_price>0.0058:
-                                    tp=order_price+0.0058*order_price      
+                                    tp=order_price+0.0058*order_price
+                                if (order_price-sl)/order_price>0.0058:
+                                    sl=order_price-0.0058*order_price       
                                 self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 is_trade=0
                             else: is_trade=0
                         elif is_trade==1.4 and self.trading_allowed():
                             # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
-                            if data.lower_30==0 and pre_row.lower_30!=0:
+                            if data.lower_30==0 and pre_2_row.lower_30>0 and pre_2_row.lower_30<=3 and pre_row.lower_30==0:
                                 order_price=data.close
                                 if next_row.low<=order_price:
-                                    sl=order_price-1*data.sd
+                                    sl=order_price-2*data.sd
                                     tp=order_price+2*data.sd
                                     if (tp-order_price)/order_price>0.0058:
                                         tp=order_price+0.0058*order_price  
+                                    if (order_price-sl)/order_price>0.0058:
+                                        sl=order_price-0.0058*order_price  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
+                            elif data.lower_30==0 and pre_2_row.lower_30>=10 and pre_row.lower_30==0:
+                                order_price=data.close
+                                if next_row.low<=order_price:
+                                    sl=order_price-0.006*order_price 
+                                    tp=order_price+0.012*order_price 
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0   
+                            elif data.lower_30==0 and pre_2_row.lower_30>3 and pre_2_row.lower_30<10 and pre_row.lower_30==0:
+                                    is_trade=0    
                         elif is_trade>=2 and is_trade<3 and  self.trading_allowed():
                             order_price=data.close
                             if next_row.high>=order_price:
@@ -359,6 +373,8 @@ class Strategy:
                                 tp=order_price-2*data.sd
                                 if (order_price-tp)/order_price>0.006:
                                     tp=order_price-0.006*order_price  
+                                if (sl-order_price)/order_price>0.006:
+                                    sl=order_price+0.006*order_price 
                                 self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 is_trade=0
                             else: is_trade=0
@@ -481,8 +497,8 @@ for year in years:
         df['buy_cnt']=count_signal_buy(df,'signal')
         df['sell_cnt']=count_signal_sell(df, 'signal')
         df.reset_index(inplace=True)
-        df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi.csv')
-        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_test.csv')
+        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi.csv')
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_4.0.csv')
         # df_h1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_h1_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
@@ -499,8 +515,8 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_test.csv',index=False)
-        df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
+        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
@@ -517,10 +533,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_test.csv')
-# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_test.csv')
-df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_4.0.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_4.0.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_4.0.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_4.0.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_4.0.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_4.0.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
