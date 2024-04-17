@@ -193,6 +193,11 @@ class Strategy:
                             is_trade=1.4
                             trade_signal='buy'
                         elif is_trade==0 \
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 \
+                                and data.buy_cnt==2:
+                            is_trade=1.5
+                            trade_signal='buy'
+                        elif is_trade==0 \
                                 and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>70\
                                 and data.sell_cnt==0  and data.over_70==0 and data.low_rsi>69 and data.high_rsi>70 and data.sd<0.02:
                             is_trade=2.1
@@ -268,6 +273,23 @@ class Strategy:
                                     is_trade=0
                                 else:is_trade=0   
                             elif data.lower_30==0 and pre_2_row.lower_30>3 and pre_2_row.lower_30<7 and pre_row.lower_30==0:
+                                    is_trade=0   
+                        elif is_trade==1.5 and self.trading_allowed():
+                            # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
+                            if  data.buy_cnt==0 and pre_2_row.buy_cnt>0 and pre_2_row.buy_cnt<=3 and pre_row.buy_cnt==0 \
+                                and data.lower_30==0 and pre_2_row.lower_30>0 and pre_2_row.lower_30<=3 and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
+                                order_price=data.close
+                                if next_row.low<=order_price:
+                                    sl=order_price-2*data.sd
+                                    tp=order_price+2*data.sd
+                                    if (tp-order_price)/order_price>0.0058:
+                                        tp=order_price+0.0058*order_price  
+                                    if (order_price-sl)/order_price>0.0058:
+                                        sl=order_price-0.0058*order_price  
+                                    self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
+                            elif data.buy_cnt==0 and pre_2_row.buy_cnt>0 and pre_2_row.buy_cnt>3 and pre_row.buy_cnt==0:
                                     is_trade=0    
                         elif is_trade==2.1 or is_trade==2.2 and  self.trading_allowed():
                             order_price=data.close
