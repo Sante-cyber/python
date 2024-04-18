@@ -107,11 +107,9 @@ class position:
         self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
         self.status='closed'
 
-    def monitor_equity(self,close_date_time,close_price):
-        self.close_datetime=close_date_time
-        self.close_price=close_price
-        self.profit=(self.close_price-self.open_price)*self.volume if self.order_type=='buy' else (self.open_price-self.close_price)*self.volume
-        self.status='open'
+    def modify_poistion(self,tp,sl):
+        self.tp=tp
+        self.sl=sl
     
     def _asdict(self):
         return {
@@ -226,7 +224,7 @@ class Strategy:
                                 self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 is_trade=0
                             else: is_trade=0
-                        if is_trade==1.2 and self.trading_allowed():
+                        elif is_trade==1.2 and self.trading_allowed():
                             order_price=data.close
                             if next_row.low<=order_price:
                                 sl=order_price-2*data.sd
@@ -267,8 +265,8 @@ class Strategy:
                             elif data.lower_30==0 and pre_2_row.lower_30>=7 and pre_row.lower_30==0:
                                 order_price=pre_row.close
                                 if data.low<=order_price:
-                                    sl=order_price-0.006*order_price 
-                                    tp=order_price+0.012*order_price 
+                                    sl=order_price-0.005*order_price 
+                                    tp=5 
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0   
@@ -276,10 +274,11 @@ class Strategy:
                                     is_trade=0   
                         elif is_trade==1.5 and self.trading_allowed():
                             # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
-                            if  data.buy_cnt==0 and pre_2_row.buy_cnt>0 and pre_2_row.buy_cnt<=3 and pre_row.buy_cnt==0 \
-                                and data.lower_30==0 and pre_2_row.lower_30>0 and pre_2_row.lower_30<=3 and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-                                order_price=data.close
-                                if next_row.low<=order_price:
+                            if  data.buy_cnt==0 and pre_2_row.buy_cnt<=2 and pre_2_row.buy_cnt>0 and pre_row.buy_cnt==0 \
+                                and pre_row.lower_30==0 and pre_row.low_point!=1:
+                                # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
+                                order_price=pre_row.close
+                                if data.low<=order_price:
                                     sl=order_price-2*data.sd
                                     tp=order_price+2*data.sd
                                     if (tp-order_price)/order_price>0.0058:
@@ -289,7 +288,21 @@ class Strategy:
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
-                            elif data.buy_cnt==0 and pre_2_row.buy_cnt>0 and pre_2_row.buy_cnt>3 and pre_row.buy_cnt==0:
+                            elif data.buy_cnt==0 and pre_2_row.buy_cnt==3 and pre_row.buy_cnt==0 \
+                                and pre_row.lower_30==0 and pre_row.low_point!=1:
+                                # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
+                                order_price=pre_row.close
+                                if data.low<=order_price:
+                                    sl=order_price-2*data.sd
+                                    tp=5
+                                    # if (tp-order_price)/order_price>0.0058:
+                                    #     tp=order_price+0.0058*order_price  
+                                    if (order_price-sl)/order_price>0.0058:
+                                        sl=order_price-0.0058*order_price  
+                                    self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
+                            elif  data.buy_cnt==0 and pre_row.buy_cnt==3 and data.lower_30!=0:
                                     is_trade=0    
                         elif is_trade==2.1 or is_trade==2.2 and  self.trading_allowed():
                             order_price=data.close
@@ -333,32 +346,25 @@ class Strategy:
                             elif data.over_70==0 and pre_2_row.over_70>=7 and pre_row.over_70==0:
                                 order_price=pre_row.close
                                 if data.low<=order_price:
-                                    tp=order_price-0.012*order_price 
-                                    sl=order_price+0.006*order_price 
+                                    tp=-5
+                                    sl=order_price+0.005*order_price 
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0   
                             elif data.over_70==0 and pre_2_row.over_70>3 and pre_2_row.over_70<7 and pre_row.over_70==0:
                                     is_trade=0  
                             # elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.low_point!=1:                        
-                        for pos in self.positions:
+                        for idx, pos in enumerate(self.positions):
                             # print(pos.status)
                             if pos.status=='open' and data.time>=pos.open_datetime:
-                                # profit=(data.close-pos.open)*pos.volume if pos.order_type=='buy' else (pos.open_price-data.close)*pos.volume
-                                # equity={
-                                #         'open_datetime':pos.open_datetime,
-                                #         'open_price':pos.open_price,
-                                #         'order_type':pos.order_type,
-                                #         'volume': pos.volume,
-                                #         'sl':pos.sl,
-                                #         'tp':pos.tp,
-                                #         'close_datetime':data.time,
-                                #         'close_price':data.close,
-                                #         'profit':profit,
-                                #         'status':pos.status,
-                                #         'symbol':pos.symbol
-                                #     }
-                                # df1=df1.append(equity, ignore_index=True)
+                                if pos.is_trade==1.5 and pos.tp==5 and pre_row.signal=='sell':
+                                        self.positions[idx].tp=pre_row.close 
+                                if pos.is_trade==1.5 and pos.tp!=5 and pre_row.lower_30==1:
+                                        self.positions[idx].tp=pre_row.high  
+                                if  pos.is_trade==1.4 and pos.tp==5 and pre_row.over_70==1:
+                                        self.positions[idx].tp=pre_row.close
+                                if  pos.is_trade==2.3 and pos.tp==-5 and pre_row.lower_30==1:
+                                        self.positions[idx].tp=pre_row.close                       
                                 df123=self.get_positions_df()
                                 # print(df123)
                                 if not df123.empty:
@@ -507,7 +513,7 @@ for year in years:
         df['sell_cnt']=count_signal_sell(df, 'signal')
         df.reset_index(inplace=True)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_4.0.csv')
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_5.0.csv')
         # df_h1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_h1_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
@@ -524,7 +530,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_5.0.csv',index=False)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_4.0.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
@@ -542,8 +548,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_4.0.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_4.0.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_5.0.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_5.0.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_4.0.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_4.0.csv')
 # 'E:/EA/bollinger-bands/H1_year'
