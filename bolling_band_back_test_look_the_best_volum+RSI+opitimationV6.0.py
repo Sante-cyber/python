@@ -201,6 +201,11 @@ class Strategy:
                             is_trade=1.5
                             trade_signal='buy'
                         elif is_trade==0 \
+                                and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
+                                and data.buy_cnt==2:
+                            is_trade=1.5
+                            trade_signal='buy'
+                        elif is_trade==0 \
                                 and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>70\
                                 and data.sell_cnt==0  and data.over_70==0 and data.low_rsi>69 and data.high_rsi>70 and data.sd<0.02:
                             is_trade=2.1
