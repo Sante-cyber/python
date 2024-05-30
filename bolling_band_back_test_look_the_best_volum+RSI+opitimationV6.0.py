@@ -677,7 +677,7 @@ class Strategy:
                              elif data.low_rsi<64:
                                  is_trade=0  
                         elif is_trade==2.5 and self.trading_allowed():
-                          if pre_row.sell_cnt>0 and data.sell_cnt==0 and data.over_70==4:
+                          if pre_row.sell_cnt>0 and data.sell_cnt==0 and pre_row.rsi<80 and pre_row.high_rsi>80:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+2*data.sd
@@ -686,6 +686,14 @@ class Strategy:
                                     #     sl=order_price+0.005*order_price  
                                     # if (order_price-tp)/order_price>0.005:
                                     #     tp=order_price-0.005*order_price 
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
+                          elif pre_row.sell_cnt>0 and data.sell_cnt==0  and pre_row.high_rsi<80 and (pre_row.rsi<pre_row.low_rsi or ():
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.005*order_price  
+                                    tp=order_price-0.005*order_price 
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
