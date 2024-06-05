@@ -662,8 +662,8 @@ class Strategy:
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
-                            elif pre_row.sell_cnt==0 and pre_row.over_70>0:
-                                is_trade=2.44
+                            # elif pre_row.sell_cnt==0 and pre_row.over_70>0:
+                            #     is_trade=2.44
                             elif  data.sell_cnt==0 and pre_2_row.sell_cnt>=2 and pre_row.sell_cnt==0:
                                     is_trade=0
                         elif is_trade==2.414 and self.trading_allowed():
