@@ -662,8 +662,8 @@ class Strategy:
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
-                            # elif pre_row.sell_cnt==0 and pre_row.over_70>0:
-                            #     is_trade=2.44
+                            elif data.sell_cnt==0 and data.over_70>0 and pre_row.sell_cnt>=2:
+                                is_trade=2.44
                             elif  data.sell_cnt==0 and pre_2_row.sell_cnt>=2 and pre_row.sell_cnt==0:
                                     is_trade=0
                         elif is_trade==2.414 and self.trading_allowed():
@@ -678,14 +678,66 @@ class Strategy:
                              elif data.low_rsi<64:
                                  is_trade=0  
                         elif is_trade==2.44 and self.trading_allowed():
-                            if pre_row.over_70>0 and data.over_70==0:
+                            if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi<70 and pre_row.high_rsi>70\
+                                and data.high_rsi<pre_row.high_rsi:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+0.005*order_price  
                                     tp=order_price-0.005*order_price 
+                                    is_trade=2.441
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
+                            if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi<70 and pre_row.high_rsi<70\
+                                and data.high_rsi<70:
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.005*order_price  
+                                    tp=order_price-0.005*order_price 
+                                    is_trade=2.442
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
+                            # if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi>pre_row.high_rsi and pre_row.low_rsi<70 and pre_row.high_rsi<70\
+                            #     and data.high_rsi<pre_row.high_rsi:
+                            #     order_price=data.close
+                            #     if next_row.high>=order_price:
+                            #         sl=order_price+0.005*order_price  
+                            #         tp=order_price-0.005*order_price 
+                            #         is_trade=2.442
+                            #         self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                            #         is_trade=0
+                            #     else:is_trade=0
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and pre_row.high_rsi<80:
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.005*order_price  
+                                    tp=order_price-0.005*order_price 
+                                    is_trade=2.443
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and  pre_row.low_rsi<80  and pre_row.high_rsi>70 and pre_row.high_rsi<80 and pre_row.low_rsi<pre_row.high_rsi\
+                                and data.high_rsi<pre_row.high_rsi:
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.006*order_price  
+                                    tp=order_price-0.006*order_price 
+                                    is_trade=2.444
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0  
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and  pre_row.low_rsi<80  and pre_row.high_rsi>70 and pre_row.low_rsi>pre_row.high_rsi:
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.006*order_price  
+                                    tp=order_price-0.006*order_price 
+                                    is_trade=2.445
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0  
+                            elif pre_row.over_70>0 and data.over_70==0:
+                                is_trade=0                 
                         elif is_trade==2.5 and self.trading_allowed():
                           if pre_row.sell_cnt>0 and data.sell_cnt==0 and pre_row.rsi<80 and pre_row.high_rsi>80:
                                 order_price=data.close
