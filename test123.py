@@ -923,7 +923,7 @@ for year in years:
         
         
         df=find_lower_high_point(df,'tick_volume')
-        
+        df.dropna(subset=['sd'], inplace=True)
         df=rsi(df,14)
         df['low_rsi']=ta.rsi(df.low, length=14)
         df['high_rsi']=ta.rsi(df.high, length=14)
@@ -933,9 +933,6 @@ for year in years:
         df['lower_30_low'] = count_consecutive_lower(df, 'low_rsi',30)
         df['over_70'] = count_consecutive_above(df, 'rsi',70)
         df['lower_30'] = count_consecutive_lower(df, 'rsi',30)
-        
-        df.dropna(subset=['sd'], inplace=True)
-
 
         # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
         # fig.show()
