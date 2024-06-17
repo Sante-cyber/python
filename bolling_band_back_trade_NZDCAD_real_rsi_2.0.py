@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
 from common import login_real,password_real,server_real
+# from common import login,password,server
 import numpy as np
 import time
 import schedule
@@ -98,6 +99,7 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
         'sell':mt.symbol_info_tick(symbol).bid
     }
 
+    print(f'abc--{order_type_dict[order_type]}')
     request={
         "action":mt.TRADE_ACTION_DEAL,
         "symbol":symbol,
@@ -279,7 +281,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
     
     tick=mt.symbol_info_tick(symbol) 
     
-    print(f'cuurently_bid_price_tick--{tick.ask}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}--sd')
+    print(f'cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if (is_trade==1.1 or is_trade==1.3):
         order_price=data.close
@@ -500,11 +502,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
         if tick.ask<=order_price:
             order_price=tick.ask
             sl=order_price-2*data.sd
-            tp=order_price+3*data.sd
-            # if (tp-order_price)/order_price>0.0058:
-            #     tp=order_price+0.0058*order_price
-            # if (order_price-sl)/order_price>0.0058:
-            #     sl=order_price-0.0058*order_price       
+            tp=order_price+3*data.sd      
             result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
             is_trade=0
         else: is_trade=0 
@@ -620,7 +618,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
             is_trade=0
         else: is_trade=0
     elif is_trade==2.3:
-        # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
         if pre_row.over_70>=2 and pre_row.over_70<=3 and data.over_70==0 and abs((data.close-data.open)/data.close)<0.00001:
             order_price=data.close
             if tick.bid>=order_price:
@@ -659,21 +656,15 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
             else:is_trade=0   
         elif data.over_70==0 and pre_2_row.over_70>=2 and pre_row.over_70==0:
                 is_trade=0  
-    elif is_trade==2.4 :
-        # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
+    elif is_trade==2.4:
         if  data.sell_cnt==0 and data.over_70_low==0 and data.over_70==0 and pre_2_row.sell_cnt==2 and pre_row.sell_cnt==0 \
             and pre_row.over_70==0 and pre_row.low_rsi<pre_row.high_rsi :
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
             if pre_row.high_point!=1:
                 order_price=data.close
                 if tick.bid>=order_price:
                     order_price=tick.bid
                     sl=order_price+2.5*data.sd
                     tp=order_price-3*data.sd
-                    # if (sl-order_price)/order_price>0.05:
-                    #     sl=order_price+0.005*order_price  
-                    # if (order_price-tp)/order_price>0.005:
-                    #     tp=order_price-0.005*order_price 
                     is_trade=2.411
                     result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                     is_trade=0
@@ -681,7 +672,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
             else: is_trade=0
         elif  pre_row.sell_cnt==2 and data.sell_cnt==0 \
             and data.over_70==0 and data.low_rsi>data.high_rsi and (data.over_70_high>0 or data.over_70_low>0):
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
@@ -698,7 +688,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
         elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and \
                 data.over_70==0 and data.low_rsi>data.high_rsi and data.rsi>data.low_rsi and\
                 data.over_70_high==0 and data.over_70_low==0:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
@@ -714,22 +703,16 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 is_trade=2.414
         elif  pre_row.sell_cnt==3 and data.sell_cnt==0 \
                 and data.over_70==0 and data.low_rsi<data.high_rsi:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+0.0058*order_price
                 tp=order_price-0.0058*order_price
-                # if (tp-order_price)/order_price>0.0058:
-                #     tp=order_price+0.0058*order_price  
-                # if (sl-order_price)/order_price>0.0058:
-                #     sl=order_price+0.0058*order_price  
                 is_trade=2.42
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:is_trade=0
         elif  pre_row.sell_cnt>3 and data.sell_cnt==0 and  data.over_70==0:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
@@ -778,16 +761,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:is_trade=0
-        # if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi>pre_row.high_rsi and pre_row.low_rsi<70 and pre_row.high_rsi<70\
-        #     and data.high_rsi<pre_row.high_rsi:
-        #     order_price=data.close
-        #     if next_row.high>=order_price:
-        #         sl=order_price+0.005*order_price  
-        #         tp=order_price-0.005*order_price 
-        #         is_trade=2.442
-        #         self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
-        #         is_trade=0
-        #     else:is_trade=0
         elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and pre_row.high_rsi<80:
             order_price=data.close
             if tick.bid>=order_price:
@@ -828,10 +801,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                # if (sl-order_price)/order_price>0.05:
-                #     sl=order_price+0.005*order_price  
-                # if (order_price-tp)/order_price>0.005:
-                #     tp=order_price-0.005*order_price 
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:is_trade=0
@@ -850,42 +819,20 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                # if (sl-order_price)/order_price>0.05:
-                #     sl=order_price+0.005*order_price  
-                # if (order_price-tp)/order_price>0.005:
-                #     tp=order_price-0.005*order_price 
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:is_trade=0
         elif pre_row.sell_cnt>0 and data.sell_cnt==0:
             is_trade=0   
 
+    return result,signal,is_trade,track_point
     
-    
-    last_close_price=df.iloc[-1]['close']
-    hour=df.iloc[-1]['hour']
-    last_rsi=df.iloc[-1]['rsi']
-    last_lower_band=df.iloc[-1]['lower_band']
-    last_upper_band=df.iloc[-1]['upper_band']
-    last_sd=df.iloc[-1]['sd']
-    if last_close_price<last_lower_band and last_rsi<oversold:
-        return 'buy', last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
-    elif last_close_price>last_upper_band and last_rsi>overbought:
-        return 'sell',last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
-    else:
-        return None,last_sd, last_close_price,last_upper_band,last_lower_band,hour,last_rsi
-
-
-
-
 
 if mt.initialize():
     print('connect to MetaTrader5')
-    # login=51658107
-    # password='VxBvOa*4'
-    # server='ICMarkets-Demo'
     mt.login(login_real,password_real,server_real)
-
+    # mt.login(login,password,server)
+    
     TIMEFRAME=mt.TIMEFRAME_H4
     VOLUME=0.04
     DEVIATION=5
@@ -895,8 +842,8 @@ if mt.initialize():
     TP_SD=2
     SL_SD=1
     symbol='GBPAUD.a'
-    signal=None
-    strategy=None
+    trade_signal=None
+    trade_strategy=0
     track_point=0
 
     # symbols=mt.symbols_get()
@@ -937,33 +884,23 @@ while True:
 
     print(f'Stragety symbol:{symbol}')
     
-    if mt.positions_total()==0 and is_trade==0:
+    if mt.positions_total()==0 and trade_strategy==0:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
-        if signal is not None:
-            print(f"It's good chance to {signal} to this symbol--{symbol}")
+        if trade_strategy>0:
+            print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
-        record,pre_record=get_strategy(symbol_df)[2:]
+        record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
+    if trade_strategy>0:
+        print(f'start run--{trade_strategy}')
+        result,trade_signal,trade_strategy,track_point=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point)
+        print(result)
+        print(f'signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
+    else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{record.close}--upper_band--{record.ub}--lower_band--{record.lb}--hour--{record.hour}--rsi--{record.rsi}--rsi signal--{record.signal}')
 
-    if signal=='buy':
-        tick=mt.symbol_info_tick(symbol) 
-        print(f'cuurently_bid_price_tick--{tick.ask}--less than {last_close_price}  and rsi--{rsi} less than 28 make order')
-        if tick.ask<=last_close_price:
-            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.ask-SL_SD*standard_deviation,tick.ask+TP_SD*standard_deviation)
-            print(f'signal-{signal},standard_deviation--{standard_deviation}')
-            print(result)
-    elif signal=='sell':
-        tick=mt.symbol_info_tick(symbol) 
-        print(f'cuurently_bid_price_tick--{tick.bid}--bigger than {last_close_price} can make order and rsi--{rsi} bigger than 68')
-        if tick.bid>=last_close_price:
-            result=market_order(symbol,VOLUME,signal,DEVIATION,10,tick.bid+SL_SD*standard_deviation,tick.bid-TP_SD*standard_deviation)
-            print(f'signal-{signal},standard_deviation--{standard_deviation}')
-            print(result)
-    else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{last_close_price}--upper_band--{upper_band}--lower_band--{lower_band}--hour--{hour}--rsi--{rsi}')
-
-    time.sleep(60)
+    time.sleep(5)
 
 
 
