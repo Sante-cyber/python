@@ -772,7 +772,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 is_trade=0
             else:is_trade=0
         elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and  pre_row.low_rsi<80  and pre_row.high_rsi>70 and pre_row.high_rsi<80 and pre_row.low_rsi<pre_row.high_rsi\
-            and data.high_rsi<pre_row.high_rsi:
+            and data.high_rsi<pre_row.high_rsi and (data.low_rsi<data.high_rsi or data.low_rsi>max(data.rsi,data.high_rsi)):
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid

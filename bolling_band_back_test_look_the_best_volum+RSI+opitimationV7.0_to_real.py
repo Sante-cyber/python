@@ -229,6 +229,7 @@ class Strategy:
                         elif is_trade==0 \
                                 and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
                                 and data.sell_cnt==2:
+                            # print(data.time)
                             is_trade=2.4
                             trade_signal='sell'
                         elif is_trade==0 \
@@ -666,7 +667,9 @@ class Strategy:
                                     is_trade=0
                                 else:is_trade=0
                             elif data.sell_cnt==0 and data.over_70>0 and pre_row.sell_cnt>=2:
+                                # print(data.time)
                                 is_trade=2.44
+                                # print(data.time)
                             elif  data.sell_cnt==0 and pre_2_row.sell_cnt>=2 and pre_row.sell_cnt==0:
                                     is_trade=0
                         elif is_trade==2.414 and self.trading_allowed():
@@ -681,6 +684,7 @@ class Strategy:
                              elif data.low_rsi<64:
                                  is_trade=0  
                         elif is_trade==2.44 and self.trading_allowed():
+                            # print(data.time)
                             if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi<70 and pre_row.high_rsi>70\
                                 and data.high_rsi<pre_row.high_rsi:
                                 order_price=data.close
@@ -721,7 +725,7 @@ class Strategy:
                                     is_trade=0
                                 else:is_trade=0
                             elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and  pre_row.low_rsi<80  and pre_row.high_rsi>70 and pre_row.high_rsi<80 and pre_row.low_rsi<pre_row.high_rsi\
-                                and data.high_rsi<pre_row.high_rsi:
+                                and data.high_rsi<pre_row.high_rsi and (data.low_rsi<data.high_rsi or data.low_rsi>max(data.rsi,data.high_rsi)):
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+0.006*order_price  
@@ -949,7 +953,7 @@ for year in years:
         df['sell_cnt']=count_signal_sell(df, 'signal')
         df.reset_index(inplace=True)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_5.0.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_5.0.csv')
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_6.0.csv')
         # df_h1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_h1_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
@@ -966,7 +970,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_5.0.csv',index=False)
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_6.0.csv',index=False)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_5.0.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
@@ -984,8 +988,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_5.0.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_5.0.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_6.0.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_6.0.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_5.0.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_5.0.csv')
 # 'E:/EA/bollinger-bands/H1_year'
