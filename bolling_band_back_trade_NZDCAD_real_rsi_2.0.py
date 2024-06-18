@@ -273,6 +273,10 @@ def get_strategy(df):
             and data.sell_cnt==2:
         is_trade=2.5
         trade_signal='sell'
+    # elif is_trade==0 \
+    #         and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
+    #     is_trade=2.6
+    #     trade_signal='sell'
     # record=data[['time','close','sma','sd','lb','ub','high_point','low_point','rsi','signal','low_rsi','high_rsi','over_70_high','over_70_low','over_70','lower_30_high','lower_30_low','lower_30','buy_cnt','sell_cnt']]
     # pre_record=pre_row[['time','close','sma','sd','lb','ub','high_point','low_point','rsi','signal','low_rsi','high_rsi','over_70_high','over_70_low','over_70','lower_30_high','lower_30_low','lower_30','buy_cnt','sell_cnt']]
     return trade_signal,is_trade,data,pre_row,pre_2_row
@@ -824,7 +828,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
             else:is_trade=0
         elif pre_row.sell_cnt>0 and data.sell_cnt==0:
             is_trade=0   
-
+            
     return result,signal,is_trade,track_point
     
 
