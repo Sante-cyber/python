@@ -88,7 +88,7 @@ def count_signal_sell(df, column_name):
 
 
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
-
+    magic=int(magic*100)
     order_type_dict={
             'buy':mt.ORDER_TYPE_BUY,
             'sell': mt.ORDER_TYPE_SELL
@@ -897,6 +897,7 @@ while True:
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
+        symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
     if trade_strategy>0:
