@@ -285,6 +285,8 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
     
     tick=mt.symbol_info_tick(symbol) 
     
+    result=None
+    
     print(f'cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if (is_trade==1.1 or is_trade==1.3):
@@ -827,8 +829,8 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point):
                 is_trade=0
             else:is_trade=0
         elif pre_row.sell_cnt>0 and data.sell_cnt==0:
-            is_trade=0   
-            
+            is_trade=0  
+     
     return result,signal,is_trade,track_point
     
 
@@ -838,7 +840,7 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.04
+    VOLUME=0.08
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
