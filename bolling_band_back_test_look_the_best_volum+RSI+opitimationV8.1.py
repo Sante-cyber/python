@@ -376,6 +376,7 @@ class Strategy:
                                 else:is_trade=0
                             elif data.buy_cnt==0 and pre_2_row.buy_cnt==3 and pre_row.buy_cnt==0 \
                                  and pre_row.lower_30==0 and pre_row.low_rsi<30 \
+                                 and (pre_row.high_rsi<30 or (pre_row.high_rsi>30 and  data.low_rsi>max(data.rsi,data.high_rsi))) \
                                  and (pre_row.low_point==1 or pre_row.high_point==1):                        
                                 order_price=data.close
                                 if next_row.low<=order_price:
@@ -451,7 +452,7 @@ class Strategy:
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else:is_trade=0
-                            elif pre_row.lower_30>0 and pre_row.lower_30==pre_row.lower_30_high and\
+                            elif pre_row.lower_30>0 and pre_row.lower_30>=pre_row.lower_30_high and\
                                   data.buy_cnt==0 and data.lower_30==0 and data.lower_30_high>0:
                                   is_trade=1.553
                             elif pre_row.lower_30>0 and pre_row.lower_30<pre_row.lower_30_high and\
@@ -460,7 +461,12 @@ class Strategy:
                             elif pre_row.lower_30>0 and data.lower_30==0 and data.buy_cnt==0:
                                   is_trade=0
                         elif is_trade==1.553 and self.trading_allowed():
-                            if pre_row.lower_30_high>0 and data.lower_30_high==0  and pre_row.low_rsi<30 and data.buy_cnt==0 and data.lower_30==0:
+                                          # and pre_row.low_rsi<30 \
+                                            # and (pre_row.low_point==1 or pre_row.high_point==1)\
+                            if pre_row.lower_30_high>0 and data.lower_30_high==0\
+                                and (pre_row.low_point==1 or pre_row.high_point==1)\
+                                and (pre_2_row.low_rsi<30 or pre_row.low_rsi<30)   \
+                                and data.buy_cnt==0 and data.lower_30==0:
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     sl=order_price-2*data.sd
