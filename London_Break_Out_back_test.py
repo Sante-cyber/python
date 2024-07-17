@@ -151,7 +151,9 @@ def last_sunday_of_month(year, month):
 def get_session(hour):
     if 0<=hour<8:
         return 'asian session'
-    else: None
+    elif 8<=hour<=17:
+        return 'trading session'
+    else: return 'close session'
 
 
 year = 2023
@@ -174,13 +176,16 @@ df['gmt_date']=df['time_gmt'].dt.date
 
 df['session']=df['gmt_hour'].apply(get_session)
 
+
+
 df_by_date=df.groupby(['gmt_date','session'],as_index=False).agg(
     session_high=('high','max'),
     session_low=('low','min')
 )
 
-df=df.merge(df_by_date,on=['gmt_date'],how='left')
-df['stoploss']=df['session_high']-(df['session_high']-df['session_low'])/2
+df=df.merge(df_by_date,on=['gmt_date','session'],how='left')
+df=df.merge(df_by_date[df_by_date['session']=='asian session'],on=['gmt_date'],how='left')
+df['stoploss']=df['session_high_y']-(df['session_high_y']-df['session_low_y'])/2
 
 trades=pd.DataFrame(columns=['state','order_type','open_time','open_price','close_time','close_price','close_reason'])
 
@@ -210,24 +215,25 @@ for i,x in df.iterrows():
         trades.loc[trades['state']=='open',['state','close_time','close_price','close_reason']]=['closed',x['time'],x['stoploss'],'touch stop loss']
     
 trades
+df.to_csv('C:/c/EA/London_break_out/b.csv')
 
-fig=go.Figure(
-    data=[go.Candlestick(
-        name='GBPJPY OHLC',
-        x=df['time_gmt'],
-        open=df['open'],
-        high=df['high'],
-        low=df['low'],
-        close=df['close'],
-    )]
-)
-fig.update_layout(xaxis_rangeslider_visible=False,height=600)
-fig.add_trace(go.Scatter(name='asia_high',x=df['time_gmt'],y=df['session_high']))
-fig.add_trace(go.Scatter(name='asia_low',x=df['time_gmt'],y=df['session_low']))
-fig.add_trace(go.Scatter(name='stoploss',x=df['time_gmt'],y=df['stoploss']))
-fig.show()
+# fig=go.Figure(
+#     data=[go.Candlestick(
+#         name='GBPJPY OHLC',
+#         x=df['time_gmt'],
+#         open=df['open'],
+#         high=df['high'],
+#         low=df['low'],
+#         close=df['close'],
+#     )]
+# )
+# fig.update_layout(xaxis_rangeslider_visible=False,height=600)
+# fig.add_trace(go.Scatter(name='asia_high',x=df['time_gmt'],y=df['session_high']))
+# fig.add_trace(go.Scatter(name='asia_low',x=df['time_gmt'],y=df['session_low']))
+# fig.add_trace(go.Scatter(name='stoploss',x=df['time_gmt'],y=df['stoploss']))
+# fig.show()
 
-df.to_csv('E:/EA/a.csv')
+# df.to_csv('E:/EA/a.csv')
 
 
 df1=pd.DataFrame()
@@ -235,13 +241,13 @@ df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 10000 + 1000, 1000))
 years=list(range(2020, 2024 + 1, 1))
-# symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
+symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
-symbol=['GBPAUD']
-# years=[2024]
-# volumes=[10000]
+# symbol=['GBPAUD']
+# # years=[2024]
+# # volumes=[10000]
 
-# aa=a.iloc[40:]
+# # aa=a.iloc[40:]
 
 
 
