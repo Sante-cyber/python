@@ -101,14 +101,12 @@ class Strategy:
                   
                 if data.signal=='buy' and self.trading_allowed() and 12>data.gmt_hour>=8:
                     # df['stoploss']=df['session_high']-(df['session_high']-df['session_low'])/2
-                  if data.open>data.session_high_y+0.05:
                     sl=data.session_high_y-(data.session_high_y-data.session_low_y)/2
-                    tp=data.open+(data.session_high_y-data.session_low_y)/2
+                    tp=data.close+(data.session_high_y-data.session_low_y)/2
                     
                     self.add_position(position(data.time,data.open,data.signal,self.volume,sl,tp,currency))
                     
                 elif data.signal=='sell' and self.trading_allowed() and 12>data.gmt_hour>=8:
-                  if data.open<data.session_low_y-0.05:
                     sl=data.session_high_y-(data.session_high_y-data.session_low_y)/2
                     tp=data.open-(data.session_high_y-data.session_low_y)/2             
                     
