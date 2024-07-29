@@ -162,7 +162,7 @@ class Strategy:
             track_point=0
             trade_signal=None
             pre_row=pd.DataFrame()
-            for i, data in df.iterrows():
+            for i, data in self.data.iterrows():
                 
               if i>1:
                 pre_row=df.iloc[i-1]

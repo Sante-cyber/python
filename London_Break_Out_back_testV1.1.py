@@ -119,9 +119,9 @@ class Strategy:
                             profit= df123['pnl_close'].iloc[-1]
                         if pos.order_type=='buy' and 17>data.gmt_hour>=8:
                           if 'JPY' in currency:
-                            total_profit=(pos.open_price-data.high)*pos.volume*0.0094+profit
+                            total_profit=(data.low-pos.open_price)*pos.volume*0.0094+profit
                           else:
-                            total_profit=(pos.open_price-data.high)*pos.volume+profit
+                            total_profit=(data.low-pos.open_price)*pos.volume+profit
                         elif pos.order_type=='sell' and 17>data.gmt_hour>=8:
                           if 'JPY' in currency:  
                             total_profit=(pos.open_price-data.high)*pos.volume*0.0094+profit
@@ -162,7 +162,7 @@ def last_sunday_of_month(year, month):
 def get_session(hour):
     if 0<=hour<8:
         return 'asian session'
-    elif 8<=hour<=17:
+    elif 8<=hour<17:
         return 'trading session'
     else: return 'close session'
 
