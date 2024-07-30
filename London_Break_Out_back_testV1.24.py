@@ -97,8 +97,7 @@ df.reset_index(drop=True, inplace=True)
 
 # Define features and target
 features = [
-    'rsi_lag1', 'bollinger_upper_lag1',  'volume_lag1', 'hour', 'day_of_week', 'month', 'doji_lag',
-    'rsi_lag3','macd_histogram_lag1','volume_change_lag_lag'
+    'rsi_lag1', 'bollinger_upper_lag1',  'volume_lag1', 'hour', 'day_of_week', 'month', 'doji_lag','macd_histogram_lag1'
 ]
 target = 'target'
 
@@ -121,11 +120,11 @@ X_test = scaler.transform(X_test)
 
 # Train a LightGBM model with Grid Search
 param_grid = {
-   'n_estimators': [100, 200, 300],
-    'max_depth': [10, 20, 30],
-    'learning_rate': [0.01, 0.05, 0.1],
-    'num_leaves': [31, 50, 70],
-    'min_child_samples': [20, 30, 50]
+   'n_estimators': [300],
+    'max_depth': [10],
+    'learning_rate': [0.01],
+    'num_leaves': [31],
+    'min_child_samples': [50]
 }
 
 model = LGBMClassifier()
