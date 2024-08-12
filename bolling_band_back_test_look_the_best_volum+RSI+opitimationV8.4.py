@@ -998,6 +998,19 @@ class Strategy:
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     is_trade=0
                                 else: is_trade=0
+                            elif  data.low_rsi<min(data.rsi,data.high_rsi) and pre_row.high_rsi>data.high_rsi and pre_row.low_rsi>data.low_rsi and pre_row.low_rsi>pre_row.high_rsi and (pre_row.high_point==1 or pre_row.low_point==1):
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+2*data.sd
+                                    tp=order_price-2*data.sd
+                                    if (order_price-tp)/order_price>0.0058:
+                                        tp=order_price-0.0058*order_price
+                                    if (sl-order_price)/order_price>0.0058:
+                                        sl=order_price+0.0058*order_price     
+                                    is_trade=2.66  
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else: is_trade=0
                             else: 
                                 is_trade=4.4
                                 trade_signal='buy'   
@@ -1291,7 +1304,7 @@ for year in years:
             bollinger_strategy=Strategy(df,200,volume)
             trade=True
             result=bollinger_strategy.run(trade)
-            # print(result)
+            print(result)
             result.dropna(inplace=True)
             last=result[-1:]
             df1=pd.concat([df1,result])
