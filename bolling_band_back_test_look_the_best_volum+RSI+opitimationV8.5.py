@@ -1328,11 +1328,11 @@ class Strategy:
                                 else:
                                     total_profit=(pos.open_price-data.high)*pos.volume+profit
                                 if total_profit<profit/2 and  pos.order_type=='buy':
-                                    pos.close_position(data.time,data.low)
+                                    pos.close_position(data.time,data.low,'closed')
                                     is_trade=0
                                     trade=False
                                 elif total_profit<profit/2 and  pos.order_type=='sell':
-                                    pos.close_position(data.time,data.high)
+                                    pos.close_position(data.time,data.high,'closed')
                                     is_trade=0
                                     trade=False
                                 elif (pos.sl>=data.low and pos.order_type=='buy'):
