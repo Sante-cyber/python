@@ -7,7 +7,7 @@ import pandas_ta as ta
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold,RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report,roc_auc_score
+from sklearn.metrics import classification_report,roc_auc_score, make_scorer, f1_score
 from imblearn.over_sampling import SMOTE
 from lightgbm import LGBMClassifier
 import matplotlib.pyplot as plt
@@ -29,7 +29,7 @@ def get_forecast_month_list(start_date):
     formatted_dates = []
 
     # Loop through each month from January to December 2023
-    for i in range(12):
+    for i in range(43):
         # Compute the date for the current month
         current_date = start_date + relativedelta(months=i)
         # Format the date as `datetime(YYYY, MM, DD)`
@@ -37,10 +37,16 @@ def get_forecast_month_list(start_date):
         formatted_dates.append(current_date)
     return formatted_dates
 
+def rsi(data,window):
+    data['rsi']=ta.rsi(data.close, length=window)
+    data['overbought']=70
+    data['oversold']=30
+    return data
 
 
 
-forecast_month_list=get_forecast_month_list(datetime(2023, 1, 1))   
+
+forecast_month_list=get_forecast_month_list(datetime(2021, 1, 1))   
 
 best_param_total=pd.DataFrame()
 report_df=pd.DataFrame()
@@ -66,7 +72,7 @@ for i in forecast_month_list:
 
 
     # Calculate technical indicators
-    df['rsi'] = ta.rsi(df['close'], length=14)
+    df=rsi(df,17)
     df['ma'] = df['close'].rolling(window=14).mean()
     macd = ta.macd(df['close'])
     df['macd'] = macd['MACD_12_26_9']
@@ -137,12 +143,12 @@ for i in forecast_month_list:
 
     # Create the target variable
     df['target_rsi'] = df['rsi'].shift(-1)
-    df['target'] = (df['target_rsi'] > 70).astype(int)
+    df['target'] = np.where(df['target_rsi'] > 70,1,
+                            np.where(df['target_rsi'] < 30,2,0))
 
 
     df.dropna(inplace=True)
     df.reset_index(drop=True, inplace=True)
-
 
     # Define features and target
     
@@ -210,9 +216,18 @@ for i in forecast_month_list:
      'num_leaves': [31, 50, 70],
      'min_child_samples': [20, 30, 50]
     }
+    scorer = 'f1_weighted'
 
     model = LGBMClassifier()
-    grid_search = RandomizedSearchCV(model, param_grid, cv=StratifiedKFold(n_splits=5), scoring='f1', n_jobs=-1)
+    grid_search = RandomizedSearchCV(
+    model, 
+    param_distributions=param_grid, 
+    cv=StratifiedKFold(n_splits=5), 
+    scoring=scorer, 
+    n_jobs=-1, 
+    n_iter=10,  # Set n_iter according to your computation resources
+    random_state=42  # For reproducibility
+)
     grid_search.fit(X_train, y_train)
 
 
