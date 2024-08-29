@@ -28,10 +28,10 @@ def moving_average(data, window):
     data['ma'] = ta.sma(data.close, length=window)
     return data
 
-def find_signal(open,session_high,session_low,gmt_hour,pre_rsi,pre_ma):
-    if open < session_low and gmt_hour >= 8 and gmt_hour < 12 and pre_rsi < 30 and open < pre_ma:
+def find_signal(open,session_high,session_low,gmt_hour,forcast_rsi,pre_ma):
+    if open < session_low and gmt_hour >= 8 and gmt_hour < 12  and open < pre_ma:
         return 'sell'
-    elif open > session_high and gmt_hour >= 8 and gmt_hour < 12 and pre_rsi > 70 and open > pre_ma:
+    elif open > session_high and gmt_hour >= 8 and gmt_hour < 12 and forcast_rsi > 0 and open > pre_ma:
         return 'buy'
     
     # if open<session_low and gmt_hour>=8 and gmt_hour<12:
@@ -280,12 +280,13 @@ for year in years:
     for currency in symbol:
         # currency='NZDCAD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M30,datetime(year,1,1), datetime(year,12,31))
-        # bars=pd.read_csv('C:/c/EA/London_break_out/model/forecast_result.csv')
+        # bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M30,datetime(year,1,1), datetime(year,12,31))
+        bars=pd.read_csv('C:/c/EA/London_break_out/model/forecast_result.csv')
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'])
         df['hour']=df['time'].dt.hour
         df['year']=df['time'].dt.year
+        df=df[df['year']==year]
 
 
         df['time_gmt'] = np.where( (df['time']>=last_day_march) & (df['time'] <= last_day_oct), 
@@ -311,7 +312,8 @@ for year in years:
         df['prev_rsi'] = df['rsi'].shift(1)
         df['prev_ma'] = df['ma'].shift(1)
         df.dropna(subset=['prev_ma'], inplace=True)
-        df['signal']=np.vectorize(find_signal)(df['open'],df['session_high_y'],df['session_low_y'],df['gmt_hour'],df['rsi'],df['prev_ma'])
+        df.columns
+        df['signal']=np.vectorize(find_signal)(df['open'],df['session_high_y'],df['session_low_y'],df['gmt_hour'],df['predicted_target'],df['prev_ma'])
         df['buy_cnt']=count_signal_buy(df,'signal')
         df['sell_cnt']=count_signal_sell(df, 'signal')
 
