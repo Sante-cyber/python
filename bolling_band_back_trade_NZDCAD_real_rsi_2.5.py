@@ -88,12 +88,12 @@ def count_signal_sell(df, column_name):
 
 
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
-    magic=int(magic*100)
+    magic=int(magic*1000)
     order_type_dict={
             'buy':mt.ORDER_TYPE_BUY,
             'sell': mt.ORDER_TYPE_SELL
         }
-    
+
     price_dict={
         'buy':mt.symbol_info_tick(symbol).ask,
         'sell':mt.symbol_info_tick(symbol).bid
@@ -108,18 +108,22 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
         "deviation":deviation,
         "magic":magic,
         # 'sl':stoploss,
-        'tp':takeprofit,
+        # 'tp':takeprofit,
         "deviation":deviation,
         "comment":"python market order",
         "type_time":mt.ORDER_TIME_GTC,
         "type_filling":mt.ORDER_FILLING_IOC,
     }
-    
+        # Conditionally add stop loss and take profit
     if stoploss is not None:
-       request['sl'] = stoploss
+        request['sl'] = stoploss
+    if takeprofit is not None:
+        request['tp'] = takeprofit
+        
+    print("Sending order:", request)
+    order_result = mt.order_send(request)
 
-    order_result=mt.order_send(request)
-    return(order_result)
+    return order_result
 
 
 def get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD):
