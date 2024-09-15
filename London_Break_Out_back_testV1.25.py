@@ -29,9 +29,9 @@ def moving_average(data, window):
     return data
 
 def find_signal(open,session_high,session_low,gmt_hour,forcast_rsi,pre_ma):
-    if open < session_low and gmt_hour >= 8 and gmt_hour < 12 and forcast_rsi < 30  and open < pre_ma:
+    if open < session_low and gmt_hour >= 8 and gmt_hour < 12  and open < pre_ma:
         return 'sell'
-    elif open > session_high and gmt_hour >= 8 and gmt_hour < 12 and forcast_rsi > 70 and open > pre_ma:
+    elif open > session_high and gmt_hour >= 8 and gmt_hour < 12 and forcast_rsi > 0 and open > pre_ma:
         return 'buy'
     
     # if open<session_low and gmt_hour>=8 and gmt_hour<12:
@@ -41,8 +41,10 @@ def find_signal(open,session_high,session_low,gmt_hour,forcast_rsi,pre_ma):
         
 def calculate_sl_tp(open_price, session_high, session_low, atr, signal):
     if signal == 'buy':
-        sl = session_low - atr
-        tp = open_price + 2 * atr
+        sl = open_price - 4 * atr
+        if abs((sl-open_price)/open_price)>0.0025:
+            sl=open_price-0.0025*open_price
+        tp = open_price + 4 * atr
         # if (tp-open_price)/open_price>0.002:
         #     tp=open_price+open_price*0.002
     elif signal == 'sell':
@@ -187,6 +189,8 @@ class Strategy:
                             
                             if pos.status=='open' and data.time>=pos.open_datetime:
                                 
+                                hours_difference = (data.time-pos.open_datetime).total_seconds()/3600
+                                
                                 df123=self.get_positions_df()
                                 if not df123.empty:
                                     profit= df123['pnl_close'].iloc[-1]
@@ -211,9 +215,6 @@ class Strategy:
                                     pos.close_position(data.time,data.high,'broke warehouse')
                                     is_trade=0
                                     trade=False
-                                elif data.gmt_hour>=17:
-                                    pos.close_position(data.time,data.open,'times up')
-                                    is_trade=0
                                 elif (pos.sl>=data.low and pos.order_type=='buy') :
                                     pos.close_position(data.time,pos.sl,'buy stoploss')
                                     is_trade=0
@@ -225,6 +226,9 @@ class Strategy:
                                     is_trade=0
                                 elif (pos.tp>=data.low and pos.order_type=='sell'):
                                     pos.close_position(data.time,pos.tp,'sell target profit')
+                                    is_trade=0
+                                elif data.gmt_hour>=17 or hours_difference>6:
+                                    pos.close_position(data.time,data.open,'times up')
                                     is_trade=0
         return self.get_positions_df()
 
@@ -256,7 +260,7 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2020, 2024 + 1, 1))
+years=list(range(2021, 2024 + 1, 1))
 symbol=['EURJPY']
 
 
@@ -280,13 +284,15 @@ for year in years:
     for currency in symbol:
         # currency='NZDCAD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M30,datetime(year,1,1), datetime(year,12,31))
-        # bars=pd.read_csv('C:/c/EA/London_break_out/model/forecast_result.csv')
+        # bars=mt.copy_rates_range(currency,mt.TIMEFRAME_M30,datetime(year,1,1), datetime(year,12,31))
+        bars=pd.read_csv('C:/c/EA/London_break_out/model/forecast_result.csv')
         df=pd.DataFrame(bars)
-        df['time']=pd.to_datetime(df['time'],unit='s')
+        df['time']=pd.to_datetime(df['time'])
         df['hour']=df['time'].dt.hour
         df['year']=df['time'].dt.year
         df=df[df['year']==year]
+        df.columns
+        df=df[['time','open','high','low','close','tick_volume','spread','real_volume','predicted_target']]
 
 
         df['time_gmt'] = np.where( (df['time']>=last_day_march) & (df['time'] <= last_day_oct), 
@@ -313,7 +319,7 @@ for year in years:
         df['prev_ma'] = df['ma'].shift(1)
         df.dropna(subset=['prev_ma'], inplace=True)
         df.columns
-        df['signal']=np.vectorize(find_signal)(df['open'],df['session_high_y'],df['session_low_y'],df['gmt_hour'],df['rsi'],df['prev_ma'])
+        df['signal']=np.vectorize(find_signal)(df['open'],df['session_high_y'],df['session_low_y'],df['gmt_hour'],df['predicted_target'],df['prev_ma'])
         df['buy_cnt']=count_signal_buy(df,'signal')
         df['sell_cnt']=count_signal_sell(df, 'signal')
 
