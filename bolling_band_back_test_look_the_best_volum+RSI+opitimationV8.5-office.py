@@ -251,7 +251,7 @@ class Strategy:
                             is_trade=2.5
                             trade_signal='sell'
                         elif is_trade==0 and track_order<=1\
-                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
+                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
                                 and data.sell_cnt==0:
                             is_trade=2.7
                             trade_signal='sell'
@@ -1066,7 +1066,7 @@ class Strategy:
                           elif pre_row.sell_cnt>0 and data.sell_cnt==0:
                               is_trade=0 
                         elif is_trade==2.7 and self.trading_allowed():
-                            if pre_row.rsi>pre_row.low_rsi and data.sd>0.009:
+                            if pre_row.rsi>pre_row.low_rsi:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+2*data.sd
@@ -1179,6 +1179,7 @@ class Strategy:
                                        sl=order_price+0.1*order_price      
                                     is_trade=2.66  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0
                             else: 
@@ -1337,16 +1338,28 @@ class Strategy:
                                     trade=False
                                 elif (pos.sl>=data.low and pos.order_type=='buy'):
                                     pos.close_position(data.time,pos.sl,'closed')
+                                    print(track_order)
                                     track_order=track_order-1
+                                    print(data.time)
+                                    print(track_order)
                                 elif (pos.sl<=data.high and pos.order_type=='sell'):
                                     pos.close_position(data.time,pos.sl,'closed')
+                                    print(track_order)
                                     track_order=track_order-1
+                                    print(data.time)
+                                    print(track_order)
                                 elif (pos.tp<=data.high and pos.order_type=='buy'):
                                     pos.close_position(data.time,pos.tp,'closed')
+                                    print(track_order)
                                     track_order=track_order-1
+                                    print(data.time)
+                                    print(track_order)
                                 elif (pos.tp>=data.low and pos.order_type=='sell'):
                                     pos.close_position(data.time,pos.tp,'closed')
+                                    print(track_order)
                                     track_order=track_order-1
+                                    print(data.time)
+                                    print(track_order)
                                 elif pos.order_type=='buy':
                                     pos.close_position(data.time,data.close,'open')
                                 elif pos.order_type=='sell':
@@ -1496,8 +1509,8 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
-        df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
+        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
+        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
@@ -1514,10 +1527,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_8.5.csv')
-# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_8.5.csv')
-df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_8.5.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_8.5.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opi_8.5.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi_opi_8.5.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_8.5.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_8.5.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])

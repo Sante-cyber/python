@@ -1016,7 +1016,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
         elif pre_row.sell_cnt>0 and data.sell_cnt==0:
             is_trade=0  
     elif is_trade==2.7 :
-        if pre_row.rsi>pre_row.low_rsi:
+        if pre_row.rsi>pre_row.low_rsi and data.sd>0.009:
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
