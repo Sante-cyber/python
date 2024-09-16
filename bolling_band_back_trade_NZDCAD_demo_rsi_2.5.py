@@ -88,7 +88,7 @@ def count_signal_sell(df, column_name):
 
 
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
-    magic=int(magic*100)
+    magic=int(magic*10000)
     order_type_dict={
             'buy':mt.ORDER_TYPE_BUY,
             'sell': mt.ORDER_TYPE_SELL
@@ -114,6 +114,7 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
         "type_time":mt.ORDER_TIME_GTC,
         "type_filling":mt.ORDER_FILLING_IOC,
     }
+    print(request)
     
     if stoploss is not None:
        request['sl'] = stoploss
@@ -290,13 +291,13 @@ def get_strategy(df):
         trade_signal='sell'
     return trade_signal,is_trade,data,pre_row,pre_2_row
 
-def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order):
+def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order,tick):
     
-    tick=mt.symbol_info_tick(symbol) 
+    # tick=mt.symbol_info_tick(symbol) 
     
     result=None
     
-    print(f'cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
+    print(f'cuurently_time--{tick.time}--cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if is_trade==1.1:
         order_price=data.close
@@ -1207,7 +1208,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else: is_trade=0   
-    return result,signal,is_trade,track_point
+    return result,signal,is_trade,track_point,tick.time
     
 
 if mt.initialize():
@@ -1216,7 +1217,7 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=1
+    VOLUME=1.0
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
@@ -1260,29 +1261,39 @@ print("GMT Time:", gmt_time.strftime('%Y-%m-%d %H:%M:%S %Z%z'))
 gmt_hour=gmt_time.hour
 
 
-
+last_order_date=None
 
 while True:
   
-
+ 
     print(f'Stragety symbol:{symbol}')
     
     if mt.positions_total()<=1 and trade_strategy==0:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
+
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
-    if trade_strategy>0:
+    tick=mt.symbol_info_tick(symbol) 
+    tick_date=datetime.fromtimestamp(tick.time).strftime('%Y-%m-%d %H')
+    if trade_strategy>0 and last_order_date!=tick_date:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
-        result,trade_signal,trade_strategy,track_point=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order)
-        print(result)
-        print(f'signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
+        result,trade_signal,trade_strategy,track_point,order_time=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick)
+        if result is not None:
+            print(result)
+            last_order_time=datetime.fromtimestamp(order_time)
+            last_order_date = last_order_time.strftime('%Y-%m-%d %H')
+            print(f'order_time--{last_order_date}--signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
+        else:
+            print(f'Still wating for chance,signal--{trade_signal},trade_strategy-{trade_strategy},track_point-{track_point}')
+    elif  last_order_date==tick_date:
+        print(f'The order have made at order_time--{last_order_date}, it cannot make more than 1 order at the same time')
     else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{record.close}--upper_band--{record.ub}--lower_band--{record.lb}--hour--{record.hour}--rsi--{record.rsi}--rsi signal--{record.signal}')
 
     time.sleep(5)

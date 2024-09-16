@@ -93,7 +93,7 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
             'buy':mt.ORDER_TYPE_BUY,
             'sell': mt.ORDER_TYPE_SELL
         }
-
+    
     price_dict={
         'buy':mt.symbol_info_tick(symbol).ask,
         'sell':mt.symbol_info_tick(symbol).bid
@@ -108,22 +108,19 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
         "deviation":deviation,
         "magic":magic,
         # 'sl':stoploss,
-        # 'tp':takeprofit,
+        'tp':takeprofit,
         "deviation":deviation,
         "comment":"python market order",
         "type_time":mt.ORDER_TIME_GTC,
         "type_filling":mt.ORDER_FILLING_IOC,
     }
-        # Conditionally add stop loss and take profit
+    print(request)
+    
     if stoploss is not None:
-        request['sl'] = stoploss
-    if takeprofit is not None:
-        request['tp'] = takeprofit
-        
-    print("Sending order:", request)
-    order_result = mt.order_send(request)
+       request['sl'] = stoploss
 
-    return order_result
+    order_result=mt.order_send(request)
+    return(order_result)
 
 
 def get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD):
@@ -294,13 +291,13 @@ def get_strategy(df):
         trade_signal='sell'
     return trade_signal,is_trade,data,pre_row,pre_2_row
 
-def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order):
+def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order,tick):
     
-    tick=mt.symbol_info_tick(symbol) 
+    # tick=mt.symbol_info_tick(symbol) 
     
     result=None
     
-    print(f'cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
+    print(f'cuurently_time--{tick.time}--cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if is_trade==1.1:
         order_price=data.close
@@ -1211,7 +1208,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else: is_trade=0   
-    return result,signal,is_trade,track_point
+    return result,signal,is_trade,track_point,tick.time
     
 
 if mt.initialize():
@@ -1233,18 +1230,6 @@ if mt.initialize():
     track_point=0
     
 
-    # symbols=mt.symbols_get()
-    # df=pd.DataFrame(symbols)
-    # a=df.iloc[:,[93,95]]
-    # a.reset_index(inplace=True)
-    # b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
-    # symbols=b[(~a.iloc[:,1].str.contains('.a'))]
-    # positions=mt.positions_get()
-    # if  len(positions) !=0:
-    #    positions_df=pd.DataFrame(positions,columns=positions[0]._asdict().keys())
-    #    total_volume=positions_df['volume'].sum()
-    # else:
-    #    total_volume=0
 
 # Define Sydney time zone
 sydney_tz = pytz.timezone('Australia/Sydney')
@@ -1264,29 +1249,39 @@ print("GMT Time:", gmt_time.strftime('%Y-%m-%d %H:%M:%S %Z%z'))
 gmt_hour=gmt_time.hour
 
 
-
+last_order_date=None
 
 while True:
   
-
+ 
     print(f'Stragety symbol:{symbol}')
     
     if mt.positions_total()<=1 and trade_strategy==0:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
+        
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
-    if trade_strategy>0:
+    tick=mt.symbol_info_tick(symbol) 
+    tick_date=datetime.fromtimestamp(tick.time).strftime('%Y-%m-%d %H')
+    if trade_strategy>0 and last_order_date!=tick_date:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
-        result,trade_signal,trade_strategy,track_point=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order)
-        print(result)
-        print(f'signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
+        result,trade_signal,trade_strategy,track_point,order_time=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick)
+        if result is not None:
+            print(result)
+            last_order_time=datetime.fromtimestamp(order_time)
+            last_order_date = last_order_time.strftime('%Y-%m-%d %H')
+            print(f'order_time--{last_order_date}--signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
+        else:
+            print(f'Still wating for chance,signal--{trade_signal},trade_strategy-{trade_strategy},track_point-{track_point}')
+    elif  last_order_date==tick_date:
+        print(f'The order have made at order_time--{last_order_date}, it cannot make more than 1 order at the same time')
     else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{record.close}--upper_band--{record.ub}--lower_band--{record.lb}--hour--{record.hour}--rsi--{record.rsi}--rsi signal--{record.signal}')
 
     time.sleep(5)

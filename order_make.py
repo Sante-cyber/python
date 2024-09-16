@@ -19,13 +19,14 @@ server='ICMarkets-Demo'
 mt.initialize()
 mt.login(login,password,server)
 
+
 def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
-    magic=int(magic*100)
+    magic=int(magic*10000)
     order_type_dict={
             'buy':mt.ORDER_TYPE_BUY,
             'sell': mt.ORDER_TYPE_SELL
         }
-
+    
     price_dict={
         'buy':mt.symbol_info_tick(symbol).ask,
         'sell':mt.symbol_info_tick(symbol).bid
@@ -46,26 +47,61 @@ def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
         "type_time":mt.ORDER_TIME_GTC,
         "type_filling":mt.ORDER_FILLING_IOC,
     }
-        # Conditionally add stop loss and take profit
+    print(request)
+    
     if stoploss is not None:
-        request['sl'] = stoploss
-    if takeprofit is not None:
-        request['tp'] = takeprofit
-        
-    print("Sending order:", request)
-    order_result = mt.order_send(request)
+       request['sl'] = stoploss
 
-    return order_result
+    order_result=mt.order_send(request)
+    return(order_result)
+
+# def market_order(symbol,volume,order_type,deviation,magic,stoploss,takeprofit):
+#     magic=int(magic*100)
+#     order_type_dict={
+#             'buy':mt.ORDER_TYPE_BUY,
+#             'sell': mt.ORDER_TYPE_SELL
+#         }
+
+#     price_dict={
+#         'buy':mt.symbol_info_tick(symbol).ask,
+#         'sell':mt.symbol_info_tick(symbol).bid
+#     }
+
+#     request={
+#         "action":mt.TRADE_ACTION_DEAL,
+#         "symbol":symbol,
+#         "volume":volume,
+#         "type":order_type_dict[order_type],
+#         "price":price_dict[order_type],
+#         "deviation":deviation,
+#         "magic":magic,
+#         # 'sl':stoploss,
+#         'tp':takeprofit,
+#         "deviation":deviation,
+#         "comment":"python market order",
+#         "type_time":mt.ORDER_TIME_GTC,
+#         "type_filling":mt.ORDER_FILLING_IOC,
+#     }
+#         # Conditionally add stop loss and take profit
+#     if stoploss is not None:
+#         request['sl'] = stoploss
+#     if takeprofit is not None:
+#         request['tp'] = takeprofit
+        
+#     print("Sending order:", request)
+#     order_result = mt.order_send(request)
+
+#     return order_result
 
 
 
 symbol = 'GBPAUD.a'
-VOLUME = 0.01
-DEVIATION = 10
+VOLUME = 1.0
+DEVIATION = 5
 sl = None 
-tp = 1.89042
+tp = 1.9462077314594919
 signal='sell'
-is_trade=2.445
+is_trade=2.1
 
 
 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
