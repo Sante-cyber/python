@@ -1208,7 +1208,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else: is_trade=0   
-    return result,signal,is_trade,track_point,tick.time
+    return result,signal,is_trade,track_point,data.time
     
 
 if mt.initialize():
@@ -1272,7 +1272,8 @@ while True:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
-
+        trade_signal='buy'
+        trade_strategy=1.1
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
@@ -1280,15 +1281,14 @@ while True:
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
     tick=mt.symbol_info_tick(symbol) 
-    tick_date=datetime.fromtimestamp(tick.time).strftime('%Y-%m-%d %H')
+    tick_date=record.time.strftime('%Y-%m-%d %H')
     if trade_strategy>0 and last_order_date!=tick_date:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
         result,trade_signal,trade_strategy,track_point,order_time=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick)
         if result is not None:
             print(result)
-            last_order_time=datetime.fromtimestamp(order_time)
-            last_order_date = last_order_time.strftime('%Y-%m-%d %H')
+            last_order_date = order_time.strftime('%Y-%m-%d %H')
             print(f'order_time--{last_order_date}--signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
         else:
             print(f'Still wating for chance,signal--{trade_signal},trade_strategy-{trade_strategy},track_point-{track_point}')
