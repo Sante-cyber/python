@@ -113,7 +113,7 @@ if __name__ == "__main__":
     df['time']=pd.to_datetime(df['time'],unit='s')
     df['hour']=df['time'].dt.hour
 
-
+    data=df
     # Initialize population of agents
     population_size = 100
     population = initialize_population(population_size)
