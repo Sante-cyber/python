@@ -719,7 +719,8 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                     sl=order_price-2*data.sd
                     tp=order_price+2*data.sd 
                     if track_order==0:
-                        sl=None  
+                        sl=None
+                    is_trade=1.92  
                     result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                     is_trade=0
                 else: is_trade=0  
