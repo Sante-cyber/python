@@ -234,10 +234,10 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2020, 2024 + 1, 1))
+years=list(range(2018, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
-symbol=['GBPAUD']
+symbol=['GBPNZD']
 # years=[2024]
 # volumes=[10000]
 

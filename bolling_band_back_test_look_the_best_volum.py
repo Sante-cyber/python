@@ -157,10 +157,10 @@ class Strategy:
 df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
-volumes = list(range(1000, 10000 + 1000, 1000))
-years=list(range(2020, 2024 + 1, 1))
+volumes = list(range(1000, 1000 + 1000, 1000))
+years=list(range(2018, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
-symbol=['GBPAUD']
+symbol=['EURAUD']
 # years=[2024]
 # volumes=[10000]
 
@@ -213,10 +213,10 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
             
-# df1.to_csv(f'C:/c/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-# df2.to_csv(f'C:/c/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
-df1.to_csv(f'E:/EA/bollinger-bands/H1_year/result_detail_volumn.csv')
-df2.to_csv(f'E:/EA/bollinger-bands/H1_year/final_result_volumn_detail.csv')
+df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn.csv')
+df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail.csv')
+# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn.csv')
+# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])

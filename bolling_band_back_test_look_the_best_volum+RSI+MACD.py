@@ -184,10 +184,10 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2023, 2023 + 1, 1))
+years=list(range(2020, 2023 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
-symbol=['GBPAUD']
+symbol=['EURAUD']
 # years=[2024]
 # volumes=[10000]
 
@@ -244,7 +244,7 @@ for year in years:
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
             print(volume)
-            bollinger_strategy=Strategy(df,300,volume)
+            bollinger_strategy=Strategy(df,200,volume)
             trade=True
             result=bollinger_strategy.run(trade)
             # print(result)
