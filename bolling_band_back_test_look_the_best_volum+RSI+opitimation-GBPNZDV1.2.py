@@ -15,7 +15,7 @@ server='ICMarkets-Demo'
 mt.initialize()
 mt.login(login,password,server)
 
-version='1.22'
+version='1.23'
 currency='GBPNZD'
 
 
@@ -181,10 +181,10 @@ class Strategy:
                                 and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and data.buy_cnt==0 and data.lower_30==0:
                             is_trade=1.1
                             trade_signal='buy'
-                        elif is_trade==0  and track_order==0 \
-                                and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and data.sell_cnt==0  and data.over_70==0:
-                            is_trade=2.1
-                            trade_signal='sell'
+                        # elif is_trade==0  and track_order==0 \
+                        #         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and data.sell_cnt==0  and data.over_70==0:
+                        #     is_trade=2.1
+                        #     trade_signal='sell'
                     if trade==True:
                         # print(is_trade)
                         if is_trade==1.1 and self.trading_allowed():
@@ -290,25 +290,16 @@ class Strategy:
                                     is_trade=0
                                 else: is_trade=0
                           else:
-                                order_price=data.close
-                                if next_row.low<=order_price:
-                                    sl=order_price-2*data.sd
-                                    tp=order_price+2*data.sd
-                                    if (tp-order_price)/order_price>0.0058:
-                                        tp=order_price+0.0058*order_price
-                                    is_trade=1.19   
-                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
-                                    track_order=track_order+1
-                                    is_trade=0
-                                else: is_trade=0     
-                        elif is_trade==2.1 and self.trading_allowed():
+                                is_trade=3.1 
+                                trade_signal='sell'
+                        elif is_trade==3.1 and self.trading_allowed():
                             order_price=data.close
                             if next_row.high>=order_price:
                             # print(f'{data}--{next_row}')
-                                sl=order_price+1*data.sd
+                                sl=order_price+2*data.sd
                                 tp=order_price-2*data.sd
-                                if (order_price-tp)/order_price>0.006:
-                                    tp=order_price-0.006*order_price  
+                                if (order_price-tp)/order_price>0.005:
+                                    tp=order_price-0.005*order_price  
                                 self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 track_order=track_order+1
                                 is_trade=0
