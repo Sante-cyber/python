@@ -1100,8 +1100,8 @@ class Strategy:
                                     #     sl=order_price+0.005*order_price  
                                     # if (order_price-tp)/order_price>0.005:
                                     #     tp=order_price-0.005*order_price
-                                    if track_order==0:
-                                         sl=order_price+0.1*order_price  
+                                    # if track_order==0:
+                                    #      sl=order_price+0.1*order_price  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     track_order=track_order+1
                                     is_trade=0
@@ -1555,14 +1555,15 @@ for year in years:
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
         df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
-
+current_time = datetime.now()
 df1['win_rate']=np.where(df1['profit']<0,0,1)
+df1['close_datetime'] = df1['close_datetime'].fillna(current_time)
 df1['year']=df1['close_datetime'].dt.year
 win_result=df1.groupby(['year','win_rate','volume']).agg({'open_datetime':"count"}).reset_index()
 pivot_table = win_result.pivot_table(index=['year','win_rate'], columns='volume', values='open_datetime')
 # col_sums = win_result['open_datetime'].sum()
 # win_result['win']=win_result['open_datetime'].div(col_sums,axis=0)
-
+df2['close_datetime'] = df2['close_datetime'].fillna(current_time)
 df2['year']=df2['close_datetime'].dt.year
 revenue_result=df2.groupby(['year','volume']).agg({'pnl_close':"sum"})
 revenue_result = revenue_result.unstack()
