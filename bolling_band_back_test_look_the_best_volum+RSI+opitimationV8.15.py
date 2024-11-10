@@ -1553,8 +1553,8 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
-        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
+        # df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
+        df.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
 current_time = datetime.now()
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['close_datetime'] = df1['close_datetime'].fillna(current_time)
@@ -1572,10 +1572,10 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
-# df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_8.5.csv')
-# df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_8.5.csv')
+# df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
+# df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
+df1.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
+df2.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
 # 'E:/EA/bollinger-bands/H1_year'
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
