@@ -1423,7 +1423,7 @@ while True:
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
         trade_signal='buy'
-        trade_strategy=1.4
+        trade_strategy=1.64
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
@@ -1443,6 +1443,7 @@ while True:
             else:
                 trade_strategy=0
                 action=None
+                track_point=0
         if result is not None:
             action=None
             print(result)
