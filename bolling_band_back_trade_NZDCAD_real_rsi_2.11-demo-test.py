@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-from common import login_real,password_real,server_real
+# from common import login_real,password_real,server_real
 # from common import login,password,server
 import numpy as np
 import time
@@ -13,9 +13,9 @@ import talib as ta1
 # import datetime
 import pytz
 
-# login=51658107
-# password='VxBvOa*4'
-# server='ICMarkets-Demo'
+login=51658107
+password='VxBvOa*4'
+server='ICMarkets-Demo'
 
 def rsi(data,window):
     data['rsi']=ta.rsi(data.close, length=window)
@@ -1373,7 +1373,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 if mt.initialize():
     print('connect to MetaTrader5')
-    mt.login(login_real,password_real,server_real)
+    mt.login(login,password,server)
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
@@ -1422,7 +1422,8 @@ while True:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
-        
+        trade_signal='buy'
+        trade_strategy=1.4
         if trade_strategy>0:
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
@@ -1435,6 +1436,7 @@ while True:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
         result,trade_signal,trade_strategy,track_point,order_time,action=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick,action)
+        print(action)
         if action is not None:
             if action==trade_strategy and trade_strategy>0:
                 action=0

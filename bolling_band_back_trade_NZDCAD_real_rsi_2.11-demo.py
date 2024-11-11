@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-from common import login_real,password_real,server_real
+# from common import login_real,password_real,server_real
 # from common import login,password,server
 import numpy as np
 import time
@@ -13,9 +13,9 @@ import talib as ta1
 # import datetime
 import pytz
 
-# login=51658107
-# password='VxBvOa*4'
-# server='ICMarkets-Demo'
+login=51658107
+password='VxBvOa*4'
+server='ICMarkets-Demo'
 
 def rsi(data,window):
     data['rsi']=ta.rsi(data.close, length=window)
@@ -1373,7 +1373,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 if mt.initialize():
     print('connect to MetaTrader5')
-    mt.login(login_real,password_real,server_real)
+    mt.login(login,password,server)
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
