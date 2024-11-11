@@ -1441,6 +1441,7 @@ while True:
             else:
                 trade_strategy=0
                 action=None
+                track_point=0
         if result is not None:
             action=None
             print(result)
