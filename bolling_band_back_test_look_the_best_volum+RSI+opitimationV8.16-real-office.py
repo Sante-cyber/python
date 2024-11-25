@@ -8,14 +8,14 @@ import pandas_ta as ta
 import talib as ta1
 from common import login_real,password_real,server_real
 
-# login=51658107
-# password='VxBvOa*4'
-# server='ICMarkets-Demo'
+login=51658107
+password='VxBvOa*4'
+server='ICMarkets-Demo'
 
 mt.initialize()
 mt.login(login_real,password_real,server_real)
 
-version='8.20'
+version='8.22'
 currency='GBPAUD'
 
 
@@ -693,7 +693,7 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0  
-                            elif data.low_rsi>30 and data.low_rsi>data.high_rsi and (pre_row.low_rsi>30 or pre_row.high_rsi>30):
+                            elif data.low_rsi>30 and data.high_rsi>30 and data.low_rsi>data.high_rsi and (pre_row.low_rsi>30 or pre_row.high_rsi>30):
                                     order_price=data.close
                                     if next_row.low<=order_price:
                                         sl=order_price-2*data.sd
@@ -705,6 +705,22 @@ class Strategy:
                                         if track_order==0:
                                             sl=order_price-0.1*order_price 
                                         is_trade=1.73     
+                                        self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                        track_order=track_order+1
+                                        is_trade=0
+                                    else: is_trade=0  
+                            elif data.low_rsi>30 and data.high_rsi<30  and pre_row.low_rsi>30 and data.high_rsi>pre_row.high_rsi:
+                                    order_price=data.close
+                                    if next_row.low<=order_price:
+                                        sl=order_price-2*data.sd
+                                        tp=order_price+2*data.sd
+                                        # if (tp-order_price)/order_price>0.0058:
+                                        #     tp=order_price+0.0058*order_price
+                                        # if (order_price-sl)/order_price>0.0058:
+                                        #     sl=order_price-0.0058*order_price 
+                                        if track_order==0:
+                                            sl=order_price-0.1*order_price 
+                                        is_trade=1.74     
                                         self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                         track_order=track_order+1
                                         is_trade=0
