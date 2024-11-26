@@ -15,7 +15,7 @@ server='ICMarkets-Demo'
 mt.initialize()
 mt.login(login,password,server)
 
-version='8.20'
+version='8.21'
 currency='GBPAUD'
 
 
@@ -1112,8 +1112,6 @@ class Strategy:
                                 if next_row.high>=order_price:
                                     sl=order_price+2*data.sd
                                     tp=order_price-2*data.sd
-                                    if track_order==0:
-                                          sl=order_price+0.1*order_price
                                     # if (sl-order_price)/order_price>0.05:
                                     #     sl=order_price+0.005*order_price  
                                     # if (order_price-tp)/order_price>0.005:
