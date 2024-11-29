@@ -6,14 +6,14 @@ from datetime import datetime,timedelta
 import numpy as np
 import pandas_ta as ta
 import talib as ta1
-from common import login,password,server
+from common import login_real,password_real,server_real
 
 login=51658107
 password='VxBvOa*4'
 server='ICMarkets-Demo'
 
 mt.initialize()
-mt.login(login,password,server)
+mt.login(login_real,password_real,server_real)
 
 version='8.22'
 currency='GBPAUD'

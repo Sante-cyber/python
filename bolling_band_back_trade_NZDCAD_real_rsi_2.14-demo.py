@@ -1364,7 +1364,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 log_path=os.getcwd()
 file_path = os.path.join(log_path, 'make_order.csv')
-make_order = pd.read_csv(file_path)
+
 
 login=51658107
 password='VxBvOa*4'
@@ -1417,14 +1417,20 @@ while True:
  
     print(f'Stragety symbol:{symbol}')
     
-    if mt.positions_total()<=1 and trade_strategy==0:
+    make_order = pd.read_csv(file_path)
+    
+    if mt.positions_total()<=1 and trade_strategy==0 and make_order.empty:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
         
         if trade_strategy>0:
+            make_order['strategy_time']=record.time.strftime('%Y-%m-%d %H')
+            make_order['strategy']=trade_strategy
+            make_order['open_time']=None
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
     else:
+        trade_strategy=make_order['strategy'].iloc[-1]
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
