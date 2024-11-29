@@ -1439,7 +1439,12 @@ while True:
     if trade_strategy>0 and last_order_date!=tick_date:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
+        pre_trade_strategy=make_order['strategy'].iloc[-1]
         result,trade_signal,trade_strategy,track_point,order_time,action=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick,action)
+        if trade_strategy>0 and trade_strategy!=pre_trade_strategy:
+            make_order['strategy']=trade_strategy
+            make_order['strategy_time']=record.time.strftime('%Y-%m-%d %H')
+            make_order['track_point']
         if action is not None:
             if action==trade_strategy and trade_strategy>0:
                 action=0
