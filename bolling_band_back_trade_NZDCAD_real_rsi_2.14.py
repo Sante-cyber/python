@@ -1364,7 +1364,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 
 log_path=os.getcwd()
-file_path = os.path.join(log_path, 'make_order_real.csv')
+file_path = os.path.join(log_path, 'make_order_gbp_aud_real.csv')
 
 if mt.initialize():
     print('connect to MetaTrader5')

@@ -1364,7 +1364,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 
 log_path=os.getcwd()
-file_path = os.path.join(log_path, 'make_order_demo.csv')
+file_path = os.path.join(log_path, 'make_order_gbp_aud_demo.csv')
 
 
 login=51658107
