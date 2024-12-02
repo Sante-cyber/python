@@ -7,17 +7,26 @@ import numpy as np
 import pandas_ta as ta
 import talib as ta1
 from common import login,password,server
+from common import login_real,password_real,server_real
+import os
 
 login=51658107
 password='VxBvOa*4'
 server='ICMarkets-Demo'
 
+login_real=11137518
+password_real='DmmbYfVg'
+server_real='ICMarkets-MT5-4'
+
 mt.initialize()
 mt.login(login,password,server)
+# mt.login(login_real,password_real,server_real)
+
+disk='C:/c/'
+# disk='E:/'
 
 version='8.22'
 currency='GBPAUD'
-
 
 def rsi(data,window):
     data['rsi']=ta.rsi(data.close, length=window)
@@ -1412,12 +1421,12 @@ years=list(range(2018, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
 symbol=['GBPAUD']
+
+
 # years=[2024]
 # volumes=[10000]
 
 # aa=a.iloc[40:]
-
-
 
 # symbols=mt.symbols_get()
 # df3=pd.DataFrame(symbols)
@@ -1548,8 +1557,8 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
-        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
+        df.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
+        # df.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
 current_time = datetime.now()
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['close_datetime'] = df1['close_datetime'].fillna(current_time)
@@ -1567,8 +1576,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
+df1.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
+df2.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
 # 'E:/EA/bollinger-bands/H1_year'

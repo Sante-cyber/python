@@ -1419,18 +1419,28 @@ while True:
     
     make_order = pd.read_csv(file_path)
     
-    if mt.positions_total()<=1 and trade_strategy==0 and make_order.empty:
+    if mt.positions_total()<=1 and trade_strategy==0:
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         
         trade_signal,trade_strategy,record,pre_record,pre_2_record=get_strategy(symbol_df)
-        
+        # trade_signal='buy'
+        # trade_strategy=1.1
         if trade_strategy>0:
             make_order['strategy_time']=record.time.strftime('%Y-%m-%d %H')
             make_order['strategy']=trade_strategy
-            make_order['open_time']=None
+            make_order['trade_signal']=trade_signal
+            make_order['track_point']=track_point
+            make_order.to_csv(file_path,index=False)
             print(f"It's good chance to {trade_signal} to this symbol--{symbol},the strategy is {trade_strategy}")
+        else:
+            pre_trade_strategy=make_order['strategy'].iloc[-1]
+            strategy_time=make_order['strategy_time'].iloc[-1]
+            if pre_trade_strategy>0:
+                trade_strategy=pre_trade_strategy
+                track_point=make_order['track_point'].iloc[-1]
+                trade_signal=make_order['trade_signal'].iloc[-1]
+            print(f'The programe have been terminal unnromal, now it continue track....trade_strategy time is {strategy_time},trade_strategy is {trade_strategy}, trade_signal is {trade_signal},track_point is {track_point}')
     else:
-        trade_strategy=make_order['strategy'].iloc[-1]
         symbol_df=get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD)
         record,pre_record,pre_2_record=get_strategy(symbol_df)[2:]
 
@@ -1440,25 +1450,35 @@ while True:
         print(f'start run--{trade_strategy}')
         track_order=mt.positions_total()
         pre_trade_strategy=make_order['strategy'].iloc[-1]
+        pre_track_point=make_order['track_point'].iloc[-1]
         result,trade_signal,trade_strategy,track_point,order_time,action=run_strategy(trade_strategy,trade_signal,record,pre_record,pre_2_record,VOLUME,track_point,track_order,tick,action)
-        if trade_strategy>0 and trade_strategy!=pre_trade_strategy:
-            make_order['strategy']=trade_strategy
+        if trade_strategy!=pre_trade_strategy and  trade_strategy>0:
             make_order['strategy_time']=record.time.strftime('%Y-%m-%d %H')
-            make_order['track_point']
+            make_order['strategy']=trade_strategy
+            make_order['trade_signal']=trade_signal
+        if trade_strategy>0:
+            make_order['track_point']=track_point
         if action is not None:
             if action==trade_strategy and trade_strategy>0:
                 action=0
             else:
                 trade_strategy=0
+                make_order['strategy']=trade_strategy
                 action=None
                 track_point=0
+                make_order['track_point']=track_point
+                make_order['trade_signal']=None
         if result is not None:
             action=None
+            make_order['strategy']=0
+            make_order['track_point']=0
+            make_order['trade_signal']=None
             print(result)
             last_order_date = order_time.strftime('%Y-%m-%d %H')
             print(f'order_time--{last_order_date}--signal--{trade_signal},after_trade_strategy-{trade_strategy},track_point-{track_point}')
         else:
             print(f'Still wating for chance,signal--{trade_signal},trade_strategy-{trade_strategy},track_point-{track_point}')
+        make_order.to_csv(file_path,index=False)
     elif  last_order_date==tick_date:
         print(f'The order have made at order_time--{last_order_date}, it cannot make more than 1 order at the same time')
     else: print(f'there is no trade chance for this symbol--{symbol}--last_close_price--{record.close}--upper_band--{record.ub}--lower_band--{record.lb}--hour--{record.hour}--rsi--{record.rsi}--rsi signal--{record.signal}')
