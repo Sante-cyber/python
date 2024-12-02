@@ -210,67 +210,55 @@ def get_strategy(df):
     pre_row=df.iloc[-2]
     pre_2_row=df.iloc[-3]
 
-    if is_trade==0\
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1\
-            and data.buy_cnt==0 and data.lower_30==0:
+    if is_trade==0  and track_order<=1\
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.1
         trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and (pre_row.rsi+pre_row.low_rsi)/2<30 \
-            and data.buy_cnt==0 and data.lower_30==2:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1\
+        and data.buy_cnt==0 and data.lower_30==2:
         is_trade=1.2
         trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
-            and data.buy_cnt==2:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
+        and data.buy_cnt==2:
         is_trade=1.3
         trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
-            and data.buy_cnt==0 and data.lower_30==0 and data.sd<0.02:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
+        and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.4
         trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
-            and data.buy_cnt==0 and  data.lower_30>0:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.rsi>30 and pre_row.rsi<32 and data.rsi>32 and pre_row.close<pre_row.lb:
         is_trade=1.5
         trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>1  \
-            and data.buy_cnt==2:
-        is_trade=1.6
-        trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.rsi>30 and pre_row.rsi<32 and data.rsi>32 and pre_row.close<pre_row.lb:
-        is_trade=1.7
-        trade_signal='buy'
-    elif is_trade==0 \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1\
-            and data.sell_cnt==0  and data.over_70==0:
+    elif is_trade==0  and track_order<=1 \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and data.sell_cnt==0  and data.over_70==0:
         is_trade=2.1
         trade_signal='sell'
-    elif is_trade==0 \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and (pre_row.rsi+pre_row.low_rsi)/2>70 \
-            and data.sell_cnt==0 and data.over_70==2:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 \
+        and data.sell_cnt==0 and data.over_70==2:
         is_trade=2.2
         trade_signal='sell'
-    elif is_trade==0 \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
-            and data.sell_cnt==2:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
+        and data.sell_cnt==2:
         is_trade=2.3
         trade_signal='sell'
-    elif is_trade==0 \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
-            and data.sell_cnt==2:
+    elif is_trade==0  and  track_order<=1\
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
+        and data.sell_cnt==2:
         is_trade=2.4
         trade_signal='sell'
-    elif is_trade==0 \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
-            and data.sell_cnt==0:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
+        and data.sell_cnt==0:
         is_trade=2.5
         trade_signal='sell'
-    elif is_trade==0 \
-            and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
+    elif is_trade==0 and track_order<=1\
+        and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
         is_trade=2.6
         trade_signal='sell'
     return trade_signal,is_trade,data,pre_row,pre_2_row
@@ -286,7 +274,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
     print(f'cuurently_time--{tick.time}--cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if is_trade==1.1:
-        if pre_row.high_rsi>30 and data.sd<0.02:
+        if pre_row.high_rsi>30 and pre_row.high_rsi>pre_row.low_rsi and pre_row.low_rsi>pre_row.rsi:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
@@ -294,429 +282,357 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp=order_price+2*data.sd
                 if (tp-order_price)/order_price>0.0058:
                     tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price
                 if track_order==0:
                     sl=None
-                is_trade=1.11  
+                is_trade=1.11      
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=1.1
-        elif pre_row.high_rsi<30 and data.sd<0.02\
-            and pre_row.rsi<28:
+        elif pre_row.high_rsi>30 and pre_row.high_rsi>max(pre_row.rsi,pre_row.low_rsi) and data.high_rsi>30:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
                 sl=order_price-2*data.sd
-                tp=order_price+2*data.sd  
+                tp=order_price+2*data.sd
                 if (tp-order_price)/order_price>0.0058:
                     tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price
                 if track_order==0:
                     sl=None
-                is_trade=1.12   
+                is_trade=1.12      
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=1.1
-        elif  pre_row.high_rsi<30 \
-            and data.high_rsi>data.low_rsi and data.sd<0.02: 
-            order_price=data.close                          
+        elif pre_row.high_rsi>30 and pre_row.high_rsi>max(pre_row.rsi,pre_row.low_rsi) and data.high_rsi<30 and data.high_rsi<data.low_rsi:
+            order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
                 sl=order_price-2*data.sd
-                tp=order_price+2*data.sd  
+                tp=order_price+2*data.sd
                 if (tp-order_price)/order_price>0.0058:
                     tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price
                 if track_order==0:
                     sl=None
-                is_trade=1.13   
+                is_trade=1.13     
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=1.1
-        elif  pre_row.high_rsi<30 \
-            and data.high_rsi<data.low_rsi and data.sd<0.02 and (pre_row.low_rsi>30 or data.low_rsi>30):
-            order_price=data.close 
+        elif pre_row.high_rsi>30 and pre_row.low_rsi>30 and data.high_rsi>30 and data.low_rsi>30 and data.high_rsi>data.low_rsi and data.high_rsi>pre_row.high_rsi and data.low_rsi>pre_row.low_rsi:
+            order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
                 sl=order_price-2*data.sd
-                tp=order_price+2*data.sd  
+                tp=order_price+2*data.sd
                 if (tp-order_price)/order_price>0.0058:
                     tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price
                 if track_order==0:
                     sl=None
-                is_trade=1.14   
+                is_trade=1.14     
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=1.1       
-        else: 
+            else: 
+                action=1.1                     
+        elif pre_row.high_rsi<min(pre_row.rsi,pre_row.low_rsi) and pre_row.low_rsi<pre_row.rsi and pre_row.high_rsi<30\
+            and data.rsi>max(data.low_rsi,data.high_rsi) and data.low_rsi>data.high_rsi and data.low_rsi<30:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.15      
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.1
+        elif pre_row.high_rsi<min(pre_row.rsi,pre_row.low_rsi) and pre_row.low_rsi<pre_row.rsi and pre_row.high_rsi<30\
+            and data.rsi>max(data.low_rsi,data.high_rsi) and data.high_rsi>30 and data.high_rsi>data.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.16      
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.1
+        elif pre_row.high_rsi<30 and pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and pre_row.low_rsi>30\
+            and data.rsi>data.low_rsi and data.low_rsi>data.high_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.17   
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.1
+        elif pre_row.high_rsi<30 and pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and pre_row.low_rsi<30\
+            and data.high_rsi>data.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.18  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=0
+        else:
             is_trade=3.1 
+            signal='sell'
+            action=None
+    elif is_trade==1.2 :
+        if data.lower_30==0 and pre_row.low_rsi<pre_row.high_rsi and data.low_rsi<data.high_rsi :
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.2
+        elif data.lower_30==0:
+            action=0
+    elif is_trade==1.3 :
+        if data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi>max(data.high_rsi,data.rsi) and pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi):
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.31  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi>max(data.high_rsi,data.rsi) and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi):
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.32  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi>max(data.high_rsi,data.rsi) and pre_row.low_rsi>data.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.33  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi<min(data.high_rsi,data.rsi) and data.low_rsi<pre_row.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.34  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi<min(data.high_rsi,data.rsi) and pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi):
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.35  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi<min(data.high_rsi,data.rsi) and pre_row.high_rsi>pre_row.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.36  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                is_trade=1.3
+        # elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.low_rsi<min(data.high_rsi,data.rsi):
+        #     order_price=data.close
+        #     if tick.ask<=order_price:
+        #         sl=order_price-2*data.sd
+        #         tp=order_price+2*data.sd
+        #         if (tp-order_price)/order_price>0.0058:
+        #             tp=order_price+0.0058*order_price
+        #         is_trade=1.38  
+        #         result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+        #         track_order=track_order+1
+        #         is_trade=0
+        #     else: is_trade=0
+        elif data.buy_cnt==0 and pre_row.buy_cnt==2 and data.rsi>max(data.high_rsi,data.low_rsi) and data.low_rsi>data.high_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.37 
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt==3 and (data.low_rsi>pre_row.low_rsi or data.low_rsi>max(data.rsi,data.high_rsi)):
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.38  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3
+        elif data.buy_cnt==0 and pre_row.buy_cnt>3:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if (tp-order_price)/order_price>0.0058:
+                    tp=order_price+0.0058*order_price
+                if track_order==0:
+                    sl=None
+                is_trade=1.39
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.3                        
+        elif data.buy_cnt==0:
+            is_trade=3.2
             action=None
             signal='sell'
-    elif is_trade==1.2:
-        # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
-        if pre_row.lower_30>2 and pre_row.lower_30<=3 and data.lower_30==0 and abs((data.close-data.open)/data.close)<0.001:
+    elif is_trade==1.4 :
+        if data.low_rsi>30 and data.low_rsi>pre_row.low_rsi and pre_row.lower_30==2:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
                 sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0055:
-                    tp=order_price+0.0055*order_price  
-                if (order_price-sl)/order_price>0.0055:
-                    sl=order_price-0.0055*order_price
-                if track_order==0:
-                    sl=None
-                is_trade=1.21  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.2
-        if data.lower_30==0 and pre_2_row.lower_30>=2 and pre_2_row.lower_30<=3 and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0055:
-                    tp=order_price+0.0055*order_price  
-                if (order_price-sl)/order_price>0.0055:
-                    sl=order_price-0.0055*order_price 
-                if track_order==0:
-                    sl=None
-                is_trade=1.22
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.2
-        elif data.lower_30==0 and pre_2_row.lower_30>=5 and pre_row.lower_30==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-0.005*order_price 
-                tp=order_price+0.009*order_price
-                if track_order==0:
-                    sl=None 
-                is_trade=1.23
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.2 
-        elif data.lower_30==0 and pre_2_row.lower_30>=2 and pre_row.lower_30==0:
-                is_trade=0
-                action=None   
-    elif is_trade==1.3:
-        # elif data.buy_cnt==0 and pre_row.buy_cnt==0 and (pre_row.rsi+pre_row.low_rsi)/2<30 and data.lower_30!=0: 
-        if  pre_row.buy_cnt==2 and data.buy_cnt==0 \
-            and data.lower_30==0 and data.high_rsi<data.low_rsi and pre_row.high_rsi<pre_row.low_rsi\
-            and (pre_row.high_point==1 or pre_row.low_point==1):
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0055:
-                    tp=order_price+0.0055*order_price  
-                if (order_price-sl)/order_price>0.0055:
-                    sl=order_price-0.0055*order_price
-                if track_order==0:
-                    sl=None  
-                is_trade=1.31
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.3
-        elif  pre_row.buy_cnt==2 and data.buy_cnt==0 and pre_row.lower_30>=pre_row.lower_30_low \
-            and data.lower_30==0 and pre_row.low_rsi>pre_row.high_rsi and data.low_rsi<data.high_rsi:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                if pre_row.rsi>27:
-                    sl=order_price-2*data.sd
-                    tp=order_price+3*data.sd
-                else:
-                    sl=order_price-0.005*order_price
-                    tp=order_price+0.005*order_price
-                if track_order==0:
-                    sl=None 
-                is_trade=1.32
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.3
-        elif  data.buy_cnt==0 and pre_2_row.buy_cnt==2 and pre_row.buy_cnt==0 \
-            and pre_row.lower_30==0 and pre_row.low_point!=1:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0045:
-                    tp=order_price+0.0045*order_price  
-                if (order_price-sl)/order_price>0.0045:
-                    sl=order_price-0.0045*order_price
-                if track_order==0:
-                    sl=None  
-                is_trade=1.33
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.3
-        elif  pre_row.buy_cnt>=3 and data.buy_cnt==0 and data.lower_30==0:
-            # and pre_row.lower_30==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.001:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                if data.marubozu==0: 
-                    tp=order_price+0.005*order_price
-                else: tp=order_price+3*data.sd
-                if track_order==0:
-                    sl=None 
-                is_trade=1.34
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.3
-        elif  pre_row.buy_cnt<=3 and pre_row.buy_cnt>0  and pre_row.lower_30>0 and pre_row.lower_30_high>0 and pre_row.lower_30>pre_row.lower_30_high and pre_row.lower_30==pre_row.lower_30_low  and\
-                data.buy_cnt==0 and data.lower_30==data.lower_30_low and data.lower_30>data.lower_30_high and data.lower_30>0 and data.lower_30_high>0: 
-                order_price=data.close
-                if tick.ask<=order_price:
-                    order_price=tick.ask
-                    sl=order_price-2*data.sd
-                    tp=order_price+2*data.sd  
-                    if (tp-order_price)/order_price>0.009:
-                        tp=order_price+0.009*order_price  
-                    if (order_price-sl)/order_price>0.0058:
-                        sl=order_price-0.0058*order_price
-                    if track_order==0:
-                        sl=None  
-                    is_trade=1.35
-                    result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                    is_trade=0
-                else:
-                    action=1.3
-        elif  data.buy_cnt==0 and data.lower_30>0 and  pre_row.buy_cnt>=2:
-                is_trade=1.36
-                action=None
-        elif  pre_2_row.buy_cnt>=2 and pre_row.buy_cnt==0:
-                  is_trade=3.2
-                  action=None
-                  signal='sell'   
-    elif is_trade==1.36:
-        if pre_row.lower_30>0 and pre_row.lower_30>pre_row.lower_30_high and pre_row.lower_30_low==0 and pre_2_row.lower_30_low>0 and\
-            data.lower_30_low==0 and data.lower_30_high==0 and data.buy_cnt==0 and data.lower_30==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd 
-                is_trade=1.361
-                if (tp-order_price)/order_price>0.009:
-                    tp=order_price+0.009*order_price  
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price
-                if track_order==0:
-                    sl=None  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.36
-        elif pre_row.lower_30>0 and pre_row.lower_30>pre_row.lower_30_high and pre_row.lower_30_low>0 and\
-            data.lower_30_low>0 and data.lower_30_high==0 and data.buy_cnt==0 and data.lower_30==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if track_order==0:
-                    sl=None    
-                is_trade=1.362
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.36
-        elif pre_row.lower_30>0 and pre_row.lower_30==pre_row.lower_30_high and\
-                data.buy_cnt==0 and data.lower_30==0 and data.lower_30_high>0:
-                is_trade=1.363
-                action=None
-        elif pre_row.lower_30>0 and pre_row.lower_30<pre_row.lower_30_high and\
-                data.buy_cnt==0 and data.lower_30==0 and data.lower_30_low>0 and data.lower_30_high>0:
-                is_trade=1.364
-                action=None  
-        elif pre_row.lower_30>0 and data.lower_30==0 and data.buy_cnt==0:
-                is_trade=3.3
-                action=None
-                signal='sell'
-    elif is_trade==1.363 :
-        if pre_row.lower_30_high>0 and data.lower_30_high==0\
-            and (pre_row.low_point==1 or pre_row.high_point==1)\
-            and (pre_2_row.low_rsi<30 or pre_row.low_rsi<30)   \
-            and data.buy_cnt==0 and data.lower_30==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if track_order==0:
-                    sl=None    
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.363  
-        elif pre_row.lower_30_high>0 and data.lower_30_high==0:
-                is_trade=3.4
-                action=None
-                signal='sell'
-    elif is_trade==1.364:
-        if pre_row.lower_30_low>0 and data.lower_30_low==0 and data.buy_cnt==0 and data.lower_30==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if track_order==0:
-                    sl=None    
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.364 
-        elif pre_row.lower_30_low>0 and data.lower_30_low==0:
-            is_trade=0
-            action=None
-    elif is_trade==1.4:
-        order_price=data.close
-        if tick.ask<=order_price:
-            order_price=tick.ask
-            sl=order_price-2*data.sd
-            tp=order_price+3*data.sd 
-            if track_order==0:
-                    sl=None       
-            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-            is_trade=0
-        else: 
-            action=1.4 
-    elif  is_trade==1.5:
-        action=0
-        if pre_row.lower_30>0 and data.lower_30==0 and data.buy_cnt==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                if data.sd<0.02:
-                        sl=order_price-2*data.sd
-                        tp=order_price+2*data.sd
-                else: 
-                        tp=order_price+0.006*order_price
-                        sl=order_price-0.006*order_price
-                if track_order==0:
-                    sl=None   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.5 
-    elif  is_trade==1.6:
-        if (pre_row.lower_30>3 and pre_row.buy_cnt>0 and data.lower_30==0 and data.buy_cnt==0)\
-            or (pre_row.lower_30==3 and pre_row.buy_cnt>0 and data.lower_30==0 and data.buy_cnt==0):
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
+                tp=order_price+3*data.sd
                 # if (tp-order_price)/order_price>0.0058:
                 #     tp=order_price+0.0058*order_price
                 # if (order_price-sl)/order_price>0.0058:
                 #     sl=order_price-0.0058*order_price
+                # if track_order==0:
+                #     sl=None 
                 if track_order==0:
-                    sl=None
-                is_trade=1.61         
+                    sl=None       
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.6 
-        elif pre_row.lower_30>0 and pre_row.buy_cnt==0 and data.high_rsi<30 and data.lower_30==0 and data.buy_cnt==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                tp=order_price+0.005*order_price
-                sl=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None
-                is_trade=1.62  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.6 
-        elif pre_row.lower_30>0 and pre_row.buy_cnt==0 and data.high_rsi<20:
-            is_trade=1.63
-            action=None
-        elif pre_row.lower_30>0 and pre_row.buy_cnt==0 and data.lower_30==0 and data.buy_cnt==0:
-            is_trade=1.64
-            action=None
-        elif  data.lower_30==0 and data.buy_cnt==0:
-            is_trade=0
-            action=None 
-    elif is_trade==1.63:
-        if  data.lower_30==0 and data.buy_cnt==0:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd 
-                if track_order==0:
-                    sl=None   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.63 
-    elif is_trade==1.64:
-        if track_point<=1:
-            if data.low_point==1:
-                track_point=track_point+1
-        elif track_point==2:
-            if pre_row.low_point==1:
-                order_price=data.close
-                if tick.ask<=order_price:
-                    order_price=tick.ask
-                    sl=order_price-2*data.sd
-                    tp=order_price+3*data.sd 
-                    if track_order==0:
-                        sl=None   
-                    result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                    is_trade=0
-                    track_point=0
-                else:
-                    action=1.64
-    elif is_trade==1.7:
-        if data.low_rsi<30 and data.high_rsi>pre_row.high_rsi:
-            order_price=data.close
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+1.8*data.sd 
-                if (order_price-sl)/order_price<0.005:
-                    sl=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None  
-                is_trade=1.71   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
             else: 
-                action=1.7  
-        elif data.low_rsi<30 and \
-            ((data.high_rsi<pre_row.high_rsi and data.rsi>data.low_rsi and data.low_rsi>data.high_rsi and (pre_row.rsi>pre_row.low_rsi or pre_row.low_rsi>pre_row.high_rsi))
-            or\
-            (data.high_rsi<pre_row.high_rsi and pre_row.rsi<pre_row.low_rsi and pre_row.low_rsi<pre_row.high_rsi and (data.rsi<data.low_rsi or data.low_rsi<data.high_rsi))):
+                action=1.4 
+        else: 
+            action=0 
+    elif is_trade==1.5 :
+        if data.high_rsi>pre_row.high_rsi and data.low_rsi>pre_row.low_rsi:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                # if (order_price-sl)/order_price<0.005:
+                #     sl=order_price-0.005*order_price
+                # if track_order==0:
+                #      sl=None
+                if track_order==0:
+                    sl=None  
+                is_trade=1.51      
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.5
+        elif pre_row.rsi>max(pre_row.low_rsi,pre_row.high_rsi) and pre_row.low_rsi>pre_row.high_rsi \
+                and (pre_row.lower_30_low>=pre_row.lower_30_high and data.lower_30_low>=data.lower_30_high\
+                        or  pre_row.lower_30_low<=pre_row.lower_30_high and data.lower_30_low<=data.lower_30_high):
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
@@ -724,642 +640,627 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp=order_price+2*data.sd
                 if track_order==0:
                     sl=None  
-                is_trade=1.72    
+                is_trade=1.52      
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=1.7
-        elif data.low_rsi>30 and data.high_rsi>30 and data.low_rsi>data.high_rsi and (pre_row.low_rsi>30 or pre_row.high_rsi>30):
-                order_price=data.close
-                if tick.ask<=order_price:
-                    order_price=tick.ask
-                    sl=order_price-2*data.sd
-                    tp=order_price+2*data.sd 
-                    if track_order==0:
-                        sl=None
-                    is_trade=1.73  
-                    result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                    is_trade=0
-                else: 
-                    action=1.7  
-        elif data.low_rsi>30 and data.high_rsi<30  and pre_row.low_rsi>30 and data.high_rsi>pre_row.high_rsi:
-                order_price=data.close
-                if tick.ask<=order_price:
-                    order_price=tick.ask
-                    sl=order_price-2*data.sd
-                    tp=order_price+2*data.sd 
-                    if track_order==0:
-                        sl=None
-                    is_trade=1.74  
-                    result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                    is_trade=0
-                else: 
-                    action=1.7  
-        else:
-            is_trade=3.5
-            action=None
-            signal='sell'
-    elif is_trade==2.1:
-        if  (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi>70 and (pre_row.high_point>0 or pre_row.low_point>0)\
-                and data.low_rsi>69 and data.high_rsi>70 and data.sd<0.02:
-            order_price=data.close   
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                if abs(data.low_rsi-data.high_rsi)/data.low_rsi<0.0025:
-                    tp=order_price-0.004*order_price 
-                    sl=order_price+0.004*order_price 
-                else:
-                    sl=order_price+1*data.sd
-                    tp=order_price-2*data.sd
-                    if (order_price-tp)/order_price>0.006:
-                        tp=order_price-0.006*order_price  
-                    if (sl-order_price)/order_price>0.006:
-                        sl=order_price+0.006*order_price
+            else: 
+                action=1.5
+        elif pre_row.rsi<min(pre_row.low_rsi,pre_row.high_rsi) and pre_row.low_rsi<pre_row.high_rsi and pre_row.low_point!=1:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
                 if track_order==0:
-                    sl=None
-                is_trade=2.11  
+                    sl=None  
+                is_trade=1.53      
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=2.1
-        elif (pre_row.rsi+pre_row.low_rsi)/2>70 and pre_row.high_rsi<70\
-                and data.high_rsi<data.low_rsi:
+            else: 
+                action=1.5   
+        elif pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) and data.rsi>max(data.low_rsi,data.high_rsi) and data.low_rsi>data.high_rsi and data.rsi>34:
+            order_price=data.close
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                sl=order_price-2*data.sd
+                tp=order_price+2*data.sd
+                if track_order==0:
+                    sl=None  
+                is_trade=1.54      
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=1.5                    
+        else:
+            is_trade=3.3
+            action=None
+            trade_signal='sell'
+    elif is_trade==2.1 :
+        if  data.high_rsi<pre_row.high_rsi and data.low_rsi>70:
             order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
-                sl=order_price+1*data.sd
+                sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.006:
-                    tp=order_price-0.006*order_price  
-                if (sl-order_price)/order_price>0.006:
-                    sl=order_price+0.006*order_price
                 if track_order==0:
-                    sl=None
-                is_trade=2.12  
+                    sl=None    
+                is_trade=2.11
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=2.1
-        elif pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) and data.low_rsi<min(data.high_rsi,data.rsi):
-            order_price=data.close
-            if tick.bid.high>=order_price:
+            else: 
+                action=2.1 
+        elif  data.high_rsi<pre_row.high_rsi and data.low_rsi<70:
+            order_price=data.close 
+            if tick.bid>=order_price:
                 order_price=tick.bid
-            # print(f'{data}--{next_row}')
-                sl=order_price+1*data.sd
+                sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.006:
-                    tp=order_price-0.006*order_price  
+                if (order_price-tp)/order_price>0.005:
+                    tp=order_price-0.005*order_price  
                 if (sl-order_price)/order_price>0.006:
                     sl=order_price+0.006*order_price
                 if track_order==0:
-                    sl=None
-                is_trade=2.13  
+                    sl=None    
+                is_trade=2.12
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=2.1
-        else:  
+        elif  pre_row.rsi<72 and pre_row.rsi>max(pre_row.low_rsi,pre_row.high_rsi):
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if (order_price-tp)/order_price>0.007:
+                    tp=order_price-0.007*order_price  
+                if track_order==0:
+                    sl=None    
+                is_trade=2.13
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.1
+        elif  pre_row.rsi<72 and data.sd>0.008:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.14
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.1
+        elif pre_row.rsi>72 and pre_row.sd>0.01:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                # if (order_price-tp)/order_price>0.007:
+                #     tp=order_price-0.007*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
+                if track_order==0:
+                    sl=None    
+                is_trade=2.15
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.1                                                                 
+        else:
             is_trade=4.1
             action=None
-            signal='sell'                                                  
-    elif is_trade==2.2:
-        if pre_row.over_70>=2 and pre_row.over_70<=3 and data.over_70==0 and abs((data.close-data.open)/data.close)<0.00001:
-            order_price=data.close
+            signal='buy'
+    elif is_trade==2.2 :
+        if  pre_row.over_70>0 and data.over_70==0 and pre_row.high_rsi>max(pre_row.low_rsi,pre_row.rsi) \
+            and data.low_rsi>min(data.rsi,data.high_rsi) and data.rsi<66:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.0058:
-                    tp=order_price-0.0058*order_price  
-                if (sl-order_price)/order_price>0.0058:
-                    sl=order_price+0.0058*order_price
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
                 if track_order==0:
-                    sl=None
-                is_trade=2.21    
+                    sl=None    
+                is_trade=2.21
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=2.2
-        if data.over_70==0 and pre_2_row.over_70>=2 and pre_2_row.over_70<=3 and pre_row.over_70==0 and abs((pre_row.close-pre_row.open)/pre_row.close)>=0.00001:
-            order_price=data.close
+        elif  pre_row.over_70>0 and data.over_70==0 and pre_row.high_rsi>max(pre_row.low_rsi,pre_row.rsi) \
+            and data.low_rsi>min(data.rsi,data.high_rsi) and data.rsi>=66 and data.rsi<69:
+            action=0
+        elif  pre_row.over_70>0 and data.over_70==0 and pre_row.high_rsi>max(pre_row.low_rsi,pre_row.rsi) \
+            and data.low_rsi<min(data.rsi,data.high_rsi) and data.rsi>max(data.low_rsi,data.high_rsi):
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (sl-order_price)/order_price>0.005:
-                    sl=order_price+0.006*order_price  
-                if (order_price-tp)/order_price>0.005:
-                    tp=order_price-0.005*order_price
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
                 if track_order==0:
-                    sl=None
-                is_trade=2.22     
+                    sl=None    
+                is_trade=2.22
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=2.2
-        elif pre_row.over_70>=7 and data.over_70==0:
-            order_price=data.close
+        elif pre_row.over_70>0 and data.over_70==0:
+            is_trade=4.2
+            action=None
+            signal='buy'
+    elif is_trade==2.3 :
+        if  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi>pre_row.low_rsi:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
+                sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                sl=order_price+0.005*order_price
                 if track_order==0:
-                    sl=None   
-                is_trade=2.23
+                    sl=None    
+                is_trade=2.31
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=2.2   
-        elif data.over_70==0 and pre_2_row.over_70>=2 and pre_row.over_70==0:
-                is_trade=4.2
-                action=None
-                signal='buy'
-    elif is_trade==2.3:
-        if  data.sell_cnt==0 and data.over_70_low==0 and data.over_70==0 and pre_2_row.sell_cnt==2 and pre_row.sell_cnt==0 \
-            and pre_row.over_70==0 and pre_row.low_rsi<pre_row.high_rsi :
-            if pre_row.high_point!=1:
-                order_price=data.close
-                if tick.bid>=order_price:
-                    order_price=tick.bid
-                    sl=order_price+2.5*data.sd
-                    tp=order_price-3*data.sd
-                    if track_order==0:
-                        sl=None  
-                    is_trade=2.31
-                    result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                    is_trade=0
-                else:is_trade=0
             else: 
                 action=2.3
-        elif  pre_row.sell_cnt==2 and data.sell_cnt==0 \
-            and data.over_70==0 and data.low_rsi>data.high_rsi and (data.over_70_high>0 or data.over_70_low>0):
-            order_price=data.close
+        elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.high_rsi>data.low_rsi and data.low_rsi>data.rsi and data.high_rsi<pre_row.high_rsi:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (sl-order_price)/order_price>0.0045:
-                    sl=order_price+0.0045*order_price  
-                if (order_price-tp)/order_price>0.0045:
-                    tp=order_price-0.0045*order_price
                 if track_order==0:
-                    sl=None   
+                    sl=None    
                 is_trade=2.32
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
+            else: 
                 action=2.3
-        elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and \
-                data.over_70==0 and data.low_rsi>data.high_rsi and data.rsi>data.low_rsi and\
-                data.over_70_high==0 and data.over_70_low==0:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.01*order_price
-                if track_order==0:
-                    sl=None   
-                is_trade=2.33
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.3
-        elif pre_row.sell_cnt==2 and data.sell_cnt==0 \
-            and data.over_70==0 and data.low_rsi>data.high_rsi and data.rsi<data.high_rsi and\
-                data.over_70_high==0 and data.over_70_low==0:
-                is_trade=2.34
-                action=None
-        elif  pre_row.sell_cnt==3 and data.sell_cnt==0 \
-                and data.over_70==0 and data.low_rsi<data.high_rsi:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.0058*order_price
-                tp=order_price-0.0058*order_price
-                if track_order==0:
-                    sl=None  
-                is_trade=2.35
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.3
-        elif  pre_row.sell_cnt>3 and data.sell_cnt==0 and  data.over_70==0:
-            order_price=data.close
+        elif  pre_row.sell_cnt>=2 and data.sell_cnt==0 and data.over_70==0:
+            is_trade=4.31
+            action=None
+            signal='buy'
+        elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70!=0:
+            is_trade=2.33
+            action=None
+        elif pre_row.sell_cnt>2 and data.sell_cnt==0 and data.over_70!=0:
+            is_trade=2.34
+            action=None
+    elif is_trade==2.33 :   
+        if pre_row.over_70==3 and data.over_70==0 and data.high_rsi>pre_row.high_rsi:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
                 if track_order==0:
-                    sl=None  
-                is_trade=2.36
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.3
-        elif data.sell_cnt==0 and data.over_70>0 and pre_row.sell_cnt>=2:
-            is_trade=2.37
-            action=None
-        elif  data.sell_cnt==0 and pre_2_row.sell_cnt>=2 and pre_row.sell_cnt==0:
-                is_trade=4.3
-                action=None
-                signal='buy'
-    elif is_trade==2.34:
-        if data.low_rsi>data.high_rsi and data.rsi>data.low_rsi:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.01*order_price
-                if track_order==0:
-                    sl=None   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.34
-        elif data.low_rsi<64:
-            is_trade=0
-            action=None  
-    elif is_trade==2.37:
-        if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi<70 and pre_row.high_rsi>70\
-            and data.high_rsi<pre_row.high_rsi:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None   
-                is_trade=2.371
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.37
-        if pre_row.over_70>0 and data.over_70==0  and pre_row.low_rsi<70 and pre_row.high_rsi<70\
-            and data.high_rsi<70:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.005*order_price 
-                if track_order==0:
-                    sl=None  
-                is_trade=2.372
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.37
-        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and pre_row.high_rsi<80:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None   
-                is_trade=2.373
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.37
-        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and pre_row.high_rsi>80:
-            order_price=data.close
-            if tick.bid>=order_price:
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.008*order_price
-                if track_order==0:
-                    sl=None     
-                is_trade=2.374
+                    sl=None    
+                is_trade=2.331
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 track_order=track_order+1
                 is_trade=0
-            else:
-                action=2.37
-        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and  pre_row.low_rsi<80  and pre_row.high_rsi>70 and pre_row.high_rsi<80 and pre_row.low_rsi<pre_row.high_rsi\
-            and data.high_rsi<pre_row.high_rsi and (data.low_rsi<data.high_rsi or data.low_rsi>max(data.rsi,data.high_rsi)):
-            order_price=data.close
+            else: 
+               action=2.33 
+        elif pre_row.over_70>3 and data.over_70==0:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
-                sl=order_price+0.006*order_price  
-                tp=order_price-0.01*order_price
+                if pre_2_row.high_rsi>pre_row.high_rsi and pre_row.high_rsi>data.high_rsi:
+                        sl=order_price+2*data.sd
+                        tp=order_price-2*data.sd
+                else:
+                        tp=order_price-0.005*order_price  
+                        sl=order_price+0.005*order_price
                 if track_order==0:
                     sl=None    
-                is_trade=2.375
+                is_trade=2.332
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
-            else:
-                action=2.37
-        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<80 and pre_row.high_rsi>70 and pre_row.low_rsi>pre_row.high_rsi:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.008*order_price  
-                tp=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None    
-                is_trade=2.376
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.37
-        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and pre_row.low_rsi<80  and pre_row.low_rsi>pre_row.high_rsi\
-                and data.high_rsi>70:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.008*order_price
-                if track_order==0:
-                    sl=None    
-                is_trade=2.377
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.37
+            else: 
+                action=2.33
         elif pre_row.over_70>0 and data.over_70==0:
-                is_trade=4.4
-                action=None
-                signal='buy'                   
-    elif is_trade==2.4:
-        if pre_row.sell_cnt>0 and data.sell_cnt==0 and pre_row.rsi<80 and pre_row.high_rsi>80:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd
-                if track_order==0:
-                    sl=None
-                is_trade=2.41   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.4
-        elif pre_row.sell_cnt>0 and data.sell_cnt==0  and pre_row.high_rsi<80 and ( pre_row.rsi>max(pre_row.high_rsi,pre_row.low_rsi) or pre_row.rsi<min(pre_row.high_rsi,pre_row.low_rsi)) :
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+0.005*order_price  
-                tp=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None
-                is_trade=2.42 
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.4
-        elif pre_row.sell_cnt>0 and data.sell_cnt==0 and pre_row.rsi>80 and pre_row.high_rsi>80 and pre_row.rsi<min(pre_row.high_rsi,pre_row.low_rsi):
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd
-                if track_order==0:
-                    sl=None
-                is_trade=2.43    
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.4
-        elif pre_row.sell_cnt>0 and data.sell_cnt==0:
-            is_trade=0
-            action=None 
-    elif is_trade==2.5 :
-        if pre_row.rsi>pre_row.low_rsi and data.sd>0.009:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd
-                # if (sl-order_price)/order_price>0.05:
-                #     sl=order_price+0.005*order_price  
-                # if (order_price-tp)/order_price>0.005:
-                #     tp=order_price-0.005*order_price
-                if track_order==0:
-                    sl=None   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.5
-        else: 
-            is_trade=0
+            is_trade=4.32
             action=None
-    elif is_trade==2.6:  
-        if pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70 and pre_row.high_rsi<70  and (pre_row.high_point>0 or pre_row.low_point>0):                            
-            order_price=data.close
+            signal='buy'
+    elif is_trade==2.34 :   
+        if pre_row.over_70>0 and data.over_70==0 and pre_row.rsi>max(pre_row.high_rsi,pre_row.low_rsi) and data.over_70_high>=data.over_70_low:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
                 if track_order==0:
-                    sl=None   
-                is_trade=2.61      
+                    sl=None    
+                is_trade=2.341
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
             else: 
-                action=2.6       
-        elif pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70  and data.low_rsi<70 and data.high_rsi>pre_row.high_rsi:                         
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd 
-                if track_order==0:
-                    sl=None      
-                is_trade=2.62  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=2.6 
-        elif  pre_row.low_rsi<pre_row.high_rsi and data.high_rsi>70 and  pre_row.high_rsi<data.high_rsi:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                tp=order_price-0.007*order_price
-                sl=order_price+0.008*order_price
-                if track_order==0:
-                    sl=None      
-                is_trade=2.63    
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=2.6
-        elif  (pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) or (pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and pre_row.high_rsi>70))  and pre_row.high_rsi>data.high_rsi and pre_row.low_rsi>data.low_rsi and pre_row.high_point!=1 and pre_row.low_point!=1:
-            order_price=data.close
-            if tick.bid>=order_price:
-                order_price=tick.bid
-                tp=order_price-0.007*order_price
-                sl=order_price+0.005*order_price
-                if track_order==0:
-                    sl=None     
-                is_trade=2.64  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=2.6 
-        elif  data.low_rsi>max(data.rsi,data.high_rsi) and pre_row.high_rsi<data.high_rsi and pre_row.low_rsi<data.low_rsi and (pre_row.high_point==1 or pre_row.low_point==1):
-            order_price=data.close
+                action=2.34
+        elif pre_2_row.over_70>0 and pre_row.over_70==0 and pre_2_row.rsi<min(pre_2_row.high_rsi,pre_2_row.low_rsi) and pre_row.high_rsi>max(pre_row.rsi,pre_row.low_rsi)\
+            and data.over_70==0 and data.over_70_high==0:
+            order_price=data.close 
             if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.0058:
-                    tp=order_price-0.0058*order_price
-                if (sl-order_price)/order_price>0.0058:
-                    sl=order_price+0.0058*order_price
+                if (order_price-tp)/order_price>0.008:
+                    tp=order_price-0.008*order_price  
                 if track_order==0:
-                    sl=None        
-                is_trade=2.65  
+                    sl=None    
+                is_trade=2.342
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
             else: 
-                action=2.6
-        elif  data.low_rsi<min(data.rsi,data.high_rsi) and pre_row.high_rsi>data.high_rsi and pre_row.low_rsi>data.low_rsi and pre_row.low_rsi>pre_row.high_rsi and (pre_row.high_point==1 or pre_row.low_point==1):
-            order_price=data.close
+                action=2.34
+        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi) and data.over_70==0 and data.over_70_high==0 and data.over_70_low==0:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.343
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.34
+        elif pre_2_row.over_70>0 and pre_row.over_70==0 and data.over_70==0:
+            is_trade=4.33
+            action=None
+            signal='buy'
+    elif is_trade==2.4 :
+        if pre_row.sell_cnt>0 and data.sell_cnt==0 and data.over_70==0:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.41
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.4
+        elif pre_row.sell_cnt>0 and data.sell_cnt==0 and data.over_70!=0:
+            is_trade=2.42
+            action=None
+    elif is_trade==2.42 : 
+        if pre_row.over_70>0 and data.over_70==0:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                if data.sd>0.009:
+                    sl=order_price+2*data.sd
+                    tp=order_price-2*data.sd
+                else:
+                    sl=order_price+0.005*order_price
+                    tp=order_price-0.0045*order_price
+                if track_order==0:
+                    sl=None    
+                is_trade=2.42
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.42
+    elif is_trade==2.5 :
+        if pre_row.over_70>0 and data.over_70==0 and pre_row.sell_cnt==1 and data.low_rsi>max(pre_row.rsi,pre_row.high_rsi):
+            order_price=data.close 
             if tick.bid>=order_price:
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.0058:
-                    tp=order_price-0.0058*order_price
-                if (sl-order_price)/order_price>0.0058:
-                    sl=order_price+0.0058*order_price
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
                 if track_order==0:
-                    sl=None      
-                is_trade=2.66  
+                    sl=None    
+                is_trade=2.51
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
             else: 
-                action=2.6
-        elif  pre_row.high_rsi>max(pre_row.rsi,pre_row.low_rsi) and data.high_rsi>max(data.rsi,data.low_rsi) and pre_row.low_rsi>70 and pre_row.high_rsi>70:
-            order_price=data.close
+                action=2.5
+        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi):
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
+                if track_order==0:
+                    sl=None    
+                is_trade=2.52
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.5
+        elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
+            and data.high_rsi<pre_row.high_rsi:
+            order_price=data.close 
             if tick.bid>=order_price:
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.0058:
-                    tp=order_price-0.0058*order_price
-                if (sl-order_price)/order_price>0.0058:
-                    sl=order_price+0.0058*order_price
+                # if (order_price-tp)/order_price>0.006:
+                #     tp=order_price-0.006*order_price  
+                # if (sl-order_price)/order_price>0.006:
+                #     sl=order_price+0.006*order_price
+                # if track_order==0:
+                #     sl=None
                 if track_order==0:
-                    sl=order_price+0.1*order_price      
-                is_trade=2.67  
+                    sl=None    
+                is_trade=2.53
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.5
+        elif pre_row.over_70>0 and data.over_70==0:
+            is_trade=4.5
+            action=None
+            signal='buy'
+    elif is_trade==2.6 :
+        if pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and data.low_rsi<pre_row.low_rsi :
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.61
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 track_order=track_order+1
                 is_trade=0
             else: 
                 action=2.6
-        else: 
-            is_trade=4.4
+        elif pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and data.low_rsi>pre_row.low_rsi and data.high_rsi>pre_row.high_rsi:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.62
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.6
+        elif pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi):
+                is_trade=4.61
+                action=None
+                trade_signal='buy'
+        elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi>70 and pre_row.high_rsi>70 and data.close<data.ub and data.low_rsi<70:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+1.5*data.sd
+                tp=order_price-1.6*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.63
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.6
+        elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi<70 and pre_row.high_rsi<70 \
+            and pre_2_row.high_rsi<60:
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+1.5*data.sd
+                tp=order_price-1.8*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.64
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.6
+        elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi<70 and pre_row.high_rsi<70 \
+            and pre_2_row.high_rsi>60 and pre_2_row.high_rsi<70 and pre_2_row.high_rsi<max(pre_2_row.rsi,pre_2_row.low_rsi):
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+1.5*data.sd
+                tp=order_price-1.8*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.65
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else: 
+                action=2.6
+        elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi):
+            action=0
+        elif  pre_row.high_rsi>70 and data.high_rsi>data.low_rsi :
+            order_price=data.close 
+            if tick.bid>=order_price:
+                order_price=tick.bid
+                sl=order_price+2*data.sd
+                tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.66
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
+                is_trade=0
+            else:
+                action=2.6 
+        elif pre_row.high_rsi>70:
+            is_trade=4.62
             action=None
-            signal='buy'  
-    elif is_trade==3.1:                            
-            order_price=data.close
-            if tick.bid>=order_price and track_order==0:
+            signal='buy'                                               
+        elif data.low_rsi>data.high_rsi:
+            order_price=data.close 
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 sl=order_price+2*data.sd
                 tp=order_price-2*data.sd
+                if track_order==0:
+                    sl=None    
+                is_trade=2.67
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                track_order=track_order+1
                 is_trade=0
             else: 
-                action=3.1     
-    elif is_trade==3.2 :                            
-            order_price=data.close
-            if tick.bid>=order_price and track_order==0:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd 
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=3.2
-    elif is_trade==3.3:                            
-            order_price=data.close
-            if tick.bid>=order_price and track_order==0:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd  
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=3.3
-    elif is_trade==3.4:                            
-            order_price=data.close
-            if tick.bid>=order_price and track_order==0:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=3.4        
-    elif is_trade==3.5:                            
-            order_price=data.close
-            if tick.bid>=order_price and track_order==0:
-                order_price=tick.bid
-                sl=order_price+2*data.sd
-                tp=order_price-2*data.sd
-                if (order_price-tp)/order_price>0.0058:
-                    tp=order_price-0.0058*order_price
-                if (sl-order_price)/order_price>0.0058:
-                    sl=order_price+0.0058*order_price   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: action=3.5           
-    elif is_trade==4.1:                            
-            order_price=data.close
-            if tick.ask<=order_price and track_order==0:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=4.1
-    elif is_trade==4.2:                            
-            order_price=data.close
-            if tick.ask<=order_price and track_order==0:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=4.2  
-    elif is_trade==4.3:                            
-            order_price=data.close
-            if tick.ask<=order_price and track_order==0:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd 
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=4.3       
-    elif is_trade==4.4:                            
-            order_price=data.close
-            if tick.ask<=order_price and track_order==0:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0058:
-                    tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=4.4 
-    elif is_trade==4.5:                            
-            order_price=data.close
-            if tick.ask<=order_price and track_order==0:
-                order_price=tick.ask
-                sl=order_price-2*data.sd
-                tp=order_price+2*data.sd
-                if (tp-order_price)/order_price>0.0058:
-                    tp=order_price+0.0058*order_price
-                if (order_price-sl)/order_price>0.0058:
-                    sl=order_price-0.0058*order_price   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else: 
-                action=4.5   
+                action=2.6
+        else:
+            action=0
+        
+    elif is_trade==3.1 :
+        order_price=pre_row.close
+        if tick.bid>=order_price and track_order==0:
+            sl=order_price+2*pre_row.sd
+            tp=order_price-2*pre_row.sd  
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==3.2 :
+        order_price=pre_row.close
+        if tick.bid>=order_price and track_order==0:
+            sl=order_price+2*pre_row.sd
+            tp=order_price-2*pre_row.sd 
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==3.3 :
+        order_price=pre_row.close
+        if tick.bid>=order_price and track_order==0:
+            sl=order_price+2*pre_row.sd
+            tp=order_price-2*pre_row.sd 
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.1 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.2 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.31 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.32 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.33 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.5 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.61 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0
+    elif is_trade==4.62 :
+        order_price=pre_row.close
+        if tick.ask<=order_price and track_order==0:
+            sl=order_price-2*pre_row.sd
+            tp=order_price+2*pre_row.sd   
+            result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+            track_order=track_order+1
+            is_trade=0
+        else: is_trade=0 
     return result,signal,is_trade,track_point,data.time,action
 
 
@@ -1411,9 +1312,11 @@ while True:
     try:
         print(f'Strategy symbol: {symbol}')
         
+        positions = len(mt.positions_get(symbol=symbol))
+        
         make_order = pd.read_csv(file_path)
         
-        if mt.positions_total() <= 1 and trade_strategy == 0:
+        if positions <= 1 and trade_strategy == 0:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             
             trade_signal, trade_strategy, record, pre_record, pre_2_record = get_strategy(symbol_df)
