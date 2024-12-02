@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-# from common import login_real,password_real,server_real
+from common import login_real,password_real,server_real
 # from common import login,password,server
 import numpy as np
 import time
@@ -1364,18 +1364,12 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 
 log_path=os.getcwd()
-file_path = os.path.join(log_path, 'make_order_demo.csv')
-
-
-login=51658107
-password='VxBvOa*4'
-server='ICMarkets-Demo'
-    
+file_path = os.path.join(log_path, 'make_order_real.csv')
 
 if mt.initialize():
     print('connect to MetaTrader5')
-    # mt.login(login_real,password_real,server_real)
-    mt.login(login,password,server)
+    mt.login(login_real,password_real,server_real)
+    # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
     VOLUME=0.2
@@ -1439,8 +1433,8 @@ while True:
                     track_point = make_order['track_point'].iloc[-1]
                     trade_signal = make_order['trade_signal'].iloc[-1]
                     print(f'The program terminated unnaturally, now continuing... '
-                        f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
-                        f'trade signal: {trade_signal}, track point: {track_point}')
+                      f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
+                      f'trade signal: {trade_signal}, track point: {track_point}')
         else:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             record, pre_record, pre_2_record = get_strategy(symbol_df)[2:]
