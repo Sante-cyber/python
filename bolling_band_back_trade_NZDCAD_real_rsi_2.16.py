@@ -1487,6 +1487,7 @@ while True:
             
             make_order.to_csv(file_path, index=False)
         elif last_order_date == tick_date:
+            trade_strategy = 0
             make_order['strategy'] = 0
             make_order['track_point'] = 0
             make_order['trade_signal'] = None
