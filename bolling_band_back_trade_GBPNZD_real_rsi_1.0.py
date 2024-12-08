@@ -210,54 +210,54 @@ def get_strategy(df):
     pre_row=df.iloc[-2]
     pre_2_row=df.iloc[-3]
 
-    if is_trade==0  and track_order<=1\
+    if is_trade==0  \
         and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.1
         trade_signal='buy'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1\
         and data.buy_cnt==0 and data.lower_30==2:
         is_trade=1.2
         trade_signal='buy'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
         and data.buy_cnt==2:
         is_trade=1.3
         trade_signal='buy'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
         and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.4
         trade_signal='buy'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.rsi>30 and pre_row.rsi<32 and data.rsi>32 and pre_row.close<pre_row.lb:
         is_trade=1.5
         trade_signal='buy'
-    elif is_trade==0  and track_order<=1 \
+    elif is_trade==0   \
         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and data.sell_cnt==0  and data.over_70==0:
         is_trade=2.1
         trade_signal='sell'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 \
         and data.sell_cnt==0 and data.over_70==2:
         is_trade=2.2
         trade_signal='sell'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
         and data.sell_cnt==2:
         is_trade=2.3
         trade_signal='sell'
-    elif is_trade==0  and  track_order<=1\
+    elif is_trade==0  \
         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
         and data.sell_cnt==2:
         is_trade=2.4
         trade_signal='sell'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
         and data.sell_cnt==0:
         is_trade=2.5
         trade_signal='sell'
-    elif is_trade==0 and track_order<=1\
+    elif is_trade==0 \
         and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
         is_trade=2.6
         trade_signal='sell'
@@ -1319,6 +1319,8 @@ while True:
         print(f'Strategy symbol: {symbol}')
         
         positions = len(mt.positions_get(symbol=symbol))
+
+        print(f'now the {symbol} order number is {positions}')
         
         make_order = pd.read_csv(file_path)
         
@@ -1353,13 +1355,13 @@ while True:
         
         if trade_strategy > 0 and last_order_date != tick_date:
             print(f'Starting run -- {trade_strategy}')
-            track_order = mt.positions_total()
+            # track_order = mt.positions_total()
             pre_trade_strategy = make_order['strategy'].iloc[-1]
             pre_track_point = make_order['track_point'].iloc[-1]
             
             result, trade_signal, trade_strategy, track_point, order_time, action = run_strategy(
                 trade_strategy, trade_signal, record, pre_record, pre_2_record, 
-                VOLUME, track_point, track_order, tick, action)
+                VOLUME, track_point, positions, tick, action)
             
             if trade_strategy != pre_trade_strategy and trade_strategy > 0:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
