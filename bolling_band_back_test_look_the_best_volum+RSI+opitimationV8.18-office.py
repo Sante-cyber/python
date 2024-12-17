@@ -6,7 +6,7 @@ from datetime import datetime,timedelta
 import numpy as np
 import pandas_ta as ta
 import talib as ta1
-from common import login,password,server
+# from common import login,password,server
 from common import login_real,password_real,server_real
 import os
 
