@@ -6,8 +6,8 @@ from datetime import datetime,timedelta
 import numpy as np
 import pandas_ta as ta
 import talib as ta1
-from common import login,password,server
-# from common import login_real,password_real,server_real
+# from common import login,password,server
+from common import login_real,password_real,server_real
 import os
 
 login=51658107
@@ -19,13 +19,13 @@ password_real='DmmbYfVg'
 server_real='ICMarkets-MT5-4'
 
 mt.initialize()
-mt.login(login,password,server)
-# mt.login(login_real,password_real,server_real)
+# mt.login(login,password,server)
+mt.login(login_real,password_real,server_real)
 
 disk='C:/c/'
 # disk='E:/'
 
-version='8.22'
+version='8.23_real'
 currency='GBPAUD'
 
 def rsi(data,window):
@@ -1011,7 +1011,7 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else:is_trade=0  
-                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<80 and pre_row.high_rsi>70 and pre_row.low_rsi>pre_row.high_rsi:
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70  and pre_row.low_rsi<79 and pre_row.high_rsi>70 and pre_row.low_rsi>pre_row.high_rsi:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+0.008*order_price  
@@ -1023,7 +1023,7 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else:is_trade=0  
-                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and pre_row.low_rsi<80  and pre_row.low_rsi>pre_row.high_rsi\
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>70 and pre_row.low_rsi<79 and pre_row.high_rsi<70  and pre_row.low_rsi>pre_row.high_rsi\
                                   and data.high_rsi>70:
                                 order_price=data.close
                                 if next_row.high>=order_price:
@@ -1036,15 +1036,15 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else:is_trade=0 
-                            # elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>80 and  pre_row.high_rsi>80  and pre_row.low_rsi>pre_row.high_rsi:
-                            #     order_price=data.close
-                            #     if next_row.high>=order_price:
-                            #         sl=order_price+0.005*order_price  
-                            #         tp=order_price-0.008*order_price 
-                            #         is_trade=2.447
-                            #         self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
-                            #         is_trade=0
-                            #     else:is_trade=0 
+                            elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>80 and  pre_row.high_rsi>80  and pre_row.low_rsi>pre_row.high_rsi:
+                                order_price=data.close
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.005*order_price  
+                                    tp=order_price-0.008*order_price 
+                                    is_trade=2.447
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    is_trade=0
+                                else:is_trade=0 
                             elif pre_row.over_70>0 and data.over_70==0:
                                 is_trade=4.4
                                 trade_signal='buy'                 
