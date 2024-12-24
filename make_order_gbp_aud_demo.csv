@@ -1,2 +1,2 @@
-strategy_time,strategy,track_point,trade_signal
-,3.1,0,sell
+strategy_time,strategy,track_point,trade_signal,action_time
+,0,0,,
