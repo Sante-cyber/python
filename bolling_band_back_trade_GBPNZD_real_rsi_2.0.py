@@ -1428,6 +1428,9 @@ while True:
         # Log the exception with traceback
         print("An error occurred! Restarting...")
         print(traceback.format_exc())
+        if mt.initialize():
+            print('connect to MetaTrader5')
+            mt.login(login_real,password_real,server_real)
         time.sleep(5)  # Optional delay before retrying
 
 
