@@ -6,8 +6,8 @@ from datetime import datetime,timedelta
 import numpy as np
 import pandas_ta as ta
 import talib as ta1
-from common import login,password,server
-# from common import login_real,password_real,server_real
+# from common import login,password,server
+from common import login_real,password_real,server_real
 import os
 
 login=51658107
@@ -19,13 +19,13 @@ password_real='DmmbYfVg'
 server_real='ICMarkets-MT5-4'
 
 mt.initialize()
-mt.login(login,password,server)
-# mt.login(login_real,password_real,server_real)
+# mt.login(login,password,server)
+mt.login(login_real,password_real,server_real)
 
 disk='C:/c/'
 # disk='E:/'
 
-version='8.24_office'
+version='8.24_real'
 currency='GBPAUD'
 
 def rsi(data,window):
@@ -1290,8 +1290,8 @@ class Strategy:
                                     tp=order_price-2*pre_row.sd
                                     if (order_price-tp)/order_price>0.005:
                                         tp=order_price-0.005*order_price
-                                    if (sl-order_price)/order_price>0.005:
-                                        sl=order_price+0.005*order_price   
+                                    if (sl-order_price)/order_price>0.0058:
+                                        sl=order_price+0.0058*order_price   
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     track_order=track_order+1
                                     is_trade=0
