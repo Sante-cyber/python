@@ -25,7 +25,7 @@ mt.login(login,password,server)
 disk='C:/c/'
 # disk='E:/'
 
-version='8.23_office'
+version='8.24_office'
 currency='GBPAUD'
 
 def rsi(data,window):
@@ -1003,7 +1003,7 @@ class Strategy:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+0.006*order_price  
-                                    tp=order_price-0.01*order_price
+                                    tp=order_price-0.006*order_price
                                     if track_order==0:
                                        sl=order_price+0.1*order_price   
                                     is_trade=2.375
@@ -1288,8 +1288,8 @@ class Strategy:
                                 if data.high>=order_price and track_order==0:
                                     sl=order_price+2*pre_row.sd
                                     tp=order_price-2*pre_row.sd
-                                    if (order_price-tp)/order_price>0.0058:
-                                        tp=order_price-0.0058*order_price
+                                    if (order_price-tp)/order_price>0.005:
+                                        tp=order_price-0.005*order_price
                                     if (sl-order_price)/order_price>0.0058:
                                         sl=order_price+0.0058*order_price   
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
@@ -1418,7 +1418,7 @@ df1=pd.DataFrame()
 df2=pd.DataFrame()
 j=0
 volumes = list(range(1000, 1000 + 1000, 1000))
-years=list(range(2018, 2025 + 1, 1))
+years=list(range(2025, 2025 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
 symbol=['GBPAUD']
@@ -1447,7 +1447,7 @@ for year in years:
     for currency in symbol:
         # currency='NZDCAD'
         print(f'{currency}--start')
-        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year,1,1), datetime(year,12,31))
+        bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year-7,1,1), datetime(year,12,31))
         # bars_h1=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
         # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
