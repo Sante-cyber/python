@@ -22,8 +22,8 @@ mt.initialize()
 # mt.login(login,password,server)
 mt.login(login_real,password_real,server_real)
 
-disk='C:/c/'
-# disk='E:/'
+# disk='C:/c/'
+disk='E:/'
 
 version='8.23_real'
 currency='GBPAUD'

@@ -865,7 +865,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp=order_price-2*data.sd
                 sl=order_price+0.005*order_price
                 if track_order==0:
-                    sl=None   
+                    sl=None     
                 is_trade=2.23
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
@@ -1373,7 +1373,7 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.15
+    VOLUME=0.25
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
@@ -1445,10 +1445,11 @@ while True:
 
         tick = mt.symbol_info_tick(symbol)
         tick_date = record.time.strftime('%Y-%m-%d %H')
+      
         
         if trade_strategy > 0 and last_order_date != tick_date:
             print(f'Starting run -- {trade_strategy}')
-            track_order = mt.positions_total()
+            track_order = len(mt.positions_get(symbol=symbol))
             pre_trade_strategy = make_order['strategy'].iloc[-1]
             pre_track_point = make_order['track_point'].iloc[-1]
             
