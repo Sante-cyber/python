@@ -1373,7 +1373,7 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.25
+    VOLUME=0.3
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
