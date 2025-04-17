@@ -1286,7 +1286,9 @@ class Strategy:
                             order_price=pre_row.close
                             if data.low<=order_price and track_order==0:
                                 sl=order_price-2*pre_row.sd
-                                tp=order_price+2*pre_row.sd   
+                                tp=order_price+2*pre_row.sd
+                                if (tp-order_price)/order_price>0.005:
+                                    tp=order_price+0.005*order_price
                                 self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                 track_order=track_order+1
                                 is_trade=0
