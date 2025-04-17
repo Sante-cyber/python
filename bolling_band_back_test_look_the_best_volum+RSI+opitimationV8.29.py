@@ -1183,22 +1183,19 @@ class Strategy:
                                 is_trade=4.42
                                 trade_signal='buy'
                         elif is_trade==2.5 and self.trading_allowed():
-                            if pre_row.rsi>pre_row.low_rsi and data.sd>0.009:
+                            if pre_row.over_70>0 and data.over_70==0 and data.low_rsi<70 :
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+0.008*order_price  
                                     tp=order_price-0.008*order_price   
-                                    # if (sl-order_price)/order_price>0.05:
-                                    #     sl=order_price+0.005*order_price  
-                                    # if (order_price-tp)/order_price>0.005:
-                                    #     tp=order_price-0.005*order_price
-                                    # if track_order==0:
-                                    #      sl=order_price+0.1*order_price  
+                                    is_trade=2.51  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     track_order=track_order+1
                                     is_trade=0
                                 else:is_trade=0
-                            else: is_trade=0
+                            elif pre_row.over_70>0 and data.over_70==0:
+                                is_trade=4.5
+                                trade_signal='buy'
                         elif is_trade==2.6 and self.trading_allowed():  
                             if pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70 and pre_row.high_rsi<70  and (pre_row.high_point>0 or pre_row.low_point>0):                            
                                 order_price=data.close
@@ -1316,7 +1313,7 @@ class Strategy:
                                     is_trade=0
                                 else: is_trade=0
                             else: 
-                                is_trade=4.5
+                                is_trade=4.6
                                 trade_signal='buy'   
                         elif is_trade==3.1 and self.trading_allowed():                            
                                 order_price=pre_row.close
@@ -1561,8 +1558,17 @@ class Strategy:
                                     self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
                                     track_order=track_order+1
                                     is_trade=0
-                                else: is_trade=0    
+                                else: is_trade=0
                         elif is_trade==4.5 and self.trading_allowed():                            
+                                order_price=pre_row.close
+                                if data.low<=order_price and track_order==0:
+                                    tp=order_price+0.008*order_price
+                                    sl=order_price-0.008*order_price
+                                    self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade))
+                                    track_order=track_order+1
+                                    is_trade=0
+                                else: is_trade=0      
+                        elif is_trade==4.6 and self.trading_allowed():                            
                                 order_price=pre_row.close
                                 if data.low<=order_price and track_order==0:
                                     sl=order_price-2*pre_row.sd
