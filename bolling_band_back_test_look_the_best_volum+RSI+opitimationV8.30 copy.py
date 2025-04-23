@@ -1207,7 +1207,8 @@ class Strategy:
                                 is_trade=4.5
                                 trade_signal='buy'
                         elif is_trade==2.6 and self.trading_allowed():  
-                            if pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70 and pre_row.high_rsi<70  and (pre_row.high_point>0 or pre_row.low_point>0):                            
+                            if pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70  \
+                               and pre_row.high_rsi<70 and (pre_row.high_point>0 or pre_row.low_point>0):                            
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+2*data.sd
@@ -1223,8 +1224,8 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0   
-                            # and pre_row.high_rsi>70   
-                            elif pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70  and data.low_rsi<70 and data.high_rsi>pre_row.high_rsi:                         
+                            elif pre_row.low_rsi<pre_row.high_rsi and data.high_rsi<70 \
+                               and data.low_rsi<70 and data.high_rsi>pre_row.high_rsi:                         
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     sl=order_price+2*data.sd
@@ -1240,7 +1241,8 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0  
-                            elif  pre_row.low_rsi<pre_row.high_rsi and data.high_rsi>70 and  pre_row.high_rsi<data.high_rsi:
+                            elif pre_row.low_rsi<pre_row.high_rsi and data.high_rsi>70 \
+                               and  pre_row.high_rsi<data.high_rsi:
                                 order_price=data.close
                                 if next_row.high>=order_price:
                                     # sl=order_price+2*data.sd
