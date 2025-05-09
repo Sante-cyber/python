@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-from common import login_real,password_real,server_real
-# from common import login,password,server
+# from common import login_real,password_real,server_real
+from common import login,password,server
 import numpy as np
 import time
 import schedule
@@ -1560,7 +1560,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=3.44           
     elif is_trade==3.5:                            
             order_price=data.close
-            if tick.bid>=order_price and track_order==0:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 if data.sd>0.01:
                     sl=order_price+0.01*order_price
@@ -1573,7 +1573,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
             else: action=3.5           
     elif is_trade==4.11:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price:
                 order_price=tick.ask
                 sl=order_price-0.007*order_price
                 tp=order_price+0.006*order_price 
@@ -1583,7 +1583,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.11
     elif is_trade==4.12:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.006*order_price
                 sl=order_price-0.007*order_price   
@@ -1593,7 +1593,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.12
     elif is_trade==4.13:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.006*order_price
                 sl=order_price-0.007*order_price   
@@ -1603,7 +1603,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.13
     elif is_trade==4.14:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1617,7 +1617,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.14
     elif is_trade==4.15:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1631,7 +1631,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.15
     elif is_trade==4.2:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1645,7 +1645,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.2  
     elif is_trade==4.31:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.006*order_price
                 sl=order_price-0.007*order_price   
@@ -1655,7 +1655,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.31
     elif is_trade==4.32:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1669,7 +1669,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.32 
     elif is_trade==4.33:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.006*order_price
                 sl=order_price-0.007*order_price   
@@ -1679,7 +1679,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.33 
     elif is_trade==4.34:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.007*order_price
                 sl=order_price-0.008*order_price
@@ -1689,7 +1689,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.34
     elif is_trade==4.361:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     sl=order_price-0.01*order_price
@@ -1703,7 +1703,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.361  
     elif is_trade==4.362:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     sl=order_price-0.01*order_price
@@ -1717,7 +1717,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.362  
     elif is_trade==4.363:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd<0.01:
                     tp=order_price+0.007*order_price
@@ -1731,7 +1731,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.363  
     elif is_trade==4.364:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 sl=order_price-0.006*order_price  
                 tp=order_price+0.005*order_price
@@ -1741,7 +1741,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.364  
     elif is_trade==4.365:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.005*order_price
                 sl=order_price-0.006*order_price   
@@ -1751,7 +1751,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.365          
     elif is_trade==4.41:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.005*order_price
                 sl=order_price-0.006*order_price
@@ -1761,7 +1761,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.41 
     elif is_trade==4.42:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1775,7 +1775,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.42 
     elif is_trade==4.5:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.007*order_price
                 sl=order_price-0.008*order_price
@@ -1785,7 +1785,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.5
     elif is_trade==4.61:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.007*order_price
                 sl=order_price-0.008*order_price
@@ -1795,7 +1795,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.61
     elif is_trade==4.62:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.005*order_price
                 sl=order_price-0.006*order_price
@@ -1805,7 +1805,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.62   
     elif is_trade==4.63:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 if data.sd>0.01:
                     tp=order_price+0.01*order_price
@@ -1819,7 +1819,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=4.63   
     elif is_trade==4.64:                            
             order_price=data.close
-            if tick.ask<=order_price and track_order==0:
+            if tick.ask<=order_price :
                 order_price=tick.ask
                 tp=order_price+0.005*order_price
                 sl=order_price-0.006*order_price
@@ -1831,15 +1831,15 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 
 log_path=os.getcwd()
-file_path = os.path.join(log_path, 'python/make_order_gbp_aud_real.csv')
+file_path = os.path.join(log_path, 'make_order_gbp_aud_demo.csv')
 
 if mt.initialize():
     print('connect to MetaTrader5')
-    mt.login(login_real,password_real,server_real)
-    # mt.login(login,password,server)
+    # mt.login(login_real,password_real,server_real)
+    mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.4
+    VOLUME=0.1
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
@@ -1885,7 +1885,7 @@ while True:
         
         make_order = pd.read_csv(file_path)
         
-        if positions <= 1 and trade_strategy == 0:
+        if positions <= 2 and trade_strategy == 0:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             
             trade_signal, trade_strategy, record, pre_record, pre_2_record = get_strategy(symbol_df)
@@ -1894,7 +1894,6 @@ while True:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
                 make_order['trade_signal'] = trade_signal
-                make_order['track_point'] = track_point
                 make_order.to_csv(file_path, index=False)
                 print(f"It's a good chance to {trade_signal} this symbol -- {symbol}, the strategy is {trade_strategy}")
             else:
@@ -1902,7 +1901,6 @@ while True:
                 strategy_time = make_order['strategy_time'].iloc[-1]
                 if pre_trade_strategy > 0:
                     trade_strategy = pre_trade_strategy
-                    track_point = make_order['track_point'].iloc[-1]
                     trade_signal = make_order['trade_signal'].iloc[-1]
                     print(f'The program terminated unnaturally, now continuing... '
                       f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
@@ -1919,7 +1917,6 @@ while True:
             print(f'Starting run -- {trade_strategy}')
             # track_order = len(mt.positions_get(symbol=symbol))
             pre_trade_strategy = make_order['strategy'].iloc[-1]
-            pre_track_point = make_order['track_point'].iloc[-1]
             
             result, trade_signal, trade_strategy, track_point, order_time, action = run_strategy(
                 trade_strategy, trade_signal, record, pre_record, pre_2_record, 
@@ -1928,10 +1925,7 @@ while True:
             if trade_strategy != pre_trade_strategy and trade_strategy > 0:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
-                make_order['trade_signal'] = trade_signal
-                
-            if trade_strategy > 0:
-                make_order['track_point'] = track_point
+                make_order['trade_signal'] = trade_signal               
                 
             if action is not None:
                 
@@ -1945,22 +1939,23 @@ while True:
                     make_order['strategy'] = trade_strategy
                     action = None
                     action_time = None
-                    track_point = 0
-                    make_order['track_point'] = track_point
                     make_order['trade_signal'] = None
             
             if result is not None:
                 action = None
                 action_time = None
                 make_order['strategy'] = 0
-                make_order['track_point'] = 0
                 make_order['trade_signal'] = None
                 print(result)
                 last_order_date = order_time.strftime('%Y-%m-%d %H')
                 print(f'Order time: {last_order_date}, signal: {trade_signal}, '
-                      f'after trade strategy: {trade_strategy}, track point: {track_point}')
+                      f'after trade strategy: {trade_strategy}')
+            elif action is None and trade_strategy==0:
+                make_order['strategy'] = 0
+                make_order['trade_signal'] = None
+                print(f'This situation have not never happened in history,please notice this new situation,the trade strategy is {pre_trade_strategy}')
             elif action is None:
-                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
+                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}')
             else:
                 print(f'Still waiting for the price to make order, action_time:{action_time},signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
             
@@ -1968,7 +1963,6 @@ while True:
         elif last_order_date == tick_date:
             trade_strategy = 0
             make_order['strategy'] = 0
-            make_order['track_point'] = 0
             make_order['trade_signal'] = None
             make_order.to_csv(file_path, index=False)
             print(f'The order was already made at order time: {last_order_date}. No duplicate orders at the same time allowed.')
@@ -1985,7 +1979,8 @@ while True:
         print(traceback.format_exc())
         if mt.initialize():
             print('connect to MetaTrader5')
-            mt.login(login_real,password_real,server_real)
+            # mt.login(login_real,password_real,server_real)
+            mt.login(login,password,server)
         time.sleep(5)  # Optional delay before retrying
 
 
