@@ -1881,7 +1881,12 @@ while True:
         
         positions = len(mt.positions_get(symbol=symbol))
         
-        print(f'now the {symbol} order number is {positions}')
+        positions_detail = mt.positions_get(symbol=symbol)
+        
+        buy_count = sum(1 for pos in positions_detail if pos.type == mt.ORDER_TYPE_BUY)
+        sell_count = sum(1 for pos in positions_detail if pos.type == mt.ORDER_TYPE_SELL)
+        
+        print(f'now the {symbol} order number is {positions},buy_count is {buy_count},sell_count is {sell_count}')
         
         make_order = pd.read_csv(file_path)
         
