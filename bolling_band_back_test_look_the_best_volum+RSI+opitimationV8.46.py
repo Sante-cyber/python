@@ -25,7 +25,7 @@ mt.login(login,password,server)
 disk='C:/c/'
 # disk='E:/'
 
-version='8.94_real'
+version='8.94_office'
 currency='GBPAUD'
 
 def rsi(data,window):
