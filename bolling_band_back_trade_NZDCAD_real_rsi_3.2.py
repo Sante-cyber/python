@@ -890,7 +890,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
         elif pre_row.high_rsi>70 and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi)\
             and pre_row.low_rsi>68 and pre_row.low_rsi<70 and data.high_rsi<70 and pre_row.high_rsi>80:
             order_price=data.close
-            if tick.bid.high>=order_price:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 tp=order_price-0.005*order_price 
                 sl=order_price+0.006*order_price
@@ -906,7 +906,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
         elif pre_row.high_rsi>70 and pre_row.low_rsi>min(pre_row.high_rsi,pre_row.rsi)\
             and data.high_rsi>min(data.rsi,data.low_rsi) and data.high_rsi<max(data.rsi,data.low_rsi):
             order_price=data.close
-            if tick.bid.high>=order_price:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 tp=order_price-0.005*order_price 
                 sl=order_price+0.006*order_price 
@@ -922,7 +922,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
         elif pre_row.high_rsi<70 and\
             pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi) :
             order_price=data.close
-            if tick.bid.high>=order_price:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 tp=order_price-0.006*order_price  
                 sl=order_price+0.007*order_price
@@ -936,7 +936,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
             and data.low_rsi>max(data.high_rsi,data.rsi) and data.low_rsi>pre_row.low_rsi \
             and data.high_rsi<=pre_row.high_rsi:
             order_price=data.close
-            if tick.bid.high>=order_price:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 tp=order_price-0.006*order_price  
                 sl=order_price+0.007*order_price
@@ -950,7 +950,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
             and data.low_rsi<max(data.high_rsi,data.rsi) and data.low_rsi<pre_row.low_rsi \
             and  pre_row.low_point>0:
             order_price=data.close
-            if tick.bid.high>=order_price:
+            if tick.bid>=order_price:
                 order_price=tick.bid
                 tp=order_price-0.005*order_price  
                 sl=order_price+0.006*order_price
