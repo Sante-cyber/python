@@ -1906,14 +1906,15 @@ while True:
                 make_order.to_csv(file_path, index=False)
                 print(f"It's a good chance to {trade_signal} this symbol -- {symbol}, the strategy is {trade_strategy}")
             else:
-                pre_trade_strategy = make_order['strategy'].iloc[-1]
-                strategy_time = make_order['strategy_time'].iloc[-1]
-                if pre_trade_strategy > 0:
-                    trade_strategy = pre_trade_strategy
-                    trade_signal = make_order['trade_signal'].iloc[-1]
-                    print(f'The program terminated unnaturally, now continuing... '
-                      f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
-                      f'trade signal: {trade_signal}, track point: {track_point}')
+                if not make_order.empty:
+                    pre_trade_strategy = make_order['strategy'].iloc[-1]
+                    strategy_time = make_order['strategy_time'].iloc[-1]
+                    if pre_trade_strategy > 0:
+                        trade_strategy = pre_trade_strategy
+                        trade_signal = make_order['trade_signal'].iloc[-1]
+                        print(f'The program terminated unnaturally, now continuing... '
+                        f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
+                        f'trade signal: {trade_signal}, track point: {track_point}')
         else:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             record, pre_record, pre_2_record = get_strategy(symbol_df)[2:]
