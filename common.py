@@ -1,5 +1,5 @@
-login=23000392
-password='A&Ck50t$cW9vH&'
+login=23000424
+password='hGB7&BmqUvn!a3'
 server='ICMarketsAU-Demo'
 
 login_real=11137518

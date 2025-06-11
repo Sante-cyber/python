@@ -25,7 +25,7 @@ mt.login(login,password,server)
 disk='C:/c/'
 # disk='E:/'
 
-version='8.95_office'
+version='8.96_office'
 currency='GBPAUD'
 
 def rsi(data,window):
@@ -257,7 +257,7 @@ class Strategy:
                         # print(is_trade)
                         if is_trade==1.1  and self.trading_allowed():
                             order_price=data.close
-                            if pre_row.high_rsi>30 and data.low_rsi>min(data.rsi,data.high_rsi):
+                            if pre_row.high_rsi>30 and data.low_rsi>min(data.rsi,data.high_rsi) and data.low_rsi<max(data.rsi,data.high_rsi):
                                 if next_row.low<=order_price:
                                     sl=order_price-0.007*order_price
                                     tp=order_price+0.007*order_price                                
