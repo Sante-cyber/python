@@ -9,8 +9,8 @@ import talib as ta1
 from common import login,password,server
 from common import login_real,password_real,server_real
 
-login=23000424
-password='hGB7&BmqUvn!a3'
+login=23000426
+password='aUiXgem1&JfkQE'
 server='ICMarketsAU-Demo'
 
 mt.initialize()
@@ -410,7 +410,7 @@ class Strategy:
                                     is_trade=0
                                 else: is_trade=0                        
                         elif is_trade==1.4 and self.trading_allowed():
-                            # if data.low_rsi>30 and data.low_rsi>pre_row.low_rsi and pre_row.lower_30==2:
+                            # if data.low_rsi>30 and pre_row.lower_30==2 and data.low_rsi>pre_row.low_rsi :
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     sl=order_price-2*data.sd

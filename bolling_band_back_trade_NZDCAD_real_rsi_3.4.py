@@ -648,12 +648,11 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 action=1.38
         elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
             and data.high_rsi<pre_row.high_rsi:
-                is_trade=3.26
-                action=None
-                signal='sell'
+                is_trade=0
+                signal=None
         elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
             and data.high_rsi>pre_row.high_rsi and pre_row.lower_30==pre_row.lower_30_low \
-            and pre_row.lower_30>0 and data.lower_30_low==0 and data.lower_30==0:
+            and data.lower_30_low==0:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask

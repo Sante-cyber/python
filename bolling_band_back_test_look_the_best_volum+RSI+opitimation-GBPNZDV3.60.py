@@ -9,9 +9,9 @@ import talib as ta1
 from common import login,password,server
 from common import login_real,password_real,server_real
 
-login=51658107
-password='VxBvOa*4'
-server='ICMarkets-Demo'
+login=23000426
+password='aUiXgem1&JfkQE'
+server='ICMarketsAU-Demo'
 
 mt.initialize()
 mt.login(login,password,server)
