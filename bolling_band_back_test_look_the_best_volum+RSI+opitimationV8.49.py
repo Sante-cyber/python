@@ -25,7 +25,7 @@ mt.login(login,password,server)
 disk='C:/c/'
 # disk='E:/'
 
-version='8.96_office'
+version='8.97_office'
 currency='GBPAUD'
 
 def rsi(data,window):
@@ -576,8 +576,8 @@ class Strategy:
                                 is_trade=0
                                 trade_signal=None
                             elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
-                                and data.high_rsi>pre_row.high_rsi and pre_row.lower_30==pre_row.lower_30_low \
-                                and data.lower_30_low==0:
+                                and data.high_rsi>pre_row.high_rsi and pre_row.lower_30_low>pre_row.lower_30_high\
+                                and data.lower_30_low==0 and data.lower_30_high==0:
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     if data.sd<0.01:
@@ -587,6 +587,22 @@ class Strategy:
                                         sl=order_price-0.01*order_price
                                         tp=order_price+0.01*order_price   
                                     is_trade=1.384
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
+                                    track_order=track_order+1
+                                    is_trade=0
+                                else:is_trade=0
+                            elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
+                                and data.high_rsi>pre_row.high_rsi and pre_row.lower_30_low>pre_row.lower_30_high\
+                                and data.lower_30_low>0 and data.lower_30_high>0:
+                                order_price=data.close
+                                if next_row.low<=order_price:
+                                    if data.sd<0.01:
+                                        sl=order_price-0.005*order_price
+                                        tp=order_price+0.005*order_price
+                                    else:
+                                        sl=order_price-0.01*order_price
+                                        tp=order_price+0.01*order_price   
+                                    is_trade=1.385
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
                                     is_trade=0
