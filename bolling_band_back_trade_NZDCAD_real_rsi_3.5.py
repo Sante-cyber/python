@@ -1910,7 +1910,7 @@ while True:
         
         make_order = pd.read_csv(file_path)
         
-        if positions <= 2 and trade_strategy == 0:
+        if positions <= 3 and trade_strategy == 0:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             
             trade_signal, trade_strategy, record, pre_record, pre_2_record = get_strategy(symbol_df)
