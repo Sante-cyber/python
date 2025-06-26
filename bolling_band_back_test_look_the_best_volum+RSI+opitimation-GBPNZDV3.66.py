@@ -19,7 +19,7 @@ mt.login(login,password,server)
 # mt.login(login_real,password_real,server_real)
 
 
-version='4.07_office'
+version='4.09_office'
 currency='GBPNZD'
 
 
@@ -33,7 +33,7 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price+0.008*order_price
         else:
             tp=order_price-0.005*order_price  
-            sl=order_price+0.006*order_price
+            sl=order_price+0.007*order_price
     elif trade_signal=='buy':
         if data.sd>0.01:
             tp=order_price+0.01*order_price  
@@ -43,7 +43,7 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price-0.008*order_price
         else:
             tp=order_price+0.005*order_price  
-            sl=order_price-0.006*order_price
+            sl=order_price-0.007*order_price
     return tp,sl
 
 
@@ -1021,10 +1021,7 @@ class Strategy:
                             if pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and data.low_rsi<pre_row.low_rsi :
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    sl=order_price+2*data.sd
-                                    tp=order_price-2*data.sd
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal)  
                                     is_trade=2.61
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
@@ -1033,17 +1030,7 @@ class Strategy:
                             elif pre_row.low_rsi>max(pre_row.rsi,pre_row.high_rsi) and data.low_rsi>pre_row.low_rsi and data.high_rsi>pre_row.high_rsi:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    # modify
-                                    sl=order_price+0.007*order_price
-                                    tp=order_price-0.006*order_price
-                                    # if (order_price-tp)/order_price>0.006:
-                                    #     tp=order_price-0.006*order_price  
-                                    # if (sl-order_price)/order_price>0.006:
-                                    #     sl=order_price+0.006*order_price
-                                    # if track_order==0:
-                                    #     sl=order_price+0.1*order_price
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal) 
                                     is_trade=2.62
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
@@ -1053,56 +1040,48 @@ class Strategy:
                                     is_trade=4.61
                                     trade_signal='buy'
                             # modify-20250210
-                            elif pre_row.rsi>=69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi>70 and pre_row.high_rsi>70 and data.close<data.ub and data.low_rsi<70:
+                            elif pre_row.rsi>=69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
+                                and data.high_rsi>70 and pre_row.high_rsi>70 \
+                                and data.close<data.ub and data.low_rsi<70:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    sl=order_price+2*data.sd
-                                    tp=order_price-2*data.sd
-                                    # if (order_price-tp)/order_price>0.005:
-                                    #     tp=order_price-0.005*order_price  
-                                    # if (sl-order_price)/order_price>0.006:
-                                    #     sl=order_price+0.006*order_price
-                                    # if track_order==0:
-                                    #     sl=order_price+0.1*order_price
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal) 
                                     is_trade=2.63
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0
-                            elif pre_row.rsi<69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi>70 and pre_row.high_rsi>70 and data.high_rsi>pre_row.high_rsi and data.close<data.ub and data.low_rsi<70:
+                            elif pre_row.rsi>=69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
+                                and data.high_rsi<70 and pre_row.high_rsi<70 \
+                                and pre_2_row.high_rsi<60:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    sl=order_price+1.5*data.sd
-                                    tp=order_price-1.6*data.sd
-                                    # if (order_price-tp)/order_price>0.005:
-                                    #     tp=order_price-0.005*order_price  
-                                    # if (sl-order_price)/order_price>0.006:
-                                    #     sl=order_price+0.006*order_price
-                                    # if track_order==0:
-                                    #     sl=order_price+0.1*order_price
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal) 
+                                    is_trade=2.631
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
+                                    track_order=track_order+1
+                                    is_trade=0
+                                else: is_trade=0
+                            elif pre_row.rsi>=69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi):
+                                is_trade=4.63
+                                trade_signal='buy'
+                            elif pre_row.rsi<69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi)\
+                                and  pre_row.high_rsi>70 and data.high_rsi>70  \
+                                and data.high_rsi>pre_row.high_rsi and data.close<data.ub and data.low_rsi<70:
+                                order_price=data.close 
+                                if next_row.high>=order_price:
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal)    
                                     is_trade=2.64
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0
-                            elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) and data.high_rsi<70 and pre_row.high_rsi<70 \
+                            elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
+                                and data.high_rsi<70 and pre_row.high_rsi<70 \
                                 and pre_2_row.high_rsi<60:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    sl=order_price+1.5*data.sd
-                                    tp=order_price-1.8*data.sd
-                                    # if (order_price-tp)/order_price>0.005:
-                                    #     tp=order_price-0.005*order_price  
-                                    # if (sl-order_price)/order_price>0.006:
-                                    #     sl=order_price+0.006*order_price
-                                    # if track_order==0:
-                                    #     sl=order_price+0.1*order_price
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal)   
                                     is_trade=2.65
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
@@ -1112,16 +1091,7 @@ class Strategy:
                                 and pre_2_row.high_rsi>60 and pre_2_row.high_rsi<70 and pre_2_row.high_rsi<max(pre_2_row.rsi,pre_2_row.low_rsi):
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    sl=order_price+1.5*data.sd
-                                    tp=order_price-1.8*data.sd
-                                    # if (order_price-tp)/order_price>0.005:
-                                    #     tp=order_price-0.005*order_price  
-                                    # if (sl-order_price)/order_price>0.006:
-                                    #     sl=order_price+0.006*order_price
-                                    # if track_order==0:
-                                    #     sl=order_price+0.1*order_price
-                                    if track_order==0:
-                                       sl=order_price+0.1*order_price    
+                                    tp,sl=set_profit_loss(data,order_price,trade_signal)  
                                     is_trade=2.66
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
@@ -1489,23 +1459,28 @@ class Strategy:
                             else: is_trade=0
                         elif is_trade==4.61 and self.trading_allowed():
                             order_price=pre_row.close
-                            if data.low<=order_price and track_order==0:
-                                sl=order_price-2*pre_row.sd
-                                tp=order_price+2*pre_row.sd   
+                            if data.low<=order_price:
+                                tp,sl=set_profit_loss(pre_row,order_price,trade_signal)  
                                 self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,pre_row.sd))
                                 track_order=track_order+1
                                 is_trade=0
                             else: is_trade=0
                         elif is_trade==4.62 and self.trading_allowed():
                             order_price=pre_row.close
-                            if data.low<=order_price and track_order==0:
-                                sl=order_price-2*pre_row.sd
-                                tp=order_price+2*pre_row.sd   
+                            if data.low<=order_price:
+                                tp,sl=set_profit_loss(pre_row,order_price,trade_signal)   
                                 self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,pre_row.sd))
                                 track_order=track_order+1
                                 is_trade=0
                             else: is_trade=0
-                            # elif next_row.low_point==1 and next_2_row.high_point==1 and next_3_row.low_point!=1:                        
+                        elif is_trade==4.63 and self.trading_allowed():
+                            order_price=pre_row.close
+                            if data.low<=order_price:
+                                tp,sl=set_profit_loss(pre_row,order_price,trade_signal)   
+                                self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,pre_row.sd))
+                                track_order=track_order+1
+                                is_trade=0
+                            else: is_trade=0                         
                     for idx, pos in enumerate(self.positions):
                         if pos.status=='open' and data.time>=pos.open_datetime:       
                             df123=self.get_positions_df()
