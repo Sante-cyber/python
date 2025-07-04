@@ -1067,7 +1067,8 @@ class Strategy:
                                 trade_signal='buy'
                             elif pre_row.rsi<69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi)\
                                 and  pre_row.high_rsi>70 and data.high_rsi>70  \
-                                and data.high_rsi>pre_row.high_rsi and data.close<data.ub and data.low_rsi<70:
+                                and data.high_rsi>pre_row.high_rsi \
+                                and data.close<data.ub and data.low_rsi<70:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
                                     tp,sl=set_profit_loss(data,order_price,trade_signal)    
@@ -1076,7 +1077,7 @@ class Strategy:
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0
-                            elif pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
+                            elif pre_row.rsi<69 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi) \
                                 and data.high_rsi<70 and pre_row.high_rsi<70 \
                                 and pre_2_row.high_rsi<60:
                                 order_price=data.close 
