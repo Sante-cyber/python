@@ -711,7 +711,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 order_price=tick.ask
                 if data.sd>0.01:
                     sl=order_price-0.01*order_price
-                    tp=order_price+0.01*order_price
+                    tp=order_price+0.009*order_price
                 else: 
                     tp=order_price+0.005*order_price
                     sl=order_price-0.006*order_price     

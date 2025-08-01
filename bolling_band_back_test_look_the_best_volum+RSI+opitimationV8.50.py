@@ -260,7 +260,7 @@ class Strategy:
                             if pre_row.high_rsi>30 and data.low_rsi>min(data.rsi,data.high_rsi) and data.low_rsi<max(data.rsi,data.high_rsi):
                                 if next_row.low<=order_price:
                                     sl=order_price-0.007*order_price
-                                    tp=order_price+0.007*order_price                                
+                                    tp=order_price+0.006*order_price                                
                                     is_trade=1.11  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
