@@ -18,6 +18,8 @@ mt.initialize()
 mt.login(login,password,server)
 # mt.login(login_real,password_real,server_real)
 
+# disk='C:/c/'
+disk='E:/'
 
 version='4.17_office'
 currency='GBPNZD'
@@ -473,7 +475,7 @@ class Strategy:
                                 is_trade=3.4
                                 trade_signal='sell'  
                         elif  is_trade==1.5 and self.trading_allowed():
-                            if pre_row.lower_30>0 and data.lower_30==0 and data.buy_cnt==0:
+                            if pre_row.lower_30>0 and data.lower_30==0:
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     if data.sd>0.01:
@@ -953,11 +955,8 @@ class Strategy:
                             elif pre_row.over_70>0 and data.over_70==0 and pre_row.low_rsi>80:
                                 is_trade=4.332
                                 trade_signal='buy'
-                            elif pre_2_row.over_70>0 and pre_row.over_70==0 and data.over_70==0:
-                                is_trade=4.33
-                                trade_signal='buy'
                         elif is_trade==2.4 and self.trading_allowed():
-                            if pre_row.sell_cnt>0 and data.sell_cnt==0 and data.over_70==0:
+                            if c:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
                                     if data.sd>0.01:
@@ -1423,19 +1422,6 @@ class Strategy:
                                 track_order=track_order+1
                                 is_trade=0
                             else: is_trade=0
-                        elif is_trade==4.33 and self.trading_allowed():
-                            order_price=pre_row.close
-                            if data.low<=order_price:
-                                if pre_row.sd>0.01:
-                                    sl=order_price-0.01*order_price
-                                    tp=order_price+0.01*order_price
-                                else:
-                                    sl=order_price-0.006*order_price
-                                    tp=order_price+0.005*order_price    
-                                self.add_position(position(data.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,pre_row.sd))
-                                track_order=track_order+1
-                                is_trade=0
-                            else: is_trade=0
                         elif is_trade==4.5 and self.trading_allowed():
                             order_price=pre_row.close
                             if data.low<=order_price:
@@ -1676,7 +1662,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
+        df.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
 
 current_time = datetime.now()
@@ -1710,8 +1696,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
+df1.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/result_detail_volumn_rsi_opi_{version}.csv')
+df2.to_csv(f'{disk}EA/bollinger-bands/H4_year/{currency}/final_result_volumn_detail_rsi_opi_{version}.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi_opiti_8.5.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_opiti_8.5.csv')
 # 'E:/EA/bollinger-bands/H1_year'
