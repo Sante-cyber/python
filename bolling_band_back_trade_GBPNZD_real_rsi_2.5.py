@@ -39,7 +39,6 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price-0.007*order_price
     return tp,sl
 
-
 def rsi(data,window):
     data['rsi']=ta.rsi(data.close, length=window)
     data['overbought']=70
@@ -235,67 +234,65 @@ def get_strategy(df):
     pre_2_row=df.iloc[-3]
 
     if is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1\
-            and data.buy_cnt==0 and data.lower_30==0:
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.1
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 \
-            and data.buy_cnt==0 and data.lower_30==2:
+    elif is_trade==0 \
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1\
+        and data.buy_cnt==0 and data.lower_30==2:
         is_trade=1.2
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
-            and data.buy_cnt==2:
+    elif is_trade==0 \
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1  \
+        and data.buy_cnt==2:
         is_trade=1.3
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
-            and data.buy_cnt==0 and data.lower_30==0:
+    elif is_trade==0 \
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
+        and data.buy_cnt==0 and data.lower_30==0:
         is_trade=1.4
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
-            and data.buy_cnt==0 and  data.lower_30>0:
+    elif is_trade==0 \
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>=2  \
+        and data.buy_cnt==0 and  data.lower_30>0:
         is_trade=1.5
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>1  \
-            and data.buy_cnt==2:
+    elif is_trade==0 \
+        and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30>1  \
+        and data.buy_cnt==2:
         is_trade=1.6
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.rsi>30 and pre_row.rsi<32 and data.rsi>32 and pre_row.close<pre_row.lb:
+    elif is_trade==0 \
+        and pre_row.rsi>30 and pre_row.rsi<32 and data.rsi>32 and pre_row.close<pre_row.lb:
         is_trade=1.7
         trade_signal='buy'
-    elif is_trade==0  \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1\
-            and data.sell_cnt==0  and data.over_70==0:
+    elif is_trade==0   \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 and data.sell_cnt==0  and data.over_70==0:
         is_trade=2.1
         trade_signal='sell'
-    # 2025-04-09 update
-    elif is_trade==0  \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 \
-            and data.sell_cnt==0 and data.over_70==2:
+    elif is_trade==0 \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1 \
+        and data.sell_cnt==0 and data.over_70==2:
         is_trade=2.2
         trade_signal='sell'
-    elif is_trade==0  \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
-            and data.sell_cnt==2:
+    elif is_trade==0 \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70==1  \
+        and data.sell_cnt==2:
+        # print(data.time)
         is_trade=2.3
         trade_signal='sell'
-    elif is_trade==0  \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
-            and data.sell_cnt==2:
+    elif is_trade==0 \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1  \
+        and data.sell_cnt==2:
         is_trade=2.4
         trade_signal='sell'
-    elif is_trade==0  \
-            and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
-            and data.sell_cnt==0:
+    elif is_trade==0 \
+        and pre_row.signal=='sell' and pre_row.sell_cnt==1 and pre_row.over_70>1 \
+        and data.sell_cnt==0:
         is_trade=2.5
         trade_signal='sell'
-    elif is_trade==0  \
-            and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
+    elif is_trade==0 \
+        and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
         is_trade=2.6
         trade_signal='sell'
     return trade_signal,is_trade,data,pre_row,pre_2_row
@@ -1657,7 +1654,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
 
 
 log_path=os.getcwd()
-file_path = os.path.join(log_path, 'python/make_order_gbp_aud_real.csv')
+file_path = os.path.join(log_path, 'python/make_order_gbp_nzd_real.csv')
 
 if mt.initialize():
     print('connect to MetaTrader5')
@@ -1665,14 +1662,14 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.1
+    VOLUME=0.03
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
     STANDARD_DEVIATIONS=2
     TP_SD=2
     SL_SD=1
-    symbol='GBPAUD.a'
+    symbol='GBPNZD.a'
     trade_signal=None
     trade_strategy=0
     track_point=0
@@ -1701,22 +1698,18 @@ last_order_date=None
 action=None
 action_time=None
 
+
 while True:
     try:
         print(f'Strategy symbol: {symbol}')
         
         positions = len(mt.positions_get(symbol=symbol))
-        
-        positions_detail = mt.positions_get(symbol=symbol)
-        
-        buy_count = sum(1 for pos in positions_detail if pos.type == mt.ORDER_TYPE_BUY)
-        sell_count = sum(1 for pos in positions_detail if pos.type == mt.ORDER_TYPE_SELL)
-        
-        print(f'now the {symbol} order number is {positions},buy_count is {buy_count},sell_count is {sell_count}')
+
+        print(f'now the {symbol} order number is {positions}')
         
         make_order = pd.read_csv(file_path)
         
-        if positions <= 3 and trade_strategy == 0:
+        if positions <= 1 and trade_strategy == 0:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             
             trade_signal, trade_strategy, record, pre_record, pre_2_record = get_strategy(symbol_df)
@@ -1725,30 +1718,31 @@ while True:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
                 make_order['trade_signal'] = trade_signal
+                make_order['track_point'] = track_point
                 make_order.to_csv(file_path, index=False)
                 print(f"It's a good chance to {trade_signal} this symbol -- {symbol}, the strategy is {trade_strategy}")
             else:
-                if not make_order.empty:
-                    pre_trade_strategy = make_order['strategy'].iloc[-1]
-                    strategy_time = make_order['strategy_time'].iloc[-1]
-                    if pre_trade_strategy > 0:
-                        trade_strategy = pre_trade_strategy
-                        trade_signal = make_order['trade_signal'].iloc[-1]
-                        print(f'The program terminated unnaturally, now continuing... '
-                        f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
-                        f'trade signal: {trade_signal}, track point: {track_point}')
+                pre_trade_strategy = make_order['strategy'].iloc[-1]
+                strategy_time = make_order['strategy_time'].iloc[-1]
+                if pre_trade_strategy > 0:
+                    trade_strategy = pre_trade_strategy
+                    track_point = make_order['track_point'].iloc[-1]
+                    trade_signal = make_order['trade_signal'].iloc[-1]
+                    print(f'The program terminated unnaturally, now continuing... '
+                      f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
+                      f'trade signal: {trade_signal}, track point: {track_point}')
         else:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             record, pre_record, pre_2_record = get_strategy(symbol_df)[2:]
 
         tick = mt.symbol_info_tick(symbol)
         tick_date = record.time.strftime('%Y-%m-%d %H')
-      
         
         if trade_strategy > 0 and last_order_date != tick_date:
             print(f'Starting run -- {trade_strategy}')
-            # track_order = len(mt.positions_get(symbol=symbol))
+            # track_order = mt.positions_total()
             pre_trade_strategy = make_order['strategy'].iloc[-1]
+            pre_track_point = make_order['track_point'].iloc[-1]
             
             result, trade_signal, trade_strategy, track_point, order_time, action = run_strategy(
                 trade_strategy, trade_signal, record, pre_record, pre_2_record, 
@@ -1757,7 +1751,10 @@ while True:
             if trade_strategy != pre_trade_strategy and trade_strategy > 0:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
-                make_order['trade_signal'] = trade_signal               
+                make_order['trade_signal'] = trade_signal
+                
+            if trade_strategy > 0:
+                make_order['track_point'] = track_point
                 
             if action is not None:
                 
@@ -1771,30 +1768,29 @@ while True:
                     make_order['strategy'] = trade_strategy
                     action = None
                     action_time = None
+                    track_point = 0
+                    make_order['track_point'] = track_point
                     make_order['trade_signal'] = None
             
             if result is not None:
                 action = None
                 action_time = None
                 make_order['strategy'] = 0
+                make_order['track_point'] = 0
                 make_order['trade_signal'] = None
                 print(result)
                 last_order_date = order_time.strftime('%Y-%m-%d %H')
                 print(f'Order time: {last_order_date}, signal: {trade_signal}, '
-                      f'after trade strategy: {trade_strategy}')
-            elif action is None and trade_strategy==0:
-                make_order['strategy'] = 0
-                make_order['trade_signal'] = None
-                print(f'This situation have not never happened in history,please notice this new situation,the trade strategy is {pre_trade_strategy}')
+                      f'after trade strategy: {trade_strategy}, track point: {track_point}')
             elif action is None:
-                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}')
+                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
             else:
                 print(f'Still waiting for the price to make order, action_time:{action_time},signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
             
             make_order.to_csv(file_path, index=False)
         elif last_order_date == tick_date:
-            trade_strategy = 0
             make_order['strategy'] = 0
+            make_order['track_point'] = 0
             make_order['trade_signal'] = None
             make_order.to_csv(file_path, index=False)
             print(f'The order was already made at order time: {last_order_date}. No duplicate orders at the same time allowed.')
@@ -1809,10 +1805,6 @@ while True:
         # Log the exception with traceback
         print("An error occurred! Restarting...")
         print(traceback.format_exc())
-        if mt.initialize():
-            print('connect to MetaTrader5')
-            mt.login(login_real,password_real,server_real)
-            # mt.login(login,password,server)
         time.sleep(5)  # Optional delay before retrying
 
 
