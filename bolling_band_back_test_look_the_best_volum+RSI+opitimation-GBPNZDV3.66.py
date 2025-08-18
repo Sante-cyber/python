@@ -956,7 +956,7 @@ class Strategy:
                                 is_trade=4.332
                                 trade_signal='buy'
                         elif is_trade==2.4 and self.trading_allowed():
-                            if c:
+                            if pre_row.sell_cnt>0 and data.sell_cnt==0 and data.over_70==0:
                                 order_price=data.close 
                                 if next_row.high>=order_price:
                                     if data.sd>0.01:
