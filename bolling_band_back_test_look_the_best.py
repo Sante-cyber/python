@@ -5,12 +5,17 @@ import plotly.graph_objects as go
 from datetime import datetime,timedelta
 import numpy as np
 from common import login,password,server
+from common import login_real,password_real,server_real
 import calendar
 
 
 
 mt.initialize()
-mt.login(login,password,server)
+# mt.login(login,password,server)
+mt.login(login_real,password_real,server_real)
+
+# disk='C:/c/'
+disk='E:/'
 
 
 def find_signal(close,lower_band,upper_band):
@@ -203,8 +208,8 @@ for year in years:
         df2=pd.concat([df2,last])
         j=j+1
         print(f'{currency} have finished-{j}')
-df1.to_csv(f'C:/c/EA/bollinger-bands/M15_month/result_detail_0.01.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/M15_month/final_result_detail_0.01.csv')
+df1.to_csv(f'{disk}EA/bollinger-bands/M15_month/result_detail_0.01.csv')
+df2.to_csv(f'{disk}EA/bollinger-bands/M15_month/final_result_detail_0.01.csv')
 print('finish')
     # fig=px.line(df,x='time',y=['close','sma','lb','ub'])
     # for i,position in result.iterrows():

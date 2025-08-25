@@ -6,13 +6,18 @@ from datetime import datetime,timedelta
 import numpy as np
 import pandas_ta as ta
 from common import login,password,server
+from common import login_real,password_real,server_real
 
 login=51658107
 password='VxBvOa*4'
 server='ICMarkets-Demo'
 
 mt.initialize()
-mt.login(login,password,server)
+# mt.login(login,password,server)
+mt.login(login_real,password_real,server_real)
+
+# disk='C:/c/'
+disk='E:/'
 
 
 def rsi(data,window):
@@ -168,23 +173,23 @@ volumes = list(range(1000, 1000 + 1000, 1000))
 years=list(range(2018, 2024 + 1, 1))
 # symbol=['GBPNZD','GBPCAD','NZDCAD','GBPAUD','GBPUSD']
 
-symbol=['GBPNZD']
+# symbol=['GBPNZD']
 # years=[2024]
 # volumes=[10000]
 
 # aa=a.iloc[40:]
+ 
 
 
+symbols=mt.symbols_get()
+df3=pd.DataFrame(symbols)
+a=df3.iloc[:,[93,95]]
+a.reset_index(inplace=True)
+# a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
+b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
+c=b[(~a.iloc[:,1].str.contains('.a'))]
 
-# symbols=mt.symbols_get()
-# df3=pd.DataFrame(symbols)
-# a=df3.iloc[:,[93,95]]
-# a.reset_index(inplace=True)
-# # a.to_csv('E:/EA/bollinger-bands/all_main_sybol.csv')
-# b=a[(a.iloc[:,2].str.contains('Majors')) |(a.iloc[:,2].str.contains('Minors'))]
-# c=b[(~a.iloc[:,1].str.contains('.a'))]
-
-# symbol=c.iloc[:,1]
+symbol=c.iloc[:,1]
 
 
 df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume', 'sl', 'tp', 'close_datetime', 'close_price', 'profit', 'status', 'symbol'])
@@ -219,7 +224,7 @@ for year in years:
         df['signal']=np.vectorize(find_signal)(df['close'],df['lb'],df['ub'],df['rsi'],df['overbought'],df['oversold'])
         df.reset_index(inplace=True)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/a_{year}.csv')
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}.csv')
+        df.to_csv(f'{disk}EA/bollinger-bands/H4_year/b_{year}.csv')
         # df.to_csv('C:/Ally/a.csv')
         print(f'{currency} have been got and start run the strategy')
         for volume in volumes:
@@ -233,9 +238,10 @@ for year in years:
             df1=pd.concat([df1,result])
             df2=pd.concat([df2,last])
             j=j+1
+            
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df.to_csv(f'C:/c/EA/bollinger-bands/H4_year/b_{year}_rsi_result.csv')
+        df.to_csv(f'{disk}EA/bollinger-bands/H4_year/b_{year}_rsi_result.csv')
 
 df1['win_rate']=np.where(df1['profit']<0,0,1)
 df1['year']=df1['close_datetime'].dt.year
@@ -252,8 +258,8 @@ print(pivot_table)
 
 print(revenue_result)
     
-df1.to_csv(f'C:/c/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
-df2.to_csv(f'C:/c/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
+df1.to_csv(f'{disk}EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
+df2.to_csv(f'{disk}EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # df1.to_csv(f'E:/EA/bollinger-bands/H4_year/result_detail_volumn_rsi.csv')
 # df2.to_csv(f'E:/EA/bollinger-bands/H4_year/final_result_volumn_detail_rsi.csv')
 # 'E:/EA/bollinger-bands/H1_year'
