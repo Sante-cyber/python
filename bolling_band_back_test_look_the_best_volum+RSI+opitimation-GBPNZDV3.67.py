@@ -21,8 +21,36 @@ mt.login(login_real,password_real,server_real)
 # disk='C:/c/'
 disk='E:/'
 
-version='4.17_real'
-currency='EURAUD'
+version='4.19_real'
+currency='GBPNZD'
+
+def get_previous_rows(df, condition_col, condition_val, n):
+    """
+    Extract the previous `n` rows from a DataFrame when a condition is met.
+    
+    Parameters:
+        df (pd.DataFrame): Input dataframe
+        condition_col (str): Column name to check condition
+        condition_val (any): Value that triggers the condition (default=1)
+        n (int): Number of previous rows to collect
+    
+    Returns:
+        pd.DataFrame: All previous rows stacked into one dataframe
+    """
+    all_prev_rows = []
+    indices = df.index[df[condition_col] == condition_val].tolist()
+    
+    for idx in indices:
+        if idx >= n:
+            end = idx+1
+            prev_rows = df.iloc[idx-n:end].copy()
+            prev_rows["signal_index"] = idx  # Tag which signal triggered
+            all_prev_rows.append(prev_rows)
+    
+    if all_prev_rows:
+        return pd.concat(all_prev_rows, ignore_index=True)
+    else:
+        return pd.DataFrame()  # empty if no matches
 
 
 def set_profit_loss(data,order_price,trade_signal):
@@ -768,13 +796,23 @@ class Strategy:
                                     else:
                                         sl=order_price+0.007*order_price
                                         tp=order_price-0.006*order_price
-                                    is_trade=2.31
+                                    is_trade=2.311
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
                                     is_trade=0
                                 else: is_trade=0
                             elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi<pre_row.low_rsi \
                                 and data.high_rsi>data.low_rsi and data.low_rsi>data.rsi and data.high_rsi<pre_row.high_rsi:
+                                order_price=data.close 
+                                if next_row.high>=order_price:
+                                    sl=order_price+0.009*order_price
+                                    tp=order_price-0.008*order_price
+                                    is_trade=2.312
+                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
+                                    track_order=track_order+1
+                                    is_trade=0
+                                else: is_trade=0
+                            elif  pre_row.sell_cnt==3 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi>max(data.rsi,data.high_rsi):
                                 order_price=data.close 
                                 if next_row.high>=order_price:
                                     sl=order_price+0.009*order_price
@@ -1549,18 +1587,29 @@ df1 = pd.DataFrame(columns=['open_datetime', 'open_price', 'order_type', 'volume
 for year in years:
     print(year)
     for currency in symbol:
+        # currency='NZDCAD'
         print(f'{currency}--start')
         bars=mt.copy_rates_range(currency,mt.TIMEFRAME_H4,datetime(year-7,1,1), datetime(year,12,31))
+        # bars_h1=mt.copy_rates_range(currency,mt.TIMEFRAME_H1,datetime(year,1,1), datetime(year,12,31))
+        # bars=mt.copy_rates_from_pos(currency,mt.TIMEFRAME_H1,1,20)
       
+#  datetime.now()
         df=pd.DataFrame(bars)
         df['time']=pd.to_datetime(df['time'],unit='s')
         df['hour']=df['time'].dt.hour
         
+        # df_h1=pd.DataFrame(bars_h1)
+        # df_h1['time']=pd.to_datetime(df_h1['time'],unit='s')
+        # df_h1['hour']=df_h1['time'].dt.hour
+        # fig=px.line(df,x='time',y='close')
+        # fig.show()
 
         df['sma']=df['close'].rolling(20).mean()
         df['sd']=df['close'].rolling(20).std()
         df['lb']=df['sma']-2*df['sd']
         df['ub']=df['sma']+2*df['sd']
+        # df['ub'] = ta.bbands(df['close'],length=20,std=2.0)['BBU_20_2.0']
+        # df['lb'] = ta.bbands(df['close'],length=20,std=2.0)['BBL_20_2.0']
         
         
         # doji
@@ -1651,8 +1700,9 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
+        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=4.31, n=3)
         df.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
-        # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
+        df_extract.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_extract_{version}.csv',index=False)
 
 current_time = datetime.now()
 df1['win_rate']=np.where(df1['profit']<0,0,1)
