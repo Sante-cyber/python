@@ -63,7 +63,7 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price+0.008*order_price
         else:
             tp=order_price-0.005*order_price  
-            sl=order_price+0.007*order_price
+            sl=order_price+0.006*order_price
     elif trade_signal=='buy':
         if data.sd>0.01:
             tp=order_price+0.01*order_price  
@@ -73,7 +73,7 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price-0.008*order_price
         else:
             tp=order_price+0.005*order_price  
-            sl=order_price-0.007*order_price
+            sl=order_price-0.006*order_price
     return tp,sl
 
 
@@ -380,7 +380,8 @@ class Strategy:
                                     is_trade=0
                                 else: is_trade=0  
                           elif pre_row.high_rsi<30 and pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi<30 \
-                               and data.lower_30_low>=data.lower_30_high and data.low_rsi<pre_row.low_rsi and data.high_rsi<pre_row.high_rsi:
+                               and data.lower_30_low>=data.lower_30_high and data.low_rsi<pre_row.low_rsi and pre_row.low_rsi<pre_2_row.low_rsi\
+                               and data.high_rsi<pre_row.high_rsi:
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     sl=order_price-0.008*order_price
@@ -1700,7 +1701,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=4.31, n=3)
+        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=2.62, n=3)
         df.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
         df_extract.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_extract_{version}.csv',index=False)
 
