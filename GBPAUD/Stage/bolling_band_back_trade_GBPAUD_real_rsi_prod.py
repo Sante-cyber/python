@@ -568,7 +568,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action)
                 action=None
                 signal='sell'
         elif pre_row.buy_cnt>=3 and data.buy_cnt==0 and data.lower_30==0 \
-            and pre_row.low_rsi<max(pre_row.rsi,pre_row.high_rsi):
+            and pre_row.low_rsi<max(pre_row.rsi,pre_row.high_rsi) and data.low_rsi>pre_row.low_rsi:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
@@ -632,7 +632,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action)
                 action=None
                 signal='sell'  
         elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
-            and data.high_rsi<pre_row.high_rsi and pre_row.low_rsi<pre_2_row.low_rsi:
+            and data.high_rsi<pre_row.high_rsi:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
@@ -648,12 +648,8 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action)
             else:
                 action=1.38
         elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
-            and data.high_rsi<pre_row.high_rsi:
-                is_trade=0
-                signal=None
-        elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
             and data.high_rsi>pre_row.high_rsi and pre_row.lower_30_low>pre_row.lower_30_high\
-            and data.lower_30_low==0 and data.lower_30_high==0:
+            and data.lower_30_high>0:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
@@ -670,7 +666,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action)
                 action=1.38
         elif pre_row.lower_30>0 and data.lower_30==0 and data.low_rsi<data.high_rsi\
             and data.high_rsi>pre_row.high_rsi and pre_row.lower_30_low>pre_row.lower_30_high\
-            and data.lower_30_low>0 and data.lower_30_high>0:
+            and data.lower_30_high==0 and data.low_rsi>pre_row.low_rsi:
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
