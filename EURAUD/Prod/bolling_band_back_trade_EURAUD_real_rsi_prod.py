@@ -1405,10 +1405,6 @@ while True:
             print(f'No trade chance for this symbol -- {symbol}. '
                   f'Last close price: {record.close}, upper band: {record.ub}, lower band: {record.lb}, '
                   f'hour: {record.hour}, RSI: {record.rsi}, RSI signal: {record.signal}')
-            with open(log_file_path, "a") as f:
-                f.write(f"No trade chance for this symbol -- {symbol}. "
-                        f"Last close price: {record.close}, upper band: {record.ub}, lower band: {record.lb}, " 
-                        f"hour: {record.hour}, RSI: {record.rsi}, RSI signal: {record.signal}\n")
         
         time.sleep(5)
 
