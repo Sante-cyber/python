@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
-from common import login_real,password_real,server_real
+from common import *
 import numpy as np
 import time
 import schedule
@@ -1246,9 +1246,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,pre_3_row,VOLUME,tick,ta
     return result,signal,is_trade,data.time,action
 
 
-log_path=os.getcwd()
-file_path = os.path.join(log_path, 'python/make_order_eur_aud_real.csv')
-
 if mt.initialize():
     print('connect to MetaTrader5')
     mt.login(login_real,password_real,server_real)
@@ -1266,7 +1263,13 @@ if mt.initialize():
     trade_signal=None
     trade_strategy=0
     
+base_symbol = symbol.split('.')[0]  # -> EURAUD
 
+log_path = os.getcwd()  # current working directory
+
+log_folder_path= os.path.join(log_path, "python", base_symbol,"Data")
+
+file_path = os.path.join(log_folder_path,"make_order.csv")
 
 # Define Sydney time zone
 sydney_tz = pytz.timezone('Australia/Sydney')
@@ -1276,6 +1279,7 @@ gmt_tz = pytz.timezone('Etc/GMT-2')
 
 # Get current time in Sydney
 sydney_time = datetime.now(sydney_tz)
+sydney_date=sydney_time.date()
 
 # Convert Sydney time to GMT+3
 gmt_time = sydney_time.astimezone(gmt_tz)
@@ -1290,6 +1294,7 @@ last_order_date=None
 action=None
 action_time=None
 
+log_file_path=f'{log_folder_path}/trade_log_{sydney_date}.txt'
 
 while True:
     try:
@@ -1312,6 +1317,9 @@ while True:
                 make_order['trade_signal'] = trade_signal
                 make_order.to_csv(file_path, index=False)
                 print(f"It's a good chance to {trade_signal} this symbol -- {symbol}, the strategy is {trade_strategy}")
+                with open(log_file_path, "a") as f:
+                    f.write(f"Order time: {record.time.strftime('%Y-%m-%d %H')}, It's a good chance to {trade_signal} "
+                            f"this symbol -- {symbol}, the strategy is {trade_strategy}\n")
             else:
                 pre_trade_strategy = make_order['strategy'].iloc[-1]
                 strategy_time = make_order['strategy_time'].iloc[-1]
@@ -1321,6 +1329,10 @@ while True:
                     print(f'The program terminated unnaturally, now continuing... '
                       f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
                       f'trade signal: {trade_signal}')
+                    with open(log_file_path, "a") as f:
+                        f.write(f"The program terminated unnaturally, now continuing... "
+                                f"Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, " 
+                                f"trade signal: {trade_signal}\n")
         else:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             record, pre_record, pre_2_record,pre_3_record = get_strategy(symbol_df)[2:]
@@ -1366,10 +1378,19 @@ while True:
                 last_order_date = order_time.strftime('%Y-%m-%d %H')
                 print(f'Order time: {last_order_date}, signal: {trade_signal}, '
                       f'after trade strategy: {trade_strategy}')
+                with open(log_file_path, "a") as f:
+                    f.write(f"Order time: {last_order_date}, signal: {trade_signal}, "
+                            f"after trade strategy: {trade_strategy}\n")
             elif action is None:
                 print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}')
+                with open(log_file_path, "a") as f:
+                    f.write(f"Order time: {order_time.strftime('%Y-%m-%d %H')},"
+                            f"Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}\n")
             else:
                 print(f'Still waiting for the price to make order, action_time:{action_time},signal: {trade_signal}, trade strategy: {trade_strategy}')
+                with open(log_file_path, "a") as f:
+                    f.write(f"Still waiting for the price to make order, action_time:{action_time}, "
+                            f"signal: {trade_signal}, trade strategy: {trade_strategy}\n")
             
             make_order.to_csv(file_path, index=False)
         elif last_order_date == tick_date:
@@ -1377,10 +1398,17 @@ while True:
             make_order['trade_signal'] = None
             make_order.to_csv(file_path, index=False)
             print(f'The order was already made at order time: {last_order_date}. No duplicate orders at the same time allowed.')
+            with open(log_file_path, "a") as f:
+                f.write(f"The order was already made at order time: {last_order_date}. "
+                        f"No duplicate orders at the same time allowed.\n")
         else:
             print(f'No trade chance for this symbol -- {symbol}. '
                   f'Last close price: {record.close}, upper band: {record.ub}, lower band: {record.lb}, '
                   f'hour: {record.hour}, RSI: {record.rsi}, RSI signal: {record.signal}')
+            with open(log_file_path, "a") as f:
+                f.write(f"No trade chance for this symbol -- {symbol}. "
+                        f"Last close price: {record.close}, upper band: {record.ub}, lower band: {record.lb}, " 
+                        f"hour: {record.hour}, RSI: {record.rsi}, RSI signal: {record.signal}\n")
         
         time.sleep(5)
 

@@ -1,0 +1,12 @@
+Order time: 2025-01-01 00, signal: buy, after trade strategy: 3.15
+Order time: 2025-01-01 00, signal: buy, after trade strategy: 3.15
+Order time: 2025-10-09 16, It's a good chance to buy this symbol -- EURAUD.a, the strategy is 3.15
+The program terminated unnaturally, now continuing... Trade strategy time: 2025-10-09 16:13:01.846557+11:00, trade strategy: 3.15, trade signal: buy
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
