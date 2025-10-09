@@ -1375,12 +1375,22 @@ while True:
                 make_order['strategy'] = 0
                 make_order['trade_signal'] = None
                 print(result)
+                with open(log_file_path, "a") as f:
+                    f.write(f"result: {result}\n")
                 last_order_date = order_time.strftime('%Y-%m-%d %H')
                 print(f'Order time: {last_order_date}, signal: {trade_signal}, '
                       f'after trade strategy: {trade_strategy}')
                 with open(log_file_path, "a") as f:
                     f.write(f"Order time: {last_order_date}, signal: {trade_signal}, "
                             f"after trade strategy: {trade_strategy}\n")
+                    
+            elif action is None and trade_strategy==0:
+                make_order['strategy'] = 0
+                make_order['trade_signal'] = None
+                print(f'This situation have not never happened in history,please notice this new situation,the trade strategy is {pre_trade_strategy}')
+                with open(log_file_path, "a") as f:
+                    f.write(f"This situation have not never happened in history,please notice this new situation "
+                            f"the trade strategy is {pre_trade_strategy}\n")          
             elif action is None:
                 print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}')
                 with open(log_file_path, "a") as f:
