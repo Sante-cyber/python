@@ -429,7 +429,7 @@ class Strategy:
                                 order_price=data.close
                                 if next_row.low<=order_price:
                                     sl=order_price-0.007*order_price
-                                    tp=order_price+0.006*order_price                                    
+                                    tp=order_price+0.0055*order_price                                    
                                     is_trade=1.32  
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1

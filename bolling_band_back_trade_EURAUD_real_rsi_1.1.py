@@ -4,13 +4,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime,timedelta
 from common import login_real,password_real,server_real
-# from common import login,password,server
 import numpy as np
 import time
 import schedule
 import pandas_ta as ta
 import talib as ta1
-# import datetime
 import pytz
 import os
 import traceback
@@ -19,7 +17,7 @@ import traceback
 def set_profit_loss(data,order_price,trade_signal):
     if trade_signal=='sell':
         if data.sd>0.01:
-            tp=order_price-0.01*order_price  
+            tp=order_price-0.009*order_price  
             sl=order_price+0.01*order_price
         elif data.sd>0.009:
             tp=order_price-0.007*order_price  
@@ -29,7 +27,7 @@ def set_profit_loss(data,order_price,trade_signal):
             sl=order_price+0.007*order_price
     elif trade_signal=='buy':
         if data.sd>0.01:
-            tp=order_price+0.01*order_price  
+            tp=order_price+0.009*order_price  
             sl=order_price-0.01*order_price
         elif data.sd>0.009:
             tp=order_price+0.007*order_price  
@@ -38,6 +36,37 @@ def set_profit_loss(data,order_price,trade_signal):
             tp=order_price+0.005*order_price  
             sl=order_price-0.007*order_price
     return tp,sl
+
+def macd(df, short_window=12, long_window=26, signal_window=9, ema_period=200):
+    # MACD
+    df['ShortEMA'] = df['close'].ewm(span=short_window, adjust=False).mean()
+    df['LongEMA'] = df['close'].ewm(span=long_window, adjust=False).mean()
+    df['MACD'] = df['ShortEMA'] - df['LongEMA']
+    df['Ema_Signal'] = df['MACD'].ewm(span=signal_window, adjust=False).mean()
+    
+    # EMA200 trend filter
+    df['EMA200'] = df['close'].ewm(span=ema_period, adjust=False).mean()
+    
+    # Generate signals
+    signals = []
+    for i in range(1, len(df)):
+        # Buy Signal: MACD crosses above Signal & price above EMA200
+        if df['MACD'][i] > df['Ema_Signal'][i] and df['MACD'][i-1] <= df['Ema_Signal'][i-1]:
+            if df['close'][i] > df['EMA200'][i]:
+                signals.append('Buy')
+            else:
+                signals.append('')
+        # Sell Signal: MACD crosses below Signal & price below EMA200
+        elif df['MACD'][i] < df['Ema_Signal'][i] and df['MACD'][i-1] >= df['Ema_Signal'][i-1]:
+            if df['close'][i] < df['EMA200'][i]:
+                signals.append('Sell')
+            else:
+                signals.append('')
+        else:
+            signals.append('')
+    signals.insert(0,'')  # No signal for first candle
+    df['Signal_Strategy'] = signals
+    return df
 
 def rsi(data,window):
     data['rsi']=ta.rsi(data.close, length=window)
@@ -156,53 +185,9 @@ def get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD):
     df['sd']=df['close'].rolling(20).std()
     df['lb']=df['sma']-STANDARD_DEVIATIONS*df['sd']
     df['ub']=df['sma']+STANDARD_DEVIATIONS*df['sd']
-    # doji
-    df['doji'] = ta1.CDLDOJI(df['open'], df['high'], df['low'], df['close'])
-
-    # hammer
-    df['hammer'] = ta1.CDLHAMMER(df['open'], df['high'], df['low'], df['close'])
-
-    # hanging man
-    df['hanging man'] = ta1.CDLHANGINGMAN(df['open'], df['high'], df['low'], df['close'])
-
-    # shooting star
-    df['shooting star'] = ta1.CDLSHOOTINGSTAR(df['open'], df['high'], df['low'], df['close'])
-
-    # inverted hammer
-    df['inverted hammer'] = ta1.CDLINVERTEDHAMMER(df['open'], df['high'], df['low'], df['close'])
-
-    # spinning top
-    df['spinning top'] = ta1.CDLSPINNINGTOP(df['open'], df['high'], df['low'], df['close'])
-
-    # marubozu
-    df['marubozu'] = ta1.CDLMARUBOZU(df['open'], df['high'], df['low'], df['close'])
-
-    # long-legged doji
-    df['long-legged doji'] = ta1.CDLLONGLEGGEDDOJI(df['open'], df['high'], df['low'], df['close'])
-
-    # dragonfly doji
-    df['dragonfly doji'] = ta1.CDLDRAGONFLYDOJI(df['open'], df['high'], df['low'], df['close'])
-
-    # gravestone doji
-    df['gravestone doji'] = ta1.CDLGRAVESTONEDOJI(df['open'], df['high'], df['low'], df['close'])
-    
-    
-    # bearish engulfing pattern
-    df['bearish_engulfing'] = ta1.CDLENGULFING(df['open'], df['high'], df['low'], df['close'])
-
-    # piercing pattern
-    df['piercing_pattern'] = ta1.CDLPIERCING(df['open'], df['high'], df['low'], df['close'])
-
-    # dark cloud cover
-    df['dark_cloud_cover'] = ta1.CDLDARKCLOUDCOVER(df['open'], df['high'], df['low'], df['close'])
-
-    # harami pattern
-    df['harami_pattern'] = ta1.CDLHARAMI(df['open'], df['high'], df['low'], df['close'])
-    
-    df['inside_bar'] = ((df['high'] < df['high'].shift(1)) & (df['low'] > df['low'].shift(1))).astype(int)
-    
     
     df=find_lower_high_point(df,'tick_volume')
+    df = macd(df)
     
     df=rsi(df,14)
     df['low_rsi']=ta.rsi(df.low, length=14)
@@ -222,7 +207,6 @@ def get_realtime_data(symbol,TIMEFRAME,SMA_PERIOD):
     df['buy_cnt']=count_signal_buy(df,'signal')
     df['sell_cnt']=count_signal_sell(df, 'signal')
     df.reset_index(inplace=True)
-    # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_5.0.csv')
     return df
     
     
@@ -232,6 +216,7 @@ def get_strategy(df):
     data=df.iloc[-1]
     pre_row=df.iloc[-2]
     pre_2_row=df.iloc[-3]
+    pre_3_row=df.iloc[-4]
 
     if is_trade==0  \
         and pre_row.signal=='buy' and pre_row.buy_cnt==1 and pre_row.lower_30==1 and data.buy_cnt==0 and data.lower_30==0:
@@ -295,9 +280,9 @@ def get_strategy(df):
         and pre_row.rsi>68 and pre_row.rsi<70 and data.rsi<68 and pre_row.close>pre_row.ub:
         is_trade=2.6
         trade_signal='sell'
-    return trade_signal,is_trade,data,pre_row,pre_2_row
+    return trade_signal,is_trade,data,pre_row,pre_2_row,pre_3_row
 
-def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order,tick,take_action):
+def run_strategy(is_trade,signal,data,pre_row,pre_2_row,pre_3_row,VOLUME,track_point,track_order,tick,take_action):
     
     # tick=mt.symbol_info_tick(symbol) 
     
@@ -308,107 +293,120 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
     print(f'cuurently_time--{tick.time}--cuurently_buy_price_tick--{tick.ask}--cuurently_sell_price_tick--{tick.bid}--last_close--{data.close}--signal--{signal}--strategy--{is_trade}')
     
     if is_trade==1.1:
-        if pre_row.high_rsi>30 and pre_row.high_rsi>pre_row.low_rsi and pre_row.low_rsi>pre_row.rsi and data.lower_30_low!=1:
+        if pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi) and data.low_rsi<max(data.rsi,data.high_rsi):
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
-                sl=order_price-0.006*order_price
-                tp=order_price+0.005*order_price
-                is_trade=1.11  
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.111 
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:
                 action=1.1
-        elif pre_row.high_rsi>30 and pre_row.high_rsi>pre_row.low_rsi and pre_row.low_rsi>pre_row.rsi and data.lower_30_low==1\
-            and data.low_rsi>data.high_rsi:
+        elif pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi) and data.low_rsi>max(data.rsi,data.high_rsi)\
+            and pre_2_row.low_rsi>max(pre_2_row.high_rsi,pre_2_row.rsi):
             order_price=data.close
             if tick.ask<=order_price:
                 order_price=tick.ask
-                sl=order_price-0.006*order_price
-                tp=order_price+0.005*order_price  
-                is_trade=1.12   
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.112   
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:
                 action=1.1
-        elif pre_row.high_rsi>30 and pre_row.high_rsi>pre_row.low_rsi and pre_row.low_rsi<pre_row.low_rsi: 
+        elif pre_row.low_rsi>max(pre_row.high_rsi,pre_row.rsi): 
             is_trade=3.11 
             action=None
             signal='sell'
-        elif pre_row.high_rsi>30 and pre_row.high_rsi<pre_row.low_rsi and data.low_rsi> pre_row.low_rsi and data.high_rsi>pre_row.high_rsi:
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) and pre_row.high_rsi<max(pre_row.low_rsi,pre_row.rsi)\
+            and data.high_rsi<pre_row.high_rsi:
             order_price=data.close                          
             if tick.ask<=order_price:
                 order_price=tick.ask
-                sl=order_price-0.006*order_price
-                tp=order_price+0.005*order_price  
-                is_trade=1.13   
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.121  
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:
                 action=1.1
-        elif pre_row.high_rsi>30 and pre_row.high_rsi<pre_row.low_rsi: 
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) and data.low_rsi<pre_row.low_rsi and data.sd>0.004:
+            order_price=data.close                          
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.122  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                is_trade=0
+            else:
+                action=1.1
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) and (data.low_rsi-pre_row.low_rsi)/data.low_rsi>0.000001 \
+            and data.high_rsi>pre_row.high_rsi and data.sd>0.004:
+            order_price=data.close                          
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.123  
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                is_trade=0
+            else:
+                action=1.1
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi): 
             is_trade=3.12 
             action=None
             signal='sell'
-        elif pre_row.high_rsi<30 and  pre_row.high_rsi>pre_row.low_rsi and data.low_rsi>30:
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.rsi<min(pre_row.high_rsi,pre_row.low_rsi) and data.high_rsi>data.low_rsi:
             order_price=data.close 
             if tick.ask<=order_price:
                 order_price=tick.ask
-                sl=order_price-0.006*order_price
-                tp=order_price+0.005*order_price  
-                is_trade=1.14   
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.1311  
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:
                 action=1.1
-        elif pre_row.high_rsi<30 and  pre_row.high_rsi>pre_row.low_rsi: 
-            is_trade=3.13 
-            action=None
-            signal='sell'
-        elif pre_row.high_rsi<30 and pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi>30 and (pre_row.high_point>0 or pre_row.low_point>0): 
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.rsi<min(pre_row.high_rsi,pre_row.low_rsi) and data.high_rsi<data.low_rsi\
+            and data.low_rsi>pre_row.low_rsi:
             order_price=data.close 
             if tick.ask<=order_price:
                 order_price=tick.ask
-                sl=order_price-0.006*order_price
-                tp=order_price+0.005*order_price  
-                is_trade=1.15   
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.1312
+                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
+                is_trade=0
+            else:
+                action=1.1
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_row.rsi<min(pre_row.high_rsi,pre_row.low_rsi): 
+            is_trade=3.13 
+            action=None
+            signal='sell'
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_2_row.rsi>min(pre_2_row.high_rsi,pre_2_row.low_rsi) \
+            and data.high_rsi>pre_row.high_rsi and pre_2_row.high_rsi<pre_2_row.low_rsi: 
+            order_price=data.close 
+            if tick.ask<=order_price:
+                order_price=tick.ask
+                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                is_trade=1.132  
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
             else:
                 action=1.1         
-        elif pre_row.high_rsi<30 and  pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi>30: 
-            is_trade=3.141 
+        elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
+            and pre_2_row.rsi>min(pre_2_row.high_rsi,pre_2_row.low_rsi): 
+            is_trade=3.14
             action=None
             signal='sell'
-        elif pre_row.high_rsi<30 and pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi<30 \
-            and data.lower_30_low>=data.lower_30_high and data.low_rsi>pre_row.low_rsi:
-            order_price=data.close 
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-0.008*order_price
-                tp=order_price+0.007*order_price  
-                is_trade=1.16   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.1
-        elif pre_row.high_rsi<30 and pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi<30 \
-            and data.lower_30_low>=data.lower_30_high and data.low_rsi<pre_row.low_rsi and pre_row.low_rsi<pre_2_row.low_rsi\
-            and data.high_rsi<pre_row.high_rsi:
-            order_price=data.close 
-            if tick.ask<=order_price:
-                order_price=tick.ask
-                sl=order_price-0.008*order_price
-                tp=order_price+0.007*order_price  
-                is_trade=1.17   
-                result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                is_trade=0
-            else:
-                action=1.1
-        elif pre_row.high_rsi<30 and pre_row.high_rsi<pre_row.low_rsi and pre_row.low_rsi<30: 
-            is_trade=3.142 
+        elif pre_row.Signal_Strategy=='Sell' or pre_2_row.Signal_Strategy=='Sell' or pre_3_row.Signal_Strategy=='Sell': 
+            is_trade=3.15
             action=None
-            signal='sell'   
+            signal='sell' 
     elif is_trade==1.2:
         if data.lower_30==0 and pre_row.low_rsi<30:
             order_price=data.close

@@ -297,7 +297,7 @@ def get_strategy(df):
         trade_signal='sell'
     return trade_signal,is_trade,data,pre_row,pre_2_row
 
-def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track_order,tick,take_action):
+def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action):
     
     # tick=mt.symbol_info_tick(symbol) 
     
@@ -1232,7 +1232,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp,sl=set_profit_loss(data,order_price,trade_signal)
                 is_trade=2.67 
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                track_order=track_order+1
                 is_trade=0
             else: 
                 action=2.6
@@ -1242,7 +1241,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp,sl=set_profit_loss(data,order_price,trade_signal)
                 is_trade=2.68
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                track_order=track_order+1
                 is_trade=0
             else: 
                 action=2.6
@@ -1256,7 +1254,6 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 tp,sl=set_profit_loss(data,order_price,trade_signal)
                 is_trade=2.69
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
-                track_order=track_order+1
                 is_trade=0
             else: 
                 action=2.6
@@ -1662,7 +1659,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,track_point,track
                 is_trade=0
             else: 
                 action=4.66 
-    return result,signal,is_trade,track_point,data.time,action
+    return result,signal,is_trade,data.time,action
 
 
 log_path=os.getcwd()
@@ -1674,7 +1671,7 @@ if mt.initialize():
     # mt.login(login,password,server)
     
     TIMEFRAME=mt.TIMEFRAME_H4
-    VOLUME=0.03
+    VOLUME=0.1
     DEVIATION=5
     MAGIC=10
     SMA_PERIOD=365
@@ -1684,7 +1681,7 @@ if mt.initialize():
     symbol='GBPNZD.a'
     trade_signal=None
     trade_strategy=0
-    track_point=0
+
     
 
 
@@ -1721,7 +1718,7 @@ while True:
         
         make_order = pd.read_csv(file_path)
         
-        if positions <= 1 and trade_strategy == 0:
+        if positions <= 3 and trade_strategy == 0:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             
             trade_signal, trade_strategy, record, pre_record, pre_2_record = get_strategy(symbol_df)
@@ -1730,7 +1727,6 @@ while True:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
                 make_order['trade_signal'] = trade_signal
-                make_order['track_point'] = track_point
                 make_order.to_csv(file_path, index=False)
                 print(f"It's a good chance to {trade_signal} this symbol -- {symbol}, the strategy is {trade_strategy}")
             else:
@@ -1738,11 +1734,10 @@ while True:
                 strategy_time = make_order['strategy_time'].iloc[-1]
                 if pre_trade_strategy > 0:
                     trade_strategy = pre_trade_strategy
-                    track_point = make_order['track_point'].iloc[-1]
                     trade_signal = make_order['trade_signal'].iloc[-1]
                     print(f'The program terminated unnaturally, now continuing... '
                       f'Trade strategy time: {strategy_time}, trade strategy: {trade_strategy}, '
-                      f'trade signal: {trade_signal}, track point: {track_point}')
+                      f'trade signal: {trade_signal}')
         else:
             symbol_df = get_realtime_data(symbol, TIMEFRAME, SMA_PERIOD)
             record, pre_record, pre_2_record = get_strategy(symbol_df)[2:]
@@ -1752,21 +1747,19 @@ while True:
         
         if trade_strategy > 0 and last_order_date != tick_date:
             print(f'Starting run -- {trade_strategy}')
-            # track_order = mt.positions_total()
+
             pre_trade_strategy = make_order['strategy'].iloc[-1]
-            pre_track_point = make_order['track_point'].iloc[-1]
+
             
-            result, trade_signal, trade_strategy, track_point, order_time, action = run_strategy(
+            result, trade_signal, trade_strategy, order_time, action = run_strategy(
                 trade_strategy, trade_signal, record, pre_record, pre_2_record, 
-                VOLUME, track_point, positions, tick, action)
+                VOLUME, tick, action)
             
             if trade_strategy != pre_trade_strategy and trade_strategy > 0:
                 make_order['strategy_time'] = record.time.strftime('%Y-%m-%d %H')
                 make_order['strategy'] = trade_strategy
                 make_order['trade_signal'] = trade_signal
                 
-            if trade_strategy > 0:
-                make_order['track_point'] = track_point
                 
             if action is not None:
                 
@@ -1780,29 +1773,25 @@ while True:
                     make_order['strategy'] = trade_strategy
                     action = None
                     action_time = None
-                    track_point = 0
-                    make_order['track_point'] = track_point
                     make_order['trade_signal'] = None
             
             if result is not None:
                 action = None
                 action_time = None
                 make_order['strategy'] = 0
-                make_order['track_point'] = 0
                 make_order['trade_signal'] = None
                 print(result)
                 last_order_date = order_time.strftime('%Y-%m-%d %H')
                 print(f'Order time: {last_order_date}, signal: {trade_signal}, '
-                      f'after trade strategy: {trade_strategy}, track point: {track_point}')
+                      f'after trade strategy: {trade_strategy}')
             elif action is None:
-                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
+                print(f'Still waiting for a chance, signal: {trade_signal}, trade strategy: {trade_strategy}')
             else:
-                print(f'Still waiting for the price to make order, action_time:{action_time},signal: {trade_signal}, trade strategy: {trade_strategy}, track point: {track_point}')
+                print(f'Still waiting for the price to make order, action_time:{action_time},signal: {trade_signal}, trade strategy: {trade_strategy}')
             
             make_order.to_csv(file_path, index=False)
         elif last_order_date == tick_date:
             make_order['strategy'] = 0
-            make_order['track_point'] = 0
             make_order['trade_signal'] = None
             make_order.to_csv(file_path, index=False)
             print(f'The order was already made at order time: {last_order_date}. No duplicate orders at the same time allowed.')
