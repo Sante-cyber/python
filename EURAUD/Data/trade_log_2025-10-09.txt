@@ -10,3 +10,6 @@ No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper ba
 No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
 No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
 No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
+No trade chance for this symbol -- EURAUD.a. Last close price: 1.76274, upper band: 1.7761220447642398, lower band: 1.7627419552357604, hour: 4, RSI: 30.476221755302312, RSI signal: None
