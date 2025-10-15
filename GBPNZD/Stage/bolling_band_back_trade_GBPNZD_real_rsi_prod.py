@@ -1718,6 +1718,8 @@ action_time=None
 log_file_path=f'{log_folder_path}/trade_log_{sydney_date}.txt'
 
 while True:
+    sydney_time = datetime.now(sydney_tz)
+    sydney_date=sydney_time.date()
     try:
         print(f'Strategy symbol: {symbol}')
         

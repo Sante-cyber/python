@@ -21,7 +21,7 @@ mt.login(login_real,password_real,server_real)
 # disk='C:/c/'
 disk='E:/'
 
-version='3.12_2_real'
+version='3.15_2_real'
 currency='EURAUD'
 
 def get_previous_rows(df, condition_col, condition_val, n):
@@ -384,18 +384,6 @@ class Strategy:
                                 if next_row.low<=order_price:
                                     tp,sl=set_profit_loss(data,order_price,trade_signal)
                                     is_trade=1.123      
-                                    self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
-                                    track_order=track_order+1
-                                    is_trade=0
-                                else: is_trade=0
-                            elif pre_row.Signal_Strategy!='Sell' and pre_2_row.Signal_Strategy!='Sell' and pre_3_row.Signal_Strategy!='Sell'\
-                                and pre_row.low_rsi<min(pre_row.high_rsi,pre_row.rsi) \
-                                and data.high_rsi>pre_row.high_rsi and data.sd<0.004\
-                                and pre_2_row.rsi>max(pre_2_row.low_rsi,pre_2_row.high_rsi):
-                                order_price=data.close
-                                if next_row.low<=order_price:
-                                    tp,sl=set_profit_loss(data,order_price,trade_signal)
-                                    is_trade=1.124      
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1
                                     is_trade=0
@@ -1316,7 +1304,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=3.12, n=3)
+        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=3.15, n=3)
         df.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
         df_extract.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_extract_{version}.csv',index=False)
         # df.to_csv(f'E:/EA/bollinger-bands/H4_year/b_{year}_opi_result_8.5.csv',index=False)
