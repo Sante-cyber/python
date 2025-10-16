@@ -774,7 +774,8 @@ class Strategy:
                                 and data.low_rsi<70 and pre_row.low_rsi<min(pre_row.rsi,pre_row.high_rsi):
                                 order_price=data.close 
                                 if next_row.high>=order_price:
-                                    tp,sl=set_profit_loss(data,order_price,trade_signal)
+                                    tp=order_price-0.005*order_price  
+                                    sl=order_price+0.006*order_price
                                     is_trade=2.311
                                     self.add_position(position(next_row.time,order_price,trade_signal,self.volume,sl,tp,currency,is_trade,data.sd))
                                     track_order=track_order+1

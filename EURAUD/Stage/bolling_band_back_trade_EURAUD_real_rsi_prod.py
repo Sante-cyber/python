@@ -801,7 +801,8 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,pre_3_row,VOLUME,tick,ta
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
-                tp,sl=set_profit_loss(data,order_price,trade_signal)
+                tp=order_price-0.005*order_price  
+                sl=order_price+0.007*order_price
                 is_trade=2.311
                 result=market_order(symbol,VOLUME,signal,DEVIATION,is_trade,sl,tp)
                 is_trade=0
