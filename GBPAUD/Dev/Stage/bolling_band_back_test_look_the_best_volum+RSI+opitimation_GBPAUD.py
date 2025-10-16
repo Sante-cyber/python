@@ -25,7 +25,7 @@ mt.login(login_real,password_real,server_real)
 # disk='C:/c/'
 disk='E:/'
 
-version='1.36_1_real'
+version='2.32_2_real'
 currency='GBPAUD'
 
 
@@ -984,7 +984,8 @@ class Strategy:
                                         is_trade=0
                                     else:is_trade=0
                             elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi<data.high_rsi \
-                                     and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi):
+                                     and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi)\
+                                     and pre_2_row.low_rsi>60:
                                     order_price=data.close
                                     if next_row.high>=order_price:
                                         sl=order_price+0.006*order_price  
@@ -1924,7 +1925,7 @@ for year in years:
             j=j+1
             print(f'{currency} have finished-{j}')
         df=df.merge(df1,how='left',left_on=['time'],right_on=['open_datetime'])
-        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=1.36, n=3)
+        df_extract=get_previous_rows(df, condition_col="is_trade", condition_val=2.32, n=3)
         df.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_{version}.csv',index=False)
         df_extract.to_csv(f'{disk}/EA/bollinger-bands/H4_year/{currency}/b_{year}_opi_result_extract_{version}.csv',index=False)
 current_time = datetime.now()

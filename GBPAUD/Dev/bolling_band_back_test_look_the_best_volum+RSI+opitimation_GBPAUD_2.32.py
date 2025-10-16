@@ -25,7 +25,7 @@ mt.login(login_real,password_real,server_real)
 # disk='C:/c/'
 disk='E:/'
 
-version='1.36_1_real'
+version='2.32_2_real'
 currency='GBPAUD'
 
 
@@ -984,7 +984,8 @@ class Strategy:
                                         is_trade=0
                                     else:is_trade=0
                             elif  pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi<data.high_rsi \
-                                     and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi):
+                                     and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi)\
+                                     and pre_2_row.low_rsi>60:
                                     order_price=data.close
                                     if next_row.high>=order_price:
                                         sl=order_price+0.006*order_price  

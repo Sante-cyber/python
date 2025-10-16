@@ -1042,8 +1042,7 @@ def run_strategy(is_trade,signal,data,pre_row,pre_2_row,VOLUME,tick,take_action)
             else: 
                 action=2.3
         elif pre_row.sell_cnt==2 and data.sell_cnt==0 and data.over_70==0 and data.low_rsi<data.high_rsi \
-            and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi)\
-            and pre_2_row.low_rsi>60:
+            and pre_row.high_rsi>pre_2_row.high_rsi and pre_2_row.high_rsi>max(pre_2_row.rsi,pre_2_row.low_rsi):
             order_price=data.close
             if tick.bid>=order_price:
                 order_price=tick.bid
